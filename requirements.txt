@@ -1,5 +1,10 @@
-librosa
-scikit-learn
 numpy
-opencv-python
+scipy
+pandas
+scikit-learn
+librosa
+soundfile
 matplotlib
+opencv-python
+joblib
+tensorflow  # or tensorflow-cpu if you don't need GPU support
