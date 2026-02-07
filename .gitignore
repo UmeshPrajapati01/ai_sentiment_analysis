@@ -11,3 +11,14 @@ __pycache__/
 # Ignore OS-specific files
 Thumbs.db
 .DS_Store
+
+# Ignore your local settings file
+settings_local.json
+.mp3
+.wav
+.env
+.mp4
+.jpg
+.png
+.gif
+datasets/
