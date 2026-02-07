@@ -48,3 +48,4 @@ settings_local.json
 *.mp3
 *.pkl
 *.md
+*.pth

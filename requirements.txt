@@ -1,10 +1,13 @@
+torch
+torchvision
 numpy
-scipy
 pandas
 scikit-learn
+matplotlib
+seaborn
+Pillow
+opencv-python
 librosa
 soundfile
-matplotlib
-opencv-python
-joblib
-tensorflow  # or tensorflow-cpu if you don't need GPU support
+scipy
+tqdm
