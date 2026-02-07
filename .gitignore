@@ -1,5 +1,13 @@
 # Ignore Python virtual environment
 .venv/
+# === IDE / Editor files ===
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+*~
 
 # Ignore compiled Python files
 *.pyc
@@ -14,12 +22,29 @@ Thumbs.db
 
 # Ignore your local settings file
 settings_local.json
-.mp3
-.wav
+*.mp3
+*.wav
 .env
-.mp4
-.jpg
-.png
-.gif
-uncleaned_datasets/
-output_weekwise/
+*.mp4
+*.jpg
+*.png
+*.gif
+*.h5
+*.pkl
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.bmp
+*.gif
+*.bmp
+*.tiff
+*.webp
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.wav
+*.mp3
+*.pkl
+*.md
