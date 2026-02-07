@@ -49,3 +49,4 @@ settings_local.json
 *.pkl
 *.md
 *.pth
+history.json
