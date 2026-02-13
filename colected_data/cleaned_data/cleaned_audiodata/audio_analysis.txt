@@ -1,0 +1,17 @@
+Total classes: 10
+Classes: Angry, Defense, Fighting, Happy, HuntingMind, Mating, MotherCall, Paining, Resting, Warning
+
+Class details:
+- Angry: 10 audio files, extensions: .mp3
+- Defense: 10 audio files, extensions: .mp3
+- Fighting: 10 audio files, extensions: .mp3
+- Happy: 10 audio files, extensions: .mp3
+- HuntingMind: 10 audio files, extensions: .mp3
+- Mating: 10 audio files, extensions: .mp3
+- MotherCall: 10 audio files, extensions: .mp3
+- Paining: 10 audio files, extensions: .mp3
+- Resting: 10 audio files, extensions: .mp3
+- Warning: 10 audio files, extensions: .mp3
+
+Total audio files across all classes: 100
+Audio file extensions (all): .mp3
