@@ -1,0 +1,12 @@
+Total classes: 5
+Classes: Angry, Master Folder, Other, Sad, happy
+
+Class details:
+- Angry: 250 image files, extensions: .jpg
+- Master Folder: 0 image files, extensions: None
+- Other: 250 image files, extensions: .jpg
+- Sad: 250 image files, extensions: .jpg
+- happy: 250 image files, extensions: .jpg
+
+Total image files across all classes: 1000
+Image file extensions (all): .jpg
