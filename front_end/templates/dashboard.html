@@ -1,57 +1,168 @@
 {% extends "base.html" %}
 
+{% block title %}Dashboard - Cat Emotion Detector{% endblock %}
+
 {% block content %}
-<div class="row">
-    <div class="col-md-12 text-center mb-4">
-        <h1>Welcome, {{ current_user.email }}!</h1>
-        <p class="lead">Upload an mage or Audio file to detect your cat's emotion.</p>
+<div class="container py-5">
+    <!-- Welcome Header -->
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <h1 class="display-4 fw-bold mb-3"
+                style="font-family: 'Poppins', sans-serif; background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 2px 20px rgba(255,255,255,0.3);">
+                Welcome, {{ current_user.email.split('@')[0] }}! 👋
+            </h1>
+            <p class="lead text-white-50" style="font-size: 1.2rem;">
+                Upload an image or audio file to detect your cat's emotion
+            </p>
+        </div>
     </div>
-</div>
 
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card shadow">
-            <div class="card-header bg-primary text-white">
-                <h4 class="mb-0">Emotion Detection</h4>
-            </div>
-            <div class="card-body">
-                <form method="POST" enctype="multipart/form-data">
-                    <div class="mb-4">
-                        <label class="form-label"><strong>Select Input Type:</strong></label>
-                        <div class="btn-group w-100" role="group">
-                            <input type="radio" class="btn-check" name="file_type" id="type_image" value="image"
-                                checked>
-                            <label class="btn btn-outline-primary" for="type_image">Image (JPG/PNG)</label>
+    <!-- Main Upload Card -->
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg" style="animation-delay: 0.1s;">
+                <!-- Card Header with Icon -->
+                <div class="card-header text-center" style="padding: 2rem;">
+                    <div
+                        style="width: 80px; height: 80px; margin: 0 auto 1rem; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                        <i class="bi bi-cloud-upload-fill" style="font-size: 2.5rem;"></i>
+                    </div>
+                    <h2 class="mb-0" style="font-family: 'Poppins', sans-serif; font-weight: 700;">Emotion Detection
+                    </h2>
+                    <p class="mb-0 mt-2" style="opacity: 0.9;">AI-powered analysis for cat emotions</p>
+                </div>
 
-                            <input type="radio" class="btn-check" name="file_type" id="type_audio" value="audio">
-                            <label class="btn btn-outline-primary" for="type_audio">Audio (MP3/WAV)</label>
+                <!-- Card Body -->
+                <div class="card-body" style="padding: 2.5rem;">
+                    <form method="POST" enctype="multipart/form-data" id="upload-form">
+                        <!-- File Type Selection -->
+                        <div class="mb-4">
+                            <label class="form-label mb-3">
+                                <i class="bi bi-filter-circle me-2"></i>
+                                <strong>Select Input Type</strong>
+                            </label>
+                            <div class="btn-group w-100" role="group"
+                                style="height: 60px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-radius: 16px; overflow: hidden;">
+                                <input type="radio" class="btn-check" name="file_type" id="type_image" value="image"
+                                    checked>
+                                <label class="btn btn-outline-primary" for="type_image"
+                                    style="border-radius: 0; border: none; font-weight: 600; font-size: 1.05rem;">
+                                    <i class="bi bi-image me-2"></i>Image
+                                    <small class="d-block mt-1" style="font-weight: 400; opacity: 0.8;">JPG, PNG,
+                                        GIF</small>
+                                </label>
+
+                                <input type="radio" class="btn-check" name="file_type" id="type_audio" value="audio">
+                                <label class="btn btn-outline-primary" for="type_audio"
+                                    style="border-radius: 0; border: none; font-weight: 600; font-size: 1.05rem;">
+                                    <i class="bi bi-music-note-beamed me-2"></i>Audio
+                                    <small class="d-block mt-1" style="font-weight: 400; opacity: 0.8;">MP3, WAV</small>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- File Upload -->
+                        <div class="mb-4">
+                            <label for="file" class="form-label">
+                                <i class="bi bi-paperclip me-2"></i>
+                                <strong>Upload File</strong>
+                            </label>
+                            <div class="file-upload-wrapper">
+                                <input type="file" class="form-control form-control-lg" id="file" name="file" required
+                                    accept="image/*,audio/*">
+                                <div class="file-upload-text text-center py-4"
+                                    style="display: none; border: 2px dashed var(--primary-color); border-radius: 16px; background: rgba(102, 126, 234, 0.05); cursor: pointer;">
+                                    <i class="bi bi-cloud-arrow-up"
+                                        style="font-size: 3rem; color: var(--primary-color);"></i>
+                                    <p class="mb-0 mt-3" style="color: var(--text-dark); font-weight: 500;">
+                                        Drag & drop or click to browse
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="btn btn-success btn-lg w-100"
+                            style="height: 60px; font-size: 1.125rem; font-weight: 600;">
+                            <i class="bi bi-stars me-2"></i>Analyze Emotion
+                        </button>
+                    </form>
+
+                    <!-- Prediction Result -->
+                    {% if prediction %}
+                    <div class="mt-5 p-5 text-center"
+                        style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(240, 244, 248, 0.9) 100%); border-radius: 24px; border: 2px solid rgba(102, 126, 234, 0.2); box-shadow: 0 8px 32px rgba(0,0,0,0.1);">
+                        <div class="mb-4">
+                            <span class="badge bg-success px-4 py-2" style="font-size: 0.875rem; border-radius: 50px;">
+                                <i class="bi bi-check-circle me-1"></i>
+                                Analysis Complete
+                            </span>
+                        </div>
+
+                        <h3 class="mb-3" style="color: var(--text-dark); font-weight: 600;">Detected Emotion</h3>
+                        <h1 class="display-3 mb-4"
+                            style="font-family: 'Poppins', sans-serif; font-weight: 800; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                            {{ prediction }}
+                        </h1>
+
+                        <!-- Result Cat GIF -->
+                        <div class="mt-4">
+                            <img src="{{ url_for('serve_assets', filename='cute-animated-cat-tutorial.gif') }}"
+                                alt="Success Cat"
+                                style="width: 200px; height: 200px; object-fit: cover; border-radius: 50%; border: 5px solid white; box-shadow: 0 8px 24px rgba(0,0,0,0.15);">
+                        </div>
+
+                        <div class="mt-4">
+                            <p class="text-muted mb-0">
+                                <i class="bi bi-info-circle me-1"></i>
+                                This prediction was added to your history
+                            </p>
                         </div>
                     </div>
-
-                    <div class="mb-4">
-                        <label for="file" class="form-label"><strong>Upload File:</strong></label>
-                        <input type="file" class="form-control" id="file" name="file" required>
-                    </div>
-
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-lg btn-success">Analyze Emotion</button>
-                    </div>
-                </form>
-
-                {% if prediction %}
-                <div class="mt-5 text-center p-4 bg-light rounded border">
-                    <h3>Prediction Result:</h3>
-                    <h1 class="display-4 text-primary">{{ prediction }}</h1>
-
-                    <div class="mt-3">
-                        <!-- Fun GIF based on emotion could go here if we tracked emotion types -->
-                        <img src="{{ url_for('get_asset', filename='cute-animated-cat-tutorial.gif') }}"
-                            alt="Result Cat" style="width: 200px;">
-                    </div>
+                    {% endif %}
                 </div>
-                {% endif %}
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="row mt-4 g-3">
+                <div class="col-md-6">
+                    <a href="{{ url_for('history') }}" class="text-decoration-none">
+                        <div class="card border-0 shadow-sm"
+                            style="background: rgba(255, 255, 255, 0.95); transition: all 0.3s ease;">
+                            <div class="card-body text-center py-4">
+                                <i class="bi bi-clock-history"
+                                    style="font-size: 2rem; color: var(--primary-color);"></i>
+                                <h5 class="mt-3 mb-0">View History</h5>
+                                <small class="text-muted">See all predictions</small>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-6">
+                    <a href="{{ url_for('dashboard') }}" class="text-decoration-none">
+                        <div class="card border-0 shadow-sm"
+                            style="background: rgba(255, 255, 255, 0.95); transition: all 0.3s ease;">
+                            <div class="card-body text-center py-4">
+                                <i class="bi bi-arrow-repeat" style="font-size: 2rem; color: var(--success-color);"></i>
+                                <h5 class="mt-3 mb-0">New Analysis</h5>
+                                <small class="text-muted">Upload another file</small>
+                            </div>
+                        </div>
+                    </a>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Add Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+<!-- Custom Hover Effects -->
+<style>
+    .row .col-md-6 a .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+</style>
 {% endblock %}

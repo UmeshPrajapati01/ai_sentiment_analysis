@@ -169,11 +169,11 @@ def dashboard():
 @login_required
 def history():
     user_history = Prediction.query.filter_by(user_id=current_user.id).order_by(Prediction.timestamp.desc()).all()
-    return render_template('history.html', history=user_history)
+    return render_template('history.html', predictions=user_history)
 
 # Helper route to serve assets from front_end folder
 @app.route('/assets/<filename>')
-def get_asset(filename):
+def serve_assets(filename):
     return send_from_directory('front_end/front_end_png', filename)
 
 if __name__ == '__main__':

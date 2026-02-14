@@ -1,41 +1,185 @@
 {% extends "base.html" %}
 
-{% block content %}
-<h2 class="mb-4">Prediction History</h2>
+{% block title %}History - Cat Emotion Detector{% endblock %}
 
-<div class="card shadow-sm">
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-striped table-hover">
-                <thead>
-                    <tr>
-                        <th>Date & Time</th>
-                        <th>Type</th>
-                        <th>File Name</th>
-                        <th>Prediction</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in history %}
-                    <tr>
-                        <td>{{ item.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-                        <td>
-                            {% if item.file_type == 'image' %}
-                            <span class="badge bg-info">Image</span>
-                            {% else %}
-                            <span class="badge bg-warning text-dark">Audio</span>
-                            {% endif %}
-                        </td>
-                        <td>{{ item.filename }}</td>
-                        <td><strong>{{ item.prediction_result }}</strong></td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+{% block content %}
+<div class="container py-5">
+    <!-- Page Header -->
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <h1 class="display-4 fw-bold mb-3"
+                style="font-family: 'Poppins', sans-serif; background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 2px 20px rgba(255,255,255,0.3);">
+                Prediction History 📊
+            </h1>
+            <p class="lead text-white-50" style="font-size: 1.2rem;">
+                View all your past cat emotion analyses
+            </p>
         </div>
-        {% if not history %}
-        <p class="text-center text-muted mt-3">No history found.</p>
-        {% endif %}
+    </div>
+
+    <!-- History Card -->
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card border-0 shadow-lg" style="animation-delay: 0.1s;">
+                <!-- Card Header -->
+                <div class="card-header text-center" style="padding: 2rem;">
+                    <h2 class="mb-0" style="font-family: 'Poppins', sans-serif; font-weight: 700;">Your Analysis Records
+                    </h2>
+                    <p class="mb-0 mt-2" style="opacity: 0.9;">Total Predictions: {{ predictions|length }}</p>
+                </div>
+
+                <!-- Card Body -->
+                <div class="card-body" style="padding: 0;">
+                    {% if predictions %}
+                    <!-- Modern Table -->
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th style="padding: 1.5rem; width: 10%;">
+                                        <i class="bi bi-hash me-1"></i>#
+                                    </th>
+                                    <th style="padding: 1.5rem; width: 15%;">
+                                        <i class="bi bi-filter-circle me-1"></i>Type
+                                    </th>
+                                    <th style="padding: 1.5rem; width: 30%;">
+                                        <i class="bi bi-file-earmark me-1"></i>Filename
+                                    </th>
+                                    <th style="padding: 1.5rem; width: 20%;">
+                                        <i class="bi bi-emoji-smile me-1"></i>Result
+                                    </th>
+                                    <th style="padding: 1.5rem; width: 25%;">
+                                        <i class="bi bi-clock me-1"></i>Date & Time
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for prediction in predictions %}
+                                <tr>
+                                    <td style="padding: 1.5rem; font-weight: 600;">
+                                        {{ loop.index }}
+                                    </td>
+                                    <td style="padding: 1.5rem;">
+                                        {% if prediction.file_type == 'image' %}
+                                        <span class="badge"
+                                            style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 0.5rem 1rem; border-radius: 50px;">
+                                            <i class="bi bi-image me-1"></i>Image
+                                        </span>
+                                        {% else %}
+                                        <span class="badge"
+                                            style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); padding: 0.5rem 1rem; border-radius: 50px;">
+                                            <i class="bi bi-music-note-beamed me-1"></i>Audio
+                                        </span>
+                                        {% endif %}
+                                    </td>
+                                    <td style="padding: 1.5rem;">
+                                        <div style="display: flex; align-items: center;">
+                                            <i class="bi bi-file-earmark-fill me-2"
+                                                style="color: var(--primary-color);"></i>
+                                            <span style="font-weight: 500;">{{ prediction.filename }}</span>
+                                        </div>
+                                    </td>
+                                    <td style="padding: 1.5rem;">
+                                        <span class="fw-bold" style="color: var(--primary-color); font-size: 1.05rem;">
+                                            {{ prediction.result }}
+                                        </span>
+                                    </td>
+                                    <td style="padding: 1.5rem; color: var(--text-light);">
+                                        <i class="bi bi-calendar-event me-1"></i>
+                                        {{ prediction.timestamp.strftime('%Y-%m-%d %H:%M') }}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <!-- Empty State -->
+                    <div class="text-center py-5" style="padding: 4rem 2rem;">
+                        <div
+                            style="width: 120px; height: 120px; margin: 0 auto 2rem; background: rgba(102, 126, 234, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                            <i class="bi bi-inbox" style="font-size: 4rem; color: var(--primary-color);"></i>
+                        </div>
+                        <h3 style="color: var(--text-dark); font-weight: 600;">No Predictions Yet</h3>
+                        <p class="text-muted mb-4">Upload your first file to get started with emotion detection!</p>
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg">
+                            <i class="bi bi-cloud-upload me-2"></i>Upload Now
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Card Footer with Stats -->
+                {% if predictions %}
+                <div class="card-footer"
+                    style="background: rgba(102, 126, 234, 0.05); border-top: 1px solid rgba(0,0,0,0.05); padding: 1.5rem;">
+                    <div class="row text-center">
+                        <div class="col-md-4">
+                            <div class="stat-item">
+                                <i class="bi bi-image" style="font-size: 1.5rem; color: var(--primary-color);"></i>
+                                <h4 class="mt-2 mb-0">{{ predictions|selectattr('file_type', 'equalto',
+                                    'image')|list|length }}</h4>
+                                <small class="text-muted">Image Analyses</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stat-item">
+                                <i class="bi bi-music-note-beamed"
+                                    style="font-size: 1.5rem; color: var(--success-color);"></i>
+                                <h4 class="mt-2 mb-0">{{ predictions|selectattr('file_type', 'equalto',
+                                    'audio')|list|length }}</h4>
+                                <small class="text-muted">Audio Analyses</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stat-item">
+                                <i class="bi bi-graph-up" style="font-size: 1.5rem; color: var(--accent-color);"></i>
+                                <h4 class="mt-2 mb-0">{{ predictions|length }}</h4>
+                                <small class="text-muted">Total Predictions</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Back Button -->
+            <div class="text-center mt-4">
+                <a href="{{ url_for('dashboard') }}" class="btn btn-outline-light btn-lg">
+                    <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+                </a>
+            </div>
+        </div>
     </div>
 </div>
+
+<!-- Add Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+<!-- Custom Styles -->
+<style>
+    .btn-outline-light {
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        color: white;
+        font-weight: 600;
+        backdrop-filter: blur(10px);
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-outline-light:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.5);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .stat-item {
+        padding: 1rem;
+        transition: transform 0.3s ease;
+    }
+
+    .stat-item:hover {
+        transform: scale(1.05);
+    }
+</style>
 {% endblock %}
