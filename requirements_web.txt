@@ -1,0 +1,15 @@
+Flask
+Flask-SQLAlchemy
+Flask-Login
+Flask-Bcrypt
+Pillow
+librosa
+torch
+torchvision
+numpy
+pandas
+scikit-learn
+joblib
+werkzeug
+email_validator
+python-dotenv

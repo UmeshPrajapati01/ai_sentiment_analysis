@@ -6,3 +6,4 @@ scikit-learn
 librosa
 joblib
 llvmlite
+Flask-Login
