@@ -1,0 +1,46 @@
+Image Data Analysis Details
+===========================
+
+Main Folder: imagetraindata
+------------------------------
+  Class: Angry
+    Count: 200
+    Sample Files: 04.jpg, 06.jpg, 08.jpg, 09.jpg, 10.jpg ... and more
+
+  Class: happy
+    Count: 200
+    Sample Files: 002.jpg, 003.jpg, 004.jpg, 006.jpg, 007.jpg ... and more
+
+  Class: Other
+    Count: 199
+    Sample Files: 03.jpg, 04.jpg, 05.jpg, 07.jpg, 08.jpg ... and more
+
+  Class: Sad
+    Count: 200
+    Sample Files: 001.jpg, 004.jpg, 006.jpg, 007.jpg, 008.jpg ... and more
+
+Total files in imagetraindata: 799
+==============================
+
+Main Folder: imagetestdata
+------------------------------
+  Class: Angry
+    Count: 50
+    Sample Files: 02.jpg, 03.jpg, 05.jpg, 18.jpg, 19.jpg ... and more
+
+  Class: happy
+    Count: 50
+    Sample Files: 001.jpg, 025.jpg, 026.jpg, 031.jpg, 037.jpg ... and more
+
+  Class: Other
+    Count: 50
+    Sample Files: 12.jpg, 16.jpg, 27.jpg, 29.jpg, 32.jpg ... and more
+
+  Class: Sad
+    Count: 50
+    Sample Files: 002.jpg, 003.jpg, 005.jpg, 010.jpg, 016.jpg ... and more
+
+Total files in imagetestdata: 200
+==============================
+
+Grand Total Analysis: 999 files processed.

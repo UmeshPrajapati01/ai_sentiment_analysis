@@ -1,0 +1,74 @@
+Audio Data Split Details
+========================
+
+Folder: train_data
+--------------------
+  Class: Angry (8 files)
+    Files: car_extcoll0162.mp3, car_extcoll0169.mp3, car_extcoll0171.mp3, car_extcoll0172.mp3, car_extcoll0174.mp3, car_extcoll0177.mp3, car_extcoll0191.mp3, car_extcoll0212.mp3
+
+  Class: Defense (8 files)
+    Files: car_extcoll0168.mp3, car_extcoll0180.mp3, car_extcoll0235.mp3, car_extcoll0236.mp3, car_extcoll0255.mp3, car_extcoll0259.mp3, car_extcoll0263.mp3, car_extcoll0265.mp3
+
+  Class: Fighting (8 files)
+    Files: car_extcoll0160.mp3, car_extcoll0207.mp3, car_extcoll0218.mp3, car_extcoll0222.mp3, car_extcoll0224.mp3, car_extcoll0232.mp3, car_extcoll0234.mp3, car_extcoll0239.mp3
+
+  Class: Happy (8 files)
+    Files: cat_20.mp3, cat_24.mp3, cat_52.mp3, cat_54.mp3, cat_67.mp3, cat_68.mp3, cat_76.mp3, cat_85.mp3
+
+  Class: HuntingMind (8 files)
+    Files: car_extcoll0326.mp3, car_extcoll0327.mp3, car_extcoll0328.mp3, car_extcoll0331.mp3, car_extcoll0332.mp3, Cat_trilling0111.mp3, Cat_trilling0112.mp3, Cat_trilling0113.mp3
+
+  Class: Mating (8 files)
+    Files: cat_youtube64304.mp3, cat_youtube64307.mp3, cat_youtube64309.mp3, cat_youtube64310.mp3, cat_youtube64312.mp3, cat_youtube64313.mp3, cat_youtube64314.mp3, cat_youtube64315.mp3
+
+  Class: MotherCall (8 files)
+    Files: cat_coll0136.mp3, cat_coll0140.mp3, cat_coll0142.mp3, cat_coll01813.mp3, cat_coll0183.mp3, cat_coll0184.mp3, cat_coll0185.mp3, cat_coll0186.mp3
+
+  Class: Paining (8 files)
+    Files: car_extcoll0146.mp3, car_extcoll0147.mp3, car_extcoll0148.mp3, car_extcoll0163.mp3, car_extcoll0188.mp3, car_extcoll0223.mp3, car_extcoll0229.mp3, car_extcoll0247.mp3
+
+  Class: Resting (8 files)
+    Files: cat_coll0106.mp3, cat_coll0107.mp3, cat_coll0108.mp3, cat_coll0109.mp3, cat_coll0110.mp3, cat_coll0117.mp3, cat_coll0118.mp3, cat_coll0124.mp3
+
+  Class: Warning (8 files)
+    Files: car_extcoll0167.mp3, car_extcoll0182.mp3, car_extcoll0185.mp3, car_extcoll0186.mp3, car_extcoll0213.mp3, car_extcoll0238.mp3, car_extcoll0239.mp3, car_extcoll0243.mp3
+
+Total in train_data: 80
+==============================
+
+Folder: test_data
+--------------------
+  Class: Angry (2 files)
+    Files: car_extcoll0156.mp3, car_extcoll0175.mp3
+
+  Class: Defense (2 files)
+    Files: car_extcoll0181.mp3, car_extcoll0251.mp3
+
+  Class: Fighting (2 files)
+    Files: car_extcoll0208.mp3, car_extcoll0233.mp3
+
+  Class: Happy (2 files)
+    Files: cat_53.mp3, cat_75.mp3
+
+  Class: HuntingMind (2 files)
+    Files: car_extcoll0329.mp3, car_extcoll0330.mp3
+
+  Class: Mating (2 files)
+    Files: cat_youtube64306.mp3, cat_youtube64311.mp3
+
+  Class: MotherCall (2 files)
+    Files: cat_coll0137.mp3, cat_coll0141.mp3
+
+  Class: Paining (2 files)
+    Files: car_extcoll0187.mp3, car_extcoll0336.mp3
+
+  Class: Resting (2 files)
+    Files: cat_coll0115.mp3, cat_coll0116.mp3
+
+  Class: Warning (2 files)
+    Files: car_extcoll0178.mp3, car_extcoll0242.mp3
+
+Total in test_data: 20
+==============================
+
+Grand Total Audio Files: 100
