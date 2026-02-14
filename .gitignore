@@ -10,4 +10,8 @@
 *.venv
 .venv
 *.log
+.pkl
+*.pkl
+*.h5
+
 
