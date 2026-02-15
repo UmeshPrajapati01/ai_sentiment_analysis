@@ -1,121 +1,166 @@
 {% extends "base.html" %}
 
-{% block title %}Dashboard - Cat Emotion Detector{% endblock %}
+{% block title %}Dashboard - CatMood AI{% endblock %}
 
 {% block content %}
+<!-- Ultra-Modern Dashboard with Vibrant Colors -->
 <div class="container py-5">
-    <!-- Welcome Header -->
+
+    <!-- Hero Section with Animated Welcome -->
     <div class="row mb-5">
         <div class="col-12 text-center">
-            <h1 class="display-4 fw-bold mb-3"
-                style="font-family: 'Poppins', sans-serif; background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 2px 20px rgba(255,255,255,0.3);">
-                Welcome, {{ current_user.email.split('@')[0] }}! 👋
-            </h1>
-            <p class="lead text-white-50" style="font-size: 1.2rem;">
-                Upload an image or audio file to detect your cat's emotion
-            </p>
+            <div style="animation: fadeIn 1s ease;">
+                <h1 class="display-2 fw-900 mb-3"
+                    style="font-family: 'Space Grotesk', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #EC4899 75%, #06B6D4 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; filter: drop-shadow(0 10px 30px rgba(139, 92, 246, 0.3));">
+                    Welcome, {{ current_user.email.split('@')[0] }}! 👋
+                </h1>
+                <p class="lead text-white mb-4"
+                    style="font-size: 1.4rem; font-weight: 600; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">
+                    Upload an image or audio to detect your cat's emotion using AI
+                </p>
+
+                <!-- Quick Stats Cards -->
+                <div class="row g-3 mt-4 justify-content-center">
+                    <div class="col-md-3 col-6">
+                        <div class="card"
+                            style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 20px; padding: 1.5rem;">
+                            <h3 class="text-white mb-0" style="font-size: 2.5rem;">🎯</h3>
+                            <p class="text-white mb-0 fw-bold">AI Powered</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="card"
+                            style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border: none; border-radius: 20px; padding: 1.5rem;">
+                            <h3 class="text-white mb-0" style="font-size: 2.5rem;">⚡</h3>
+                            <p class="text-white mb-0 fw-bold">Fast Results</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="card"
+                            style="background: linear-gradient(135deg, #06B6D4 0%, #10B981 100%); border: none; border-radius: 20px; padding: 1.5rem;">
+                            <h3 class="text-white mb-0" style="font-size: 2.5rem;">📊</h3>
+                            <p class="text-white mb-0 fw-bold">Accurate</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="card"
+                            style="background: linear-gradient(135deg, #FFD200 0%, #F7971E 100%); border: none; border-radius: 20px; padding: 1.5rem;">
+                            <h3 class="text-white mb-0" style="font-size: 2.5rem;">🔒</h3>
+                            <p class="text-white mb-0 fw-bold">Secure</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- Main Upload Card -->
     <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card border-0 shadow-lg" style="animation-delay: 0.1s;">
-                <!-- Card Header with Icon -->
-                <div class="card-header text-center" style="padding: 2rem;">
-                    <div
-                        style="width: 80px; height: 80px; margin: 0 auto 1rem; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                        <i class="bi bi-cloud-upload-fill" style="font-size: 2.5rem;"></i>
-                    </div>
-                    <h2 class="mb-0" style="font-family: 'Poppins', sans-serif; font-weight: 700;">Emotion Detection
+        <div class="col-lg-10 col-xl-9">
+            <div class="card" style="animation-delay: 0.2s;">
+                <!-- Card Header -->
+                <div class="card-header">
+                    <div style="font-size: 4rem; margin-bottom: 1rem;">🐱✨</div>
+                    <h2 class="mb-2"
+                        style="font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: 2rem;">
+                        Cat Emotion Analyzer
                     </h2>
-                    <p class="mb-0 mt-2" style="opacity: 0.9;">AI-powered analysis for cat emotions</p>
+                    <p class="mb-0" style="opacity: 0.95; font-size: 1.1rem;">
+                        Advanced AI-powered emotion detection for your feline friends
+                    </p>
                 </div>
 
                 <!-- Card Body -->
-                <div class="card-body" style="padding: 2.5rem;">
+                <div class="card-body">
                     <form method="POST" enctype="multipart/form-data" id="upload-form">
+
                         <!-- File Type Selection -->
-                        <div class="mb-4">
-                            <label class="form-label mb-3">
-                                <i class="bi bi-filter-circle me-2"></i>
-                                <strong>Select Input Type</strong>
+                        <div class="mb-5">
+                            <label class="form-label">
+                                <i class="bi bi-stars" style="color: #8B5CF6;"></i>
+                                <span>Select Analysis Type</span>
                             </label>
-                            <div class="btn-group w-100" role="group"
-                                style="height: 60px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-radius: 16px; overflow: hidden;">
+                            <div class="btn-group w-100" role="group" style="height: 80px;">
                                 <input type="radio" class="btn-check" name="file_type" id="type_image" value="image"
                                     checked>
-                                <label class="btn btn-outline-primary" for="type_image"
-                                    style="border-radius: 0; border: none; font-weight: 600; font-size: 1.05rem;">
-                                    <i class="bi bi-image me-2"></i>Image
-                                    <small class="d-block mt-1" style="font-weight: 400; opacity: 0.8;">JPG, PNG,
-                                        GIF</small>
+                                <label
+                                    class="btn btn-outline-primary d-flex flex-column align-items-center justify-content-center"
+                                    for="type_image">
+                                    <i class="bi bi-image-fill" style="font-size: 2rem;"></i>
+                                    <span class="mt-2 fw-bold">Image Analysis</span>
+                                    <small style="opacity: 0.7;">JPG, PNG, GIF</small>
                                 </label>
 
                                 <input type="radio" class="btn-check" name="file_type" id="type_audio" value="audio">
-                                <label class="btn btn-outline-primary" for="type_audio"
-                                    style="border-radius: 0; border: none; font-weight: 600; font-size: 1.05rem;">
-                                    <i class="bi bi-music-note-beamed me-2"></i>Audio
-                                    <small class="d-block mt-1" style="font-weight: 400; opacity: 0.8;">MP3, WAV</small>
+                                <label
+                                    class="btn btn-outline-primary d-flex flex-column align-items-center justify-content-center"
+                                    for="type_audio">
+                                    <i class="bi bi-music-note-beamed" style="font-size: 2rem;"></i>
+                                    <span class="mt-2 fw-bold">Audio Analysis</span>
+                                    <small style="opacity: 0.7;">MP3, WAV</small>
                                 </label>
                             </div>
                         </div>
 
                         <!-- File Upload -->
-                        <div class="mb-4">
+                        <div class="mb-5">
                             <label for="file" class="form-label">
-                                <i class="bi bi-paperclip me-2"></i>
-                                <strong>Upload File</strong>
+                                <i class="bi bi-cloud-upload-fill" style="color: #EC4899;"></i>
+                                <span>Upload Your File</span>
                             </label>
                             <div class="file-upload-wrapper">
                                 <input type="file" class="form-control form-control-lg" id="file" name="file" required
-                                    accept="image/*,audio/*">
-                                <div class="file-upload-text text-center py-4"
-                                    style="display: none; border: 2px dashed var(--primary-color); border-radius: 16px; background: rgba(102, 126, 234, 0.05); cursor: pointer;">
-                                    <i class="bi bi-cloud-arrow-up"
-                                        style="font-size: 3rem; color: var(--primary-color);"></i>
-                                    <p class="mb-0 mt-3" style="color: var(--text-dark); font-weight: 500;">
-                                        Drag & drop or click to browse
-                                    </p>
-                                </div>
+                                    accept="image/*,audio/*"
+                                    style="border-width: 3px; height: 80px; font-size: 1.1rem;">
+                            </div>
+                            <div class="mt-3 text-center" style="color: #64748B;">
+                                <small><i class="bi bi-info-circle"></i> Drag and drop supported • Max file size:
+                                    10MB</small>
                             </div>
                         </div>
 
                         <!-- Submit Button -->
                         <button type="submit" class="btn btn-success btn-lg w-100"
-                            style="height: 60px; font-size: 1.125rem; font-weight: 600;">
-                            <i class="bi bi-stars me-2"></i>Analyze Emotion
+                            style="height: 70px; font-size: 1.3rem;">
+                            <i class="bi bi-sparkles me-2"></i>
+                            Analyze Cat Emotion
+                            <i class="bi bi-arrow-right ms-2"></i>
                         </button>
                     </form>
 
                     <!-- Prediction Result -->
                     {% if prediction %}
-                    <div class="mt-5 p-5 text-center"
-                        style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(240, 244, 248, 0.9) 100%); border-radius: 24px; border: 2px solid rgba(102, 126, 234, 0.2); box-shadow: 0 8px 32px rgba(0,0,0,0.1);">
-                        <div class="mb-4">
-                            <span class="badge bg-success px-4 py-2" style="font-size: 0.875rem; border-radius: 50px;">
-                                <i class="bi bi-check-circle me-1"></i>
-                                Analysis Complete
-                            </span>
+                    <div class="mt-5 prediction-result" style="border-color: #8B5CF6;">
+                        <!-- Success Badge -->
+                        <div class="emotion-badge"
+                            style="background: linear-gradient(135deg, #10B981 0%, #06B6D4 100%); color: white;">
+                            <i class="bi bi-check-circle-fill me-2"></i>
+                            Analysis Complete
                         </div>
 
-                        <h3 class="mb-3" style="color: var(--text-dark); font-weight: 600;">Detected Emotion</h3>
-                        <h1 class="display-3 mb-4"
-                            style="font-family: 'Poppins', sans-serif; font-weight: 800; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-                            {{ prediction }}
-                        </h1>
-
-                        <!-- Result Cat GIF -->
-                        <div class="mt-4">
-                            <img src="{{ url_for('serve_assets', filename='cute-animated-cat-tutorial.gif') }}"
-                                alt="Success Cat"
-                                style="width: 200px; height: 200px; object-fit: cover; border-radius: 50%; border: 5px solid white; box-shadow: 0 8px 24px rgba(0,0,0,0.15);">
+                        <!-- Emotion Icon -->
+                        <div style="font-size: 6rem; margin: 1rem 0; animation: bounce 1s ease;">
+                            {% if 'happy' in prediction.lower() %}
+                            😸
+                            {% elif 'sad' in prediction.lower() %}
+                            😿
+                            {% elif 'angry' in prediction.lower() %}
+                            😾
+                            {% else %}
+                            🐱
+                            {% endif %}
                         </div>
 
-                        <div class="mt-4">
-                            <p class="text-muted mb-0">
-                                <i class="bi bi-info-circle me-1"></i>
-                                This prediction was added to your history
+                        <!-- Emotion Label -->
+                        <h3 style="color: #64748B; font-weight: 700; font-size: 1.3rem;">Detected Emotion</h3>
+                        <h1 class="emotion-text">{{ prediction }}</h1>
+
+                        <!-- Info Message -->
+                        <div class="mt-4 p-4"
+                            style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%); border-radius: 20px; border: 2px dashed rgba(139, 92, 246, 0.3);">
+                            <p class="mb-0" style="color: #64748B; font-weight: 600;">
+                                <i class="bi bi-info-circle-fill" style="color: #8B5CF6;"></i>
+                                This prediction has been saved to your history
                             </p>
                         </div>
                     </div>
@@ -123,29 +168,28 @@
                 </div>
             </div>
 
-            <!-- Quick Actions -->
-            <div class="row mt-4 g-3">
+            <!-- Quick Action Cards -->
+            <div class="row mt-5 g-4">
                 <div class="col-md-6">
                     <a href="{{ url_for('history') }}" class="text-decoration-none">
-                        <div class="card border-0 shadow-sm"
-                            style="background: rgba(255, 255, 255, 0.95); transition: all 0.3s ease;">
-                            <div class="card-body text-center py-4">
-                                <i class="bi bi-clock-history"
-                                    style="font-size: 2rem; color: var(--primary-color);"></i>
-                                <h5 class="mt-3 mb-0">View History</h5>
-                                <small class="text-muted">See all predictions</small>
+                        <div class="card"
+                            style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; transition: all 0.3s ease;">
+                            <div class="card-body text-center py-5 text-white">
+                                <i class="bi bi-clock-history" style="font-size: 3.5rem; opacity: 0.9;"></i>
+                                <h4 class="mt-3 mb-2 fw-bold">View History</h4>
+                                <p class="mb-0" style="opacity: 0.9;">See all your past predictions</p>
                             </div>
                         </div>
                     </a>
                 </div>
                 <div class="col-md-6">
                     <a href="{{ url_for('dashboard') }}" class="text-decoration-none">
-                        <div class="card border-0 shadow-sm"
-                            style="background: rgba(255, 255, 255, 0.95); transition: all 0.3s ease;">
-                            <div class="card-body text-center py-4">
-                                <i class="bi bi-arrow-repeat" style="font-size: 2rem; color: var(--success-color);"></i>
-                                <h5 class="mt-3 mb-0">New Analysis</h5>
-                                <small class="text-muted">Upload another file</small>
+                        <div class="card"
+                            style="background: linear-gradient(135deg, #06B6D4 0%, #10B981 100%); border: none; transition: all 0.3s ease;">
+                            <div class="card-body text-center py-5 text-white">
+                                <i class="bi bi-arrow-repeat" style="font-size: 3.5rem; opacity: 0.9;"></i>
+                                <h4 class="mt-3 mb-2 fw-bold">New Analysis</h4>
+                                <p class="mb-0" style="opacity: 0.9;">Upload another file</p>
                             </div>
                         </div>
                     </a>
@@ -155,14 +199,47 @@
     </div>
 </div>
 
-<!-- Add Bootstrap Icons -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
-<!-- Custom Hover Effects -->
+<!-- Bounce Animation for Emotion Icon -->
 <style>
+    @keyframes bounce {
+
+        0%,
+        20%,
+        50%,
+        80%,
+        100% {
+            transform: translateY(0);
+        }
+
+        40% {
+            transform: translateY(-30px);
+        }
+
+        60% {
+            transform: translateY(-15px);
+        }
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
     .row .col-md-6 a .card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        transform: translateY(-10px) scale(1.02);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
     }
 </style>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
 {% endblock %}

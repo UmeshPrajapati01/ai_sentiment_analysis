@@ -1,124 +1,109 @@
 {% extends "base.html" %}
 
-{% block title %}Register - Cat Emotion Detector{% endblock %}
+{% block title %}Register - CatMood AI{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="row justify-content-center align-items-center min-vh-100">
-        <div class="col-md-6">
-            <!-- Registration Card with Modern Design -->
-            <div class="card border-0 shadow-lg" style="animation-delay: 0.1s;">
-                <!-- Card Header with Gradient -->
-                <div class="card-header text-center">
-                    <div class="mb-3">
-                        <img src="{{ url_for('serve_assets', filename='dance-dancing.gif') }}" alt="Dancing Cat"
-                            style="width: 140px; height: 140px; object-fit: cover; margin: -70px auto 0; display: block; border-radius: 50%; border: 5px solid white; box-shadow: 0 8px 24px rgba(0,0,0,0.2);">
-                    </div>
-                    <h2 class="mt-4 mb-0" style="font-family: 'Poppins', sans-serif; font-weight: 700;">Join Us!</h2>
-                    <p class="mb-0" style="opacity: 0.9; font-size: 0.95rem;">Create your account to get started</p>
+<div class="container">
+    <div class="row justify-content-center align-items-center" style="min-height: calc(100vh - 100px);">
+        <div class="col-md-6 col-lg-5">
+            <!-- Register Card -->
+            <div class="card" style="animation: fadeInUp 0.8s ease;">
+                <!-- Card Header -->
+                <div class="card-header"
+                    style="background: linear-gradient(135deg, #EC4899 0%, #8B5CF6 100%) !important;">
+                    <div style="font-size: 4rem; margin-bottom: 1rem;">🐱✨</div>
+                    <h2 class="mb-2"
+                        style="font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: 2.2rem;">
+                        Join CatMood AI
+                    </h2>
+                    <p class="mb-0" style="opacity: 0.95; font-size: 1.1rem;">
+                        Start detecting cat emotions in seconds
+                    </p>
                 </div>
 
                 <!-- Card Body -->
                 <div class="card-body">
-                    <form method="POST" action="{{ url_for('register') }}">
-                        <!-- Email Input -->
+                    <form method="POST">
+                        <!-- Email Field -->
                         <div class="mb-4">
                             <label for="email" class="form-label">
-                                <i class="bi bi-envelope-fill me-2"></i>Gmail Address
+                                <i class="bi bi-envelope-fill" style="color: #8B5CF6;"></i>
+                                <span>Email Address</span>
                             </label>
                             <input type="email" class="form-control form-control-lg" id="email" name="email"
-                                placeholder="your.email@gmail.com" pattern="[a-zA-Z0-9._%+-]+@gmail\.com$"
-                                title="Please enter a valid Gmail address" required autocomplete="email">
-                            <small class="text-muted">
-                                <i class="bi bi-info-circle me-1"></i>
-                                Only Gmail addresses are accepted
-                            </small>
+                                placeholder="your.email@example.com" required
+                                style="padding-left: 3rem; background-image: url('data:image/svg+xml;utf8,<svg xmlns=\"
+                                http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" fill=\"%238B5CF6\" viewBox=\"0 0
+                                16 16\">
+                            <path d=\"M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4Zm2-1a1 1 0 0
+                                0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1H2Zm13 2.383-4.708 2.825L15 11.105V5.383Zm-.034
+                                6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741ZM1
+                                11.105l4.708-2.897L1 5.383v5.722Z\" /></svg>'); background-repeat: no-repeat;
+                            background-position: 15px center;">
+                            <small class="text-muted mt-1 d-block" style="padding-left: 0.5rem;">We'll never share your
+                                email</small>
                         </div>
 
-                        <!-- Password Input -->
+                        <!-- Password Field -->
                         <div class="mb-4">
                             <label for="password" class="form-label">
-                                <i class="bi bi-lock-fill me-2"></i>Password
+                                <i class="bi bi-lock-fill" style="color: #EC4899;"></i>
+                                <span>Password</span>
                             </label>
                             <input type="password" class="form-control form-control-lg" id="password" name="password"
-                                placeholder="Create a strong password" minlength="6" required
-                                autocomplete="new-password">
-                            <small class="text-muted">
-                                <i class="bi bi-shield-check me-1"></i>
-                                Minimum 6 characters
-                            </small>
+                                placeholder="Create a strong password" required minlength="6"
+                                style="padding-left: 3rem; background-image: url('data:image/svg+xml;utf8,<svg xmlns=\"
+                                http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" fill=\"%23EC4899\" viewBox=\"0 0
+                                16 16\">
+                            <path d=\"M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2
+                                0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z\" /></svg>'); background-repeat: no-repeat;
+                            background-position: 15px center;">
+                            <small class="text-muted mt-1 d-block" style="padding-left: 0.5rem;">Minimum 6
+                                characters</small>
                         </div>
 
-                        <!-- Confirm Password Input -->
-                        <div class="mb-4">
-                            <label for="confirm_password" class="form-label">
-                                <i class="bi bi-lock-fill me-2"></i>Confirm Password
-                            </label>
-                            <input type="password" class="form-control form-control-lg" id="confirm_password"
-                                name="confirm_password" placeholder="Re-enter your password" minlength="6" required
-                                autocomplete="new-password">
-                        </div>
-
-                        <!-- Terms & Conditions -->
-                        <div class="form-check mb-4">
-                            <input class="form-check-input" type="checkbox" id="terms" required>
-                            <label class="form-check-label" for="terms">
-                                I agree to the <a href="#" class="text-decoration-none">Terms & Conditions</a>
-                            </label>
-                        </div>
-
-                        <!-- Submit Button -->
-                        <button type="submit" class="btn btn-success btn-lg w-100 mb-3">
-                            <i class="bi bi-person-plus-fill me-2"></i>Create Account
+                        <!-- Register Button -->
+                        <button type="submit" class="btn btn-success btn-lg w-100 mb-4"
+                            style="height: 65px; font-size: 1.2rem;">
+                            <i class="bi bi-rocket-takeoff-fill me-2"></i>
+                            Create Account
+                            <i class="bi bi-stars ms-2"></i>
                         </button>
 
-                        <!-- Divider -->
-                        <div class="text-center my-3">
-                            <div
-                                style="height: 1px; background: linear-gradient(90deg, transparent, rgba(0,0,0,0.1), transparent);">
-                            </div>
-                        </div>
-
                         <!-- Login Link -->
-                        <p class="text-center mb-0">
-                            <span class="text-muted">Already have an account?</span>
-                            <a href="{{ url_for('login') }}" class="text-decoration-none fw-bold ms-2"
-                                style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-                                Sign In
-                            </a>
-                        </p>
+                        <div class="text-center">
+                            <p class="mb-0" style="color: #64748B; font-weight: 600;">
+                                Already have an account?
+                                <a href="{{ url_for('login') }}"
+                                    style="color: #EC4899; font-weight: 700; text-decoration: none;">
+                                    Sign In <i class="bi bi-arrow-right"></i>
+                                </a>
+                            </p>
+                        </div>
                     </form>
                 </div>
             </div>
 
-            <!-- Privacy Note -->
-            <div class="text-center mt-4">
-                <p class="text-white-50" style="font-size: 0.875rem;">
-                    <i class="bi bi-shield-lock me-2"></i>
-                    We respect your privacy and never share your information
-                </p>
+            <!-- Benefits Cards -->
+            <div class="row g-3 mt-4">
+                <div class="col-6">
+                    <div class="p-4 text-center"
+                        style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(236, 72, 153, 0.15) 100%); border-radius: 20px; border: 2px solid rgba(139, 92, 246, 0.3);">
+                        <div style="font-size: 2.5rem;">🎯</div>
+                        <h6 class="text-white fw-bold mt-2 mb-1">AI Powered</h6>
+                        <small class="text-white" style="opacity: 0.8;">Advanced detection</small>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="p-4 text-center"
+                        style="background: linear-gradient(135deg, rgba(6, 182, 212, 0.15) 0%, rgba(16, 185, 129, 0.15) 100%); border-radius: 20px; border: 2px solid rgba(6, 182, 212, 0.3);">
+                        <div style="font-size: 2.5rem;">📊</div>
+                        <h6 class="text-white fw-bold mt-2 mb-1">Track History</h6>
+                        <small class="text-white" style="opacity: 0.8;">Save all results</small>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
-
-<!-- Password Match Validation Script -->
-<script>
-    document.getElementById('confirm_password').addEventListener('input', function () {
-        const password = document.getElementById('password').value;
-        const confirmPassword = this.value;
-
-        if (password !== confirmPassword) {
-            this.setCustomValidity('Passwords do not match');
-            this.classList.add('is-invalid');
-        } else {
-            this.setCustomValidity('');
-            this.classList.remove('is-invalid');
-            this.classList.add('is-valid');
-        }
-    });
-</script>
-
-<!-- Add Bootstrap Icons -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 {% endblock %}

@@ -1,0 +1,6 @@
+num_classes: 10
+classes: [np.str_('Angry'), np.str_('Defense'), np.str_('Fighting'), np.str_('Happy'), np.str_('HuntingMind'), np.str_('Mating'), np.str_('MotherCall'), np.str_('Paining'), np.str_('Resting'), np.str_('Warning')]
+n_estimators: 150
+val_accuracy: 0.95
+sample_rate: 22050
+duration: 3

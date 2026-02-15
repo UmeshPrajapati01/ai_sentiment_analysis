@@ -12,9 +12,13 @@ import torch.nn as nn
 SCRIPT_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = SCRIPT_DIR.parents[1]  # backend/inference -> backend -> project_root
 
-# Model Paths
+# Model Paths - Using original models (fine-tuned models have incorrect class structure)
+# TODO: Re-train fine-tuned models with correct data directory structure
 IMAGE_MODEL_DIR = PROJECT_ROOT / "backend/trained_modelimages/image_model"
 AUDIO_MODEL_DIR = PROJECT_ROOT / "backend/trained_modelimages/audio_model"
+
+print(f"[Model Loader] Image Model Directory: {IMAGE_MODEL_DIR}")
+print(f"[Model Loader] Audio Model Directory: {AUDIO_MODEL_DIR}")
 
 class ModelLoader:
     _instance = None
