@@ -1,0 +1,52 @@
+<!-- Shared Sidebar Component -->
+<aside class="sidebar" id="mainSidebar">
+    <div class="sidebar-logo">
+        <div class="logo-icon">🐱</div>
+        <span>MewConnect</span>
+    </div>
+
+    <div class="sidebar-section">
+        <div class="sidebar-section-title">Main</div>
+        <a href="{{ url_for('dashboard') }}" class="sidebar-link {{ 'active' if active_page == 'dashboard' }}"
+            id="navDashboard">
+            <span class="link-icon">📊</span> Dashboard
+        </a>
+        <a href="{{ url_for('profile') }}" class="sidebar-link {{ 'active' if active_page == 'profile' }}"
+            id="navProfile">
+            <span class="link-icon">👤</span> Profile
+        </a>
+        <a href="{{ url_for('metrics') }}" class="sidebar-link {{ 'active' if active_page == 'metrics' }}"
+            id="navMetrics">
+            <span class="link-icon">📈</span> Metrics
+        </a>
+    </div>
+
+    <div class="sidebar-section">
+        <div class="sidebar-section-title">Analysis</div>
+        <a href="{{ url_for('dashboard') }}#uploadSection" class="sidebar-link" id="navUpload">
+            <span class="link-icon">📸</span> Upload Photo
+        </a>
+        <a href="{{ url_for('history') }}" class="sidebar-link {{ 'active' if active_page == 'history' }}"
+            id="navHistory">
+            <span class="link-icon">🕐</span> History
+        </a>
+    </div>
+
+    <div class="sidebar-section">
+        <div class="sidebar-section-title">System</div>
+        <a href="#" class="sidebar-link" id="navSettings">
+            <span class="link-icon">⚙️</span> Settings
+        </a>
+        <a href="{{ url_for('logout') }}" class="sidebar-link logout-btn" id="navLogout">
+            <span class="link-icon">🚪</span> Logout
+        </a>
+    </div>
+
+    <div class="sidebar-user">
+        <div class="sidebar-user-avatar">🐱</div>
+        <div class="sidebar-user-info">
+            <div class="name" id="sidebarUserName">{{ current_user.display_name }}</div>
+            <div class="role">Premium Member</div>
+        </div>
+    </div>
+</aside>

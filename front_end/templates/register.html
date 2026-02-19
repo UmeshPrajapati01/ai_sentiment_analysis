@@ -1,109 +1,159 @@
 {% extends "base.html" %}
 
-{% block title %}Register - CatMood AI{% endblock %}
+{% block description %}Create your MewConnect account - Start understanding your cat's emotions today.{% endblock %}
+{% block title %}Register | MewConnect{% endblock %}
+{% block page_id %}register{% endblock %}
 
-{% block content %}
-<div class="container">
-    <div class="row justify-content-center align-items-center" style="min-height: calc(100vh - 100px);">
-        <div class="col-md-6 col-lg-5">
-            <!-- Register Card -->
-            <div class="card" style="animation: fadeInUp 0.8s ease;">
-                <!-- Card Header -->
-                <div class="card-header"
-                    style="background: linear-gradient(135deg, #EC4899 0%, #8B5CF6 100%) !important;">
-                    <div style="font-size: 4rem; margin-bottom: 1rem;">🐱✨</div>
-                    <h2 class="mb-2"
-                        style="font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: 2.2rem;">
-                        Join CatMood AI
-                    </h2>
-                    <p class="mb-0" style="opacity: 0.95; font-size: 1.1rem;">
-                        Start detecting cat emotions in seconds
-                    </p>
+{% block body %}
+<!-- NAVBAR -->
+<nav class="navbar scrolled" id="mainNavbar">
+    <div class="container">
+        <a href="{{ url_for('landing') }}" class="nav-logo">
+            <div class="logo-icon">🐱</div>
+            <span>MewConnect</span>
+        </a>
+        <div class="nav-links" id="navLinks">
+            <a href="{{ url_for('landing') }}">Home</a>
+            <a href="{{ url_for('register') }}">Features</a>
+            <a href="{{ url_for('login') }}">Login</a>
+            <a href="{{ url_for('register') }}" class="btn btn-primary btn-sm">Get Started</a>
+        </div>
+        <div class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+            <span></span><span></span><span></span>
+        </div>
+    </div>
+</nav>
+
+<!-- REGISTER PAGE -->
+<div class="register-page">
+    <div class="container">
+        <!-- Header -->
+        <div class="register-header anim-fadeInDown">
+            <div style="font-size:3rem; margin-bottom:12px;">✨</div>
+            <h1>Discover What Makes Your Cat <span style="color:var(--accent);">Unique</span></h1>
+            <p>Explore our features, then create your free account below</p>
+        </div>
+
+        <!-- 3 Feature Boxes -->
+        <div class="feature-boxes">
+            <div class="feature-box anim-scaleIn anim-delay-1" id="featureBox1">
+                <div class="feature-box-media">
+                    <video autoplay muted loop playsinline id="bearVideo">
+                        <source
+                            src="{{ url_for('serve_media', filename='grok-video-78357e77-95ed-406d-8a54-df6a852cc3d7.mp4') }}"
+                            type="video/mp4">
+                    </video>
+                    <div class="media-overlay"></div>
                 </div>
-
-                <!-- Card Body -->
-                <div class="card-body">
-                    <form method="POST">
-                        <!-- Email Field -->
-                        <div class="mb-4">
-                            <label for="email" class="form-label">
-                                <i class="bi bi-envelope-fill" style="color: #8B5CF6;"></i>
-                                <span>Email Address</span>
-                            </label>
-                            <input type="email" class="form-control form-control-lg" id="email" name="email"
-                                placeholder="your.email@example.com" required
-                                style="padding-left: 3rem; background-image: url('data:image/svg+xml;utf8,<svg xmlns=\"
-                                http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" fill=\"%238B5CF6\" viewBox=\"0 0
-                                16 16\">
-                            <path d=\"M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4Zm2-1a1 1 0 0
-                                0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1H2Zm13 2.383-4.708 2.825L15 11.105V5.383Zm-.034
-                                6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741ZM1
-                                11.105l4.708-2.897L1 5.383v5.722Z\" /></svg>'); background-repeat: no-repeat;
-                            background-position: 15px center;">
-                            <small class="text-muted mt-1 d-block" style="padding-left: 0.5rem;">We'll never share your
-                                email</small>
-                        </div>
-
-                        <!-- Password Field -->
-                        <div class="mb-4">
-                            <label for="password" class="form-label">
-                                <i class="bi bi-lock-fill" style="color: #EC4899;"></i>
-                                <span>Password</span>
-                            </label>
-                            <input type="password" class="form-control form-control-lg" id="password" name="password"
-                                placeholder="Create a strong password" required minlength="6"
-                                style="padding-left: 3rem; background-image: url('data:image/svg+xml;utf8,<svg xmlns=\"
-                                http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" fill=\"%23EC4899\" viewBox=\"0 0
-                                16 16\">
-                            <path d=\"M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2
-                                0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z\" /></svg>'); background-repeat: no-repeat;
-                            background-position: 15px center;">
-                            <small class="text-muted mt-1 d-block" style="padding-left: 0.5rem;">Minimum 6
-                                characters</small>
-                        </div>
-
-                        <!-- Register Button -->
-                        <button type="submit" class="btn btn-success btn-lg w-100 mb-4"
-                            style="height: 65px; font-size: 1.2rem;">
-                            <i class="bi bi-rocket-takeoff-fill me-2"></i>
-                            Create Account
-                            <i class="bi bi-stars ms-2"></i>
-                        </button>
-
-                        <!-- Login Link -->
-                        <div class="text-center">
-                            <p class="mb-0" style="color: #64748B; font-weight: 600;">
-                                Already have an account?
-                                <a href="{{ url_for('login') }}"
-                                    style="color: #EC4899; font-weight: 700; text-decoration: none;">
-                                    Sign In <i class="bi bi-arrow-right"></i>
-                                </a>
-                            </p>
-                        </div>
-                    </form>
+                <div class="feature-box-content">
+                    <div class="feature-box-icon">🐻</div>
+                    <h3>Friendly Companions</h3>
+                    <p>Every pet deserves a friend — even your cat. Our AI helps you understand what your furry
+                        companion truly feels.</p>
                 </div>
             </div>
 
-            <!-- Benefits Cards -->
-            <div class="row g-3 mt-4">
-                <div class="col-6">
-                    <div class="p-4 text-center"
-                        style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(236, 72, 153, 0.15) 100%); border-radius: 20px; border: 2px solid rgba(139, 92, 246, 0.3);">
-                        <div style="font-size: 2.5rem;">🎯</div>
-                        <h6 class="text-white fw-bold mt-2 mb-1">AI Powered</h6>
-                        <small class="text-white" style="opacity: 0.8;">Advanced detection</small>
+            <div class="feature-box anim-scaleIn anim-delay-2" id="featureBox2">
+                <div class="feature-box-media">
+                    <video autoplay muted loop playsinline>
+                        <source
+                            src="{{ url_for('serve_media', filename='grok-video-78357e77-95ed-406d-8a54-df6a852cc3d7 (1).mp4') }}"
+                            type="video/mp4">
+                    </video>
+                    <div class="media-overlay"></div>
+                </div>
+                <div class="feature-box-content">
+                    <div class="feature-box-icon">😺</div>
+                    <h3>Expression Analysis</h3>
+                    <p>Our cutting-edge neural network identifies 7+ cat emotions from a single photo with over 92%
+                        accuracy.</p>
+                </div>
+            </div>
+
+            <div class="feature-box anim-scaleIn anim-delay-3" id="featureBox3">
+                <div class="feature-box-media">
+                    <video autoplay muted loop playsinline>
+                        <source
+                            src="{{ url_for('serve_media', filename='grok-video-78357e77-95ed-406d-8a54-df6a852cc3d7 (2).mp4') }}"
+                            type="video/mp4">
+                    </video>
+                    <div class="media-overlay"></div>
+                </div>
+                <div class="feature-box-content">
+                    <div class="feature-box-icon">📈</div>
+                    <h3>Track Progress</h3>
+                    <p>Monitor emotional history and build a deeper, more empathetic relationship with your cat over
+                        time.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Register Form -->
+        <div class="register-form-section anim-fadeInUp anim-delay-3" id="registerFormSection">
+            <h2>Create an Account</h2>
+            <p class="form-subtitle">Sign up and start your free journey 🐾</p>
+
+            <form id="registerForm" method="POST" action="{{ url_for('register') }}" novalidate>
+                <div class="form-group">
+                    <label for="fullName">Full Name</label>
+                    <input type="text" id="fullName" name="full_name" class="form-control"
+                        placeholder="Enter your full name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" class="form-control" placeholder="you@gmail.com"
+                        required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div style="position:relative;">
+                        <input type="password" id="password" name="password" class="form-control"
+                            placeholder="Minimum 6 characters" required>
+                        <button type="button" onclick="togglePassword('password')"
+                            style="position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:1.2rem;cursor:pointer;background:none;border:none;">
+                            👁️
+                        </button>
                     </div>
                 </div>
-                <div class="col-6">
-                    <div class="p-4 text-center"
-                        style="background: linear-gradient(135deg, rgba(6, 182, 212, 0.15) 0%, rgba(16, 185, 129, 0.15) 100%); border-radius: 20px; border: 2px solid rgba(6, 182, 212, 0.3);">
-                        <div style="font-size: 2.5rem;">📊</div>
-                        <h6 class="text-white fw-bold mt-2 mb-1">Track History</h6>
-                        <small class="text-white" style="opacity: 0.8;">Save all results</small>
+                <div class="form-group">
+                    <label for="confirm_password">Confirm Password</label>
+                    <div style="position:relative;">
+                        <input type="password" id="confirm_password" name="confirm_password" class="form-control"
+                            placeholder="Repeat your password" required>
+                        <button type="button" onclick="togglePassword('confirm_password')"
+                            style="position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:1.2rem;cursor:pointer;background:none;border:none;">
+                            👁️
+                        </button>
                     </div>
                 </div>
+                <button type="submit" class="btn btn-primary" style="width:100%; margin-bottom:20px;"
+                    id="submitRegister">
+                    🚀 Create Account
+                </button>
+            </form>
+
+            <div class="form-divider">Or sign up with</div>
+
+            <div class="social-login">
+                <button class="social-btn" id="googleSignup">
+                    <span style="font-size:1.2rem;">G</span> Google
+                </button>
+                <button class="social-btn" id="facebookSignup">
+                    <span style="font-size:1.2rem;">f</span> Facebook
+                </button>
+            </div>
+
+            <div class="form-footer">
+                Already have an account? <a href="{{ url_for('login') }}">Sign in</a>
             </div>
         </div>
     </div>
 </div>
+
+<!-- FOOTER -->
+<footer style="background:var(--primary-dark); color:rgba(255,255,255,0.6); padding:30px 0; text-align:center;">
+    <div class="container">
+        <p style="font-size:0.85rem;">© 2026 MewConnect. Made with 💛 for cat lovers.</p>
+    </div>
+</footer>
 {% endblock %}

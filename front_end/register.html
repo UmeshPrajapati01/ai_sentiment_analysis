@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Create your MewConnect account - Start understanding your cat's emotions today.">
+    <title>Register | MewConnect</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐱</text></svg>">
+</head>
+
+<body data-page="register">
+
+    <!-- NAVBAR -->
+    <nav class="navbar scrolled" id="mainNavbar">
+        <div class="container">
+            <a href="index.html" class="nav-logo">
+                <div class="logo-icon">🐱</div>
+                <span>MewConnect</span>
+            </a>
+            <div class="nav-links" id="navLinks">
+                <a href="index.html">Home</a>
+                <a href="register.html">Features</a>
+                <a href="login.html">Login</a>
+                <a href="register.html" class="btn btn-primary btn-sm">Get Started</a>
+            </div>
+            <div class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- REGISTER PAGE -->
+    <div class="register-page">
+        <div class="container">
+            <!-- Header -->
+            <div class="register-header anim-fadeInDown">
+                <div style="font-size:3rem; margin-bottom:12px;">✨</div>
+                <h1>Discover What Makes Your Cat <span style="color:var(--accent);">Unique</span></h1>
+                <p>Explore our features, then create your free account below</p>
+            </div>
+
+            <!-- 3 Feature Boxes -->
+            <div class="feature-boxes">
+                <!-- Box 1: Bear Video -->
+                <div class="feature-box anim-scaleIn anim-delay-1" id="featureBox1">
+                    <div class="feature-box-media">
+                        <video autoplay muted loop playsinline id="bearVideo">
+                            <source src="images_videos/grok-video-78357e77-95ed-406d-8a54-df6a852cc3d7.mp4"
+                                type="video/mp4">
+                        </video>
+                        <div class="media-overlay"></div>
+                    </div>
+                    <div class="feature-box-content">
+                        <div class="feature-box-icon">🐻</div>
+                        <h3>Friendly Companions</h3>
+                        <p>Every pet deserves a friend — even your cat. Our AI helps you understand what your furry
+                            companion truly feels.</p>
+                    </div>
+                </div>
+
+                <!-- Box 2: Cat Video -->
+                <div class="feature-box anim-scaleIn anim-delay-2" id="featureBox2">
+                    <div class="feature-box-media">
+                        <video autoplay muted loop playsinline>
+                            <source src="images_videos/grok-video-78357e77-95ed-406d-8a54-df6a852cc3d7 (1).mp4"
+                                type="video/mp4">
+                        </video>
+                        <div class="media-overlay"></div>
+                    </div>
+                    <div class="feature-box-content">
+                        <div class="feature-box-icon">😺</div>
+                        <h3>Expression Analysis</h3>
+                        <p>Our cutting-edge neural network identifies 7+ cat emotions from a single photo with over 92%
+                            accuracy.</p>
+                    </div>
+                </div>
+
+                <!-- Box 3: Another Video -->
+                <div class="feature-box anim-scaleIn anim-delay-3" id="featureBox3">
+                    <div class="feature-box-media">
+                        <video autoplay muted loop playsinline>
+                            <source src="images_videos/grok-video-78357e77-95ed-406d-8a54-df6a852cc3d7 (2).mp4"
+                                type="video/mp4">
+                        </video>
+                        <div class="media-overlay"></div>
+                    </div>
+                    <div class="feature-box-content">
+                        <div class="feature-box-icon">📈</div>
+                        <h3>Track Progress</h3>
+                        <p>Monitor emotional history and build a deeper, more empathetic relationship with your cat over
+                            time.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Register Form -->
+            <div class="register-form-section anim-fadeInUp anim-delay-3" id="registerFormSection">
+                <h2>Create an Account</h2>
+                <p class="form-subtitle">Sign up and start your free journey 🐾</p>
+
+                <form id="registerForm" novalidate>
+                    <div class="form-group">
+                        <label for="fullName">Full Name</label>
+                        <input type="text" id="fullName" class="form-control" placeholder="Enter your full name"
+                            required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" class="form-control" placeholder="you@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <div style="position:relative;">
+                            <input type="password" id="password" class="form-control" placeholder="Minimum 6 characters"
+                                required>
+                            <button type="button" onclick="togglePassword('password')"
+                                style="position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:1.2rem;cursor:pointer;background:none;border:none;">
+                                👁️
+                            </button>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width:100%; margin-bottom:20px;"
+                        id="submitRegister">
+                        🚀 Create Account
+                    </button>
+                </form>
+
+                <div class="form-divider">Or sign up with</div>
+
+                <div class="social-login">
+                    <button class="social-btn" id="googleSignup">
+                        <span style="font-size:1.2rem;">G</span> Google
+                    </button>
+                    <button class="social-btn" id="facebookSignup">
+                        <span style="font-size:1.2rem;">f</span> Facebook
+                    </button>
+                </div>
+
+                <div class="form-footer">
+                    Already have an account? <a href="login.html">Sign in</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer style="background:var(--primary-dark); color:rgba(255,255,255,0.6); padding:30px 0; text-align:center;">
+        <div class="container">
+            <p style="font-size:0.85rem;">© 2026 MewConnect. Made with 💛 for cat lovers.</p>
+        </div>
+    </footer>
+
+    <script src="scripts/main.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,315 @@
+{% extends "base.html" %}
+
+{% block description %}MewConnect User Profile - Manage your cat companion profile.{% endblock %}
+{% block title %}Profile | MewConnect{% endblock %}
+{% block page_id %}profile{% endblock %}
+
+{% block body %}
+<div class="dashboard-layout">
+    <!-- SIDEBAR -->
+    {% set active_page = 'profile' %}
+    {% include '_sidebar.html' %}
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <button id="sidebarToggle"
+            style="display:none; position:fixed; top:16px; left:16px; z-index:600; width:44px; height:44px; background:var(--primary); color:#fff; border-radius:var(--radius-md); font-size:1.3rem; border:none; cursor:pointer;">☰</button>
+
+        <!-- ============================== -->
+        <!-- SECTION 1: Page Header         -->
+        <!-- ============================== -->
+        <div class="page-header">
+            <h1>My Profile 👤</h1>
+            <div class="header-actions">
+                <button class="btn btn-outline btn-sm"
+                    onclick="document.getElementById('editModal').style.display='flex'">✏️ Edit Profile</button>
+            </div>
+        </div>
+
+        <!-- ============================== -->
+        <!-- SECTION 2: Profile Banner      -->
+        <!-- ============================== -->
+        <div class="profile-banner"
+            style="background: linear-gradient(135deg, #1e293b 0%, #475569 40%, #f59e0b 100%); position:relative; overflow:hidden;">
+            <!-- Video Background Overlay -->
+            <video autoplay muted loop playsinline
+                style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0.15;">
+                <source
+                    src="{{ url_for('serve_media', filename='grok-video-78357e77-95ed-406d-8a54-df6a852cc3d7 (2).mp4') }}"
+                    type="video/mp4">
+            </video>
+            <div class="profile-avatar-wrap" style="z-index:2; position:relative;">
+                <div class="profile-avatar" id="profileAvatar">🐱</div>
+                <div class="profile-name-section">
+                    <h2 id="profileName" style="color:#fff;">{{ current_user.display_name }}</h2>
+                    <p style="color:rgba(255,255,255,0.7);" id="profileEmail">{{ current_user.email }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================== -->
+        <!-- SECTION 3: Profile Stats       -->
+        <!-- ============================== -->
+        <div class="stats-grid" style="margin-bottom:28px;">
+            <div class="stat-card">
+                <div class="stat-card-icon">🐾</div>
+                <div class="stat-card-value">{{ total_predictions }}</div>
+                <div class="stat-card-label">Total Predictions</div>
+                <div class="stat-card-change up">↑ Active</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-icon">📸</div>
+                <div class="stat-card-value">{{ image_count }}</div>
+                <div class="stat-card-label">Images Analyzed</div>
+                <div class="stat-card-change up">📸 Photos</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-icon">🎵</div>
+                <div class="stat-card-value">{{ audio_count }}</div>
+                <div class="stat-card-label">Audio Analyzed</div>
+                <div class="stat-card-change up">🎵 Audio</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-icon">🎯</div>
+                <div class="stat-card-value">{{ unique_emotions }}</div>
+                <div class="stat-card-label">Unique Emotions</div>
+                <div class="stat-card-change up">✅ Detected</div>
+            </div>
+        </div>
+
+        <!-- ============================== -->
+        <!-- SECTION 4: Info + Cat Friends   -->
+        <!-- ============================== -->
+        <div class="profile-grid" style="margin-bottom:28px;">
+            <!-- Personal Info -->
+            <div class="profile-card">
+                <h3>👤 Personal Information</h3>
+                <div class="profile-field">
+                    <span class="profile-field-label">Full Name</span>
+                    <span class="profile-field-value" id="fieldName">{{ current_user.display_name }}</span>
+                </div>
+                <div class="profile-field">
+                    <span class="profile-field-label">Email</span>
+                    <span class="profile-field-value" id="fieldEmail">{{ current_user.email }}</span>
+                </div>
+                <div class="profile-field">
+                    <span class="profile-field-label">Member Since</span>
+                    <span class="profile-field-value" id="fieldJoined">Feb 2026</span>
+                </div>
+                <div class="profile-field">
+                    <span class="profile-field-label">Plan</span>
+                    <span class="profile-field-value" style="color:var(--accent);">✨ Premium</span>
+                </div>
+                <div class="profile-field">
+                    <span class="profile-field-label">Total Predictions</span>
+                    <span class="profile-field-value">{{ total_predictions }}</span>
+                </div>
+                <div class="profile-field" style="border:none;">
+                    <span class="profile-field-label">Bio</span>
+                    <span class="profile-field-value" style="font-weight:400; color:var(--text-mid);">Just a human
+                        who loves cats 🐱</span>
+                </div>
+            </div>
+
+            <!-- Cat Friends -->
+            <div class="profile-card">
+                <h3>🐾 Cat Friends</h3>
+                <div class="friend-item">
+                    <div class="friend-avatar" style="background:rgba(245,158,11,0.12);">😺</div>
+                    <div class="friend-info">
+                        <div class="friend-name">Whiskers</div>
+                        <div class="friend-status">Happy • Just now</div>
+                    </div>
+                    <div class="online-dot"></div>
+                </div>
+                <div class="friend-item">
+                    <div class="friend-avatar" style="background:rgba(139,92,246,0.12);">😸</div>
+                    <div class="friend-info">
+                        <div class="friend-name">Luna</div>
+                        <div class="friend-status">Playful • 5m ago</div>
+                    </div>
+                    <div class="online-dot"></div>
+                </div>
+                <div class="friend-item">
+                    <div class="friend-avatar" style="background:rgba(16,185,129,0.12);">😻</div>
+                    <div class="friend-info">
+                        <div class="friend-name">Mittens</div>
+                        <div class="friend-status">Sleepy • 2h ago</div>
+                    </div>
+                    <div class="online-dot" style="background:var(--text-light);"></div>
+                </div>
+                <div class="friend-item">
+                    <div class="friend-avatar" style="background:rgba(236,72,153,0.12);">🐱</div>
+                    <div class="friend-info">
+                        <div class="friend-name">Oliver</div>
+                        <div class="friend-status">Curious • 4h ago</div>
+                    </div>
+                    <div class="online-dot" style="background:var(--text-light);"></div>
+                </div>
+                <div class="friend-item">
+                    <div class="friend-avatar" style="background:rgba(59,130,246,0.12);">😼</div>
+                    <div class="friend-info">
+                        <div class="friend-name">Shadow</div>
+                        <div class="friend-status">Alert • 1d ago</div>
+                    </div>
+                    <div class="online-dot" style="background:var(--text-light);"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================== -->
+        <!-- SECTION 5: Cat Video Showcase  -->
+        <!-- ============================== -->
+        <div class="dash-card" style="margin-bottom:28px;">
+            <div class="dash-card-header">
+                <h3>🎬 Your Cat Journey</h3>
+                <span style="color:var(--text-light); font-size:0.85rem;">Sessions captured with AI</span>
+            </div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+                <!-- Large featured video -->
+                <div style="position:relative; border-radius:var(--radius-lg); overflow:hidden; box-shadow:var(--shadow-md); grid-row: span 2; transition:var(--transition);"
+                    onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='none'">
+                    <video autoplay muted loop playsinline
+                        style="width:100%; display:block; height:100%; min-height:300px; object-fit:cover;">
+                        <source src="{{ url_for('serve_media', filename='AI_Analyzes_Cat_s_Curiosity.mp4') }}"
+                            type="video/mp4">
+                    </video>
+                    <div
+                        style="position:absolute; bottom:0; left:0; right:0; padding:20px; background:linear-gradient(transparent, rgba(0,0,0,0.8));">
+                        <div style="color:#fff; font-weight:800; font-size:1.1rem;">🔍 AI Curiosity Analysis</div>
+                        <div style="color:rgba(255,255,255,0.7); font-size:0.85rem;">Full AI session recording</div>
+                    </div>
+                </div>
+                <!-- Smaller videos -->
+                <div style="position:relative; border-radius:var(--radius-lg); overflow:hidden; box-shadow:var(--shadow-md); transition:var(--transition);"
+                    onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='none'">
+                    <video autoplay muted loop playsinline
+                        style="width:100%; display:block; height:180px; object-fit:cover;">
+                        <source
+                            src="{{ url_for('serve_media', filename='grok-video-78357e77-95ed-406d-8a54-df6a852cc3d7 (3).mp4') }}"
+                            type="video/mp4">
+                    </video>
+                    <div
+                        style="position:absolute; bottom:0; left:0; right:0; padding:14px; background:linear-gradient(transparent, rgba(0,0,0,0.7));">
+                        <div style="color:#fff; font-weight:700; font-size:0.9rem;">😸 Happy Cat</div>
+                    </div>
+                </div>
+                <div style="position:relative; border-radius:var(--radius-lg); overflow:hidden; box-shadow:var(--shadow-md); transition:var(--transition);"
+                    onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='none'">
+                    <video autoplay muted loop playsinline
+                        style="width:100%; display:block; height:180px; object-fit:cover;">
+                        <source
+                            src="{{ url_for('serve_media', filename='grok-video-f7857bed-98a3-4edc-8ef9-9413cf876406 (1).mp4') }}"
+                            type="video/mp4">
+                    </video>
+                    <div
+                        style="position:absolute; bottom:0; left:0; right:0; padding:14px; background:linear-gradient(transparent, rgba(0,0,0,0.7));">
+                        <div style="color:#fff; font-weight:700; font-size:0.9rem;">😺 Relaxed Cat</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================== -->
+        <!-- SECTION 6: Recent Activity     -->
+        <!-- ============================== -->
+        <div class="dash-card" style="margin-bottom:32px;">
+            <div class="dash-card-header">
+                <h3>📋 Recent Prediction History</h3>
+                <a href="{{ url_for('history') }}" style="color:var(--accent); font-size:0.85rem; font-weight:600;">View
+                    All →</a>
+            </div>
+            <div class="activity-list">
+                {% if recent_predictions %}
+                {% for pred in recent_predictions %}
+                <div class="activity-item">
+                    <div class="activity-icon"
+                        style="background:{{ 'rgba(245,158,11,0.12)' if pred.file_type == 'image' else 'rgba(59,130,246,0.12)' }};">
+                        {{ '📸' if pred.file_type == 'image' else '🎵' }}
+                    </div>
+                    <div class="activity-info">
+                        <div class="activity-text">{{ pred.filename }} — <strong>{{ pred.prediction_result
+                                }}</strong> detected</div>
+                        <div class="activity-time">{{ pred.timestamp.strftime('%b %d, %Y at %I:%M %p') }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="activity-item">
+                    <div class="activity-icon" style="background:rgba(245,158,11,0.12);">🐾</div>
+                    <div class="activity-info">
+                        <div class="activity-text">No prediction history yet. Start analyzing!</div>
+                        <div class="activity-time">Just now</div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- ============================== -->
+        <!-- SECTION 7: Emotion Distribution-->
+        <!-- ============================== -->
+        {% if emotion_distribution %}
+        <div class="dash-card" style="margin-bottom:32px;">
+            <div class="dash-card-header">
+                <h3>🎯 Your Emotion Breakdown</h3>
+            </div>
+            {% for emotion, count in emotion_distribution.items() %}
+            <div class="progress-bar-wrap">
+                <div class="progress-label">
+                    <span>{{ emotion }}</span><span>{{ count }} ({{ (count / total_predictions * 100)|int if
+                        total_predictions > 0 else 0 }}%)</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill"
+                        data-width="{{ (count / total_predictions * 100)|int if total_predictions > 0 else 0 }}%" style="width:0; background: linear-gradient(90deg,
+                            {% if loop.index0 % 5 == 0 %}#f59e0b, #fbbf24
+                            {% elif loop.index0 % 5 == 1 %}#3b82f6, #60a5fa
+                            {% elif loop.index0 % 5 == 2 %}#ec4899, #f472b6
+                            {% elif loop.index0 % 5 == 3 %}#8b5cf6, #a78bfa
+                            {% else %}#10b981, #34d399
+                            {% endif %});"></div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+    </main>
+</div>
+
+<!-- Edit Profile Modal -->
+<div id="editModal"
+    style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); backdrop-filter:blur(8px); z-index:9999; align-items:center; justify-content:center;">
+    <div
+        style="background:#fff; border-radius:var(--radius-xl); padding:40px; width:90%; max-width:460px; box-shadow:var(--shadow-xl); animation: scaleIn 0.3s ease;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:28px;">
+            <h2 style="font-size:1.4rem; font-weight:700;">Edit Profile</h2>
+            <button onclick="document.getElementById('editModal').style.display='none'"
+                style="font-size:1.5rem; cursor:pointer; background:none; border:none; color:var(--text-light);">✕</button>
+        </div>
+        <form method="POST" action="{{ url_for('update_profile') }}">
+            <div class="form-group">
+                <label>Display Name</label>
+                <input type="text" class="form-control" value="{{ current_user.display_name }}" id="editName"
+                    name="display_name">
+            </div>
+            <div class="form-group">
+                <label>Bio</label>
+                <textarea class="form-control" rows="3" id="editBio" name="bio"
+                    style="resize:vertical;">Just a human who loves cats 🐱</textarea>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%;">💾 Save Changes</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    if (window.innerWidth <= 768) document.getElementById('sidebarToggle').style.display = 'block';
+    window.addEventListener('resize', () => {
+        document.getElementById('sidebarToggle').style.display = window.innerWidth <= 768 ? 'block' : 'none';
+    });
+</script>
+{% endblock %}

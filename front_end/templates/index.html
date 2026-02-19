@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+
+{% block description %}MewConnect - Because everybody needs a friend. AI-powered cat emotion recognition and
+companionship platform.{% endblock %}
+{% block title %}MewConnect | Everybody Needs a Friend{% endblock %}
+{% block page_id %}landing{% endblock %}
+
+{% block body %}
+<!-- NAVBAR -->
+<nav class="navbar" id="mainNavbar">
+    <div class="container">
+        <a href="{{ url_for('home') }}" class="nav-logo">
+            <div class="logo-icon">🐱</div>
+            <span>MewConnect</span>
+        </a>
+        <div class="nav-links" id="navLinks">
+            <a href="{{ url_for('home') }}">Home</a>
+            <a href="{{ url_for('register') }}">Features</a>
+            <a href="{{ url_for('login') }}">Login</a>
+            <a href="{{ url_for('register') }}" class="btn btn-primary btn-sm">Get Started</a>
+        </div>
+        <div class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+            <span></span><span></span><span></span>
+        </div>
+    </div>
+</nav>
+
+<!-- HERO SECTION -->
+<section class="hero" id="heroSection">
+    <div class="hero-particles" id="heroParticles"></div>
+    <div class="container">
+        <div class="hero-content">
+            <div class="hero-badge">🐾 AI-Powered Emotion Recognition</div>
+            <h1>Everybody Needs A <span>Friend</span> In Life</h1>
+            <p class="hero-subtitle">
+                Cats are intelligent, curious, and deeply expressive. Discover the emotions behind every purr,
+                every whisker twitch, and every gentle gaze with MewConnect.
+            </p>
+            <div class="hero-buttons">
+                <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg" id="getStartedBtn">
+                    🚀 Get Started Now
+                </a>
+                <div class="hero-watch"
+                    onclick="document.getElementById('catGallery').scrollIntoView({behavior:'smooth'})">
+                    <div class="play-circle">▶</div>
+                    <span>Watch Video</span>
+                </div>
+            </div>
+
+            <!-- Cat Gallery -->
+            <div class="cat-gallery" id="catGallery">
+                <div class="cat-card">
+                    <div class="cat-card-inner">
+                        <div class="cat-emoji">🐱</div>
+                        <div class="cat-name">Happy Whiskers</div>
+                    </div>
+                </div>
+                <div class="cat-card">
+                    <div class="cat-card-inner">
+                        <div class="cat-emoji">😺</div>
+                        <div class="cat-name">Curious Mittens</div>
+                    </div>
+                </div>
+                <div class="cat-card">
+                    <div class="cat-card-inner">
+                        <div class="cat-emoji">😸</div>
+                        <div class="cat-name">Playful Luna</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Social Sidebar -->
+    <div class="social-sidebar">
+        <a href="#" title="Facebook">f</a>
+        <a href="#" title="YouTube">▶</a>
+        <a href="#" title="Instagram">📷</a>
+    </div>
+</section>
+
+<!-- FEATURES SECTION -->
+<section style="background: #fff; padding: 80px 0;">
+    <div class="container">
+        <div style="text-align:center; margin-bottom:50px;" class="animate-on-scroll">
+            <h2
+                style="font-family: var(--font-display); font-size: clamp(2rem,4vw,2.8rem); color: var(--primary); margin-bottom:12px;">
+                Why <span style="color: var(--accent);">MewConnect</span>?
+            </h2>
+            <p style="color: var(--text-mid); max-width:550px; margin:0 auto; font-size:1.05rem;">
+                Understanding your cat's emotions has never been easier. Our AI reads their expressions in real-time.
+            </p>
+        </div>
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:28px;">
+            <div class="animate-on-scroll"
+                style="background:var(--bg-light); border-radius:var(--radius-lg); padding:36px; text-align:center; transition:var(--transition); border:1px solid #f1f5f9;"
+                onmouseover="this.style.transform='translateY(-6px)'; this.style.boxShadow='var(--shadow-lg)';"
+                onmouseout="this.style.transform='none'; this.style.boxShadow='none';">
+                <div style="font-size:3rem; margin-bottom:16px;">🔍</div>
+                <h3 style="font-size:1.2rem; font-weight:700; margin-bottom:10px; color:var(--primary);">Emotion
+                    Detection</h3>
+                <p style="color:var(--text-mid); font-size:0.95rem;">Upload a photo and our AI identifies happiness,
+                    fear, curiosity, and more in seconds.</p>
+            </div>
+            <div class="animate-on-scroll"
+                style="background:var(--bg-light); border-radius:var(--radius-lg); padding:36px; text-align:center; transition:var(--transition); border:1px solid #f1f5f9;"
+                onmouseover="this.style.transform='translateY(-6px)'; this.style.boxShadow='var(--shadow-lg)';"
+                onmouseout="this.style.transform='none'; this.style.boxShadow='none';">
+                <div style="font-size:3rem; margin-bottom:16px;">📊</div>
+                <h3 style="font-size:1.2rem; font-weight:700; margin-bottom:10px; color:var(--primary);">Track Metrics
+                </h3>
+                <p style="color:var(--text-mid); font-size:0.95rem;">Monitor your cat's emotional patterns over time
+                    with beautiful, interactive dashboards.</p>
+            </div>
+            <div class="animate-on-scroll"
+                style="background:var(--bg-light); border-radius:var(--radius-lg); padding:36px; text-align:center; transition:var(--transition); border:1px solid #f1f5f9;"
+                onmouseover="this.style.transform='translateY(-6px)'; this.style.boxShadow='var(--shadow-lg)';"
+                onmouseout="this.style.transform='none'; this.style.boxShadow='none';">
+                <div style="font-size:3rem; margin-bottom:16px;">💛</div>
+                <h3 style="font-size:1.2rem; font-weight:700; margin-bottom:10px; color:var(--primary);">Build
+                    Connection</h3>
+                <p style="color:var(--text-mid); font-size:0.95rem;">Strengthen your bond by truly understanding what
+                    your furry friend is feeling.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- VIDEO SECTION -->
+<section style="background: var(--primary); padding: 80px 0; text-align:center;">
+    <div class="container animate-on-scroll">
+        <h2 style="font-family:var(--font-display); font-size:2.2rem; color:#fff; margin-bottom:12px;">See It In Action
+        </h2>
+        <p
+            style="color:rgba(255,255,255,0.7); margin-bottom:36px; max-width:500px; margin-left:auto; margin-right:auto;">
+            Watch how our AI analyzes cat emotions in real time</p>
+        <div
+            style="max-width:700px; margin:0 auto; border-radius:var(--radius-lg); overflow:hidden; box-shadow: var(--shadow-xl);">
+            <video autoplay muted loop playsinline style="width:100%; display:block;">
+                <source src="{{ url_for('serve_media', filename='AI_Analyzes_Cat_s_Curiosity.mp4') }}" type="video/mp4">
+            </video>
+        </div>
+    </div>
+</section>
+
+<!-- CTA SECTION -->
+<section style="background: var(--gradient-warm); padding: 80px 0; text-align:center;">
+    <div class="container animate-on-scroll">
+        <div style="font-size:4rem; margin-bottom:20px;">🐾</div>
+        <h2
+            style="font-family:var(--font-display); font-size:clamp(1.8rem,3.5vw,2.6rem); color:var(--primary); margin-bottom:16px;">
+            Ready to Understand Your Cat?
+        </h2>
+        <p style="color:var(--text-mid); max-width:480px; margin:0 auto 30px; font-size:1.05rem;">
+            Join thousands of cat lovers who are deepening their connection every day.
+        </p>
+        <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">🚀 Start Free Today</a>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer style="background:var(--primary-dark); color:rgba(255,255,255,0.6); padding:40px 0; text-align:center;">
+    <div class="container">
+        <div style="display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:16px;">
+            <div class="logo-icon"
+                style="width:36px;height:36px;background:var(--gradient-accent);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:1.1rem;">
+                🐱</div>
+            <span style="font-weight:700;font-size:1.2rem;color:#fff;">MewConnect</span>
+        </div>
+        <p style="font-size:0.85rem;">© 2026 MewConnect. Made with 💛 for cat lovers everywhere.</p>
+    </div>
+</footer>
+{% endblock %}

@@ -1,185 +1,250 @@
 {% extends "base.html" %}
 
-{% block title %}History - Cat Emotion Detector{% endblock %}
+{% block description %}MewConnect History - View all your past cat emotion predictions.{% endblock %}
+{% block title %}History | MewConnect{% endblock %}
+{% block page_id %}history{% endblock %}
 
-{% block content %}
-<div class="container py-5">
-    <!-- Page Header -->
-    <div class="row mb-5">
-        <div class="col-12 text-center">
-            <h1 class="display-4 fw-bold mb-3"
-                style="font-family: 'Poppins', sans-serif; background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 2px 20px rgba(255,255,255,0.3);">
-                Prediction History 📊
-            </h1>
-            <p class="lead text-white-50" style="font-size: 1.2rem;">
-                View all your past cat emotion analyses
-            </p>
-        </div>
-    </div>
-
-    <!-- History Card -->
-    <div class="row justify-content-center">
-        <div class="col-lg-10">
-            <div class="card border-0 shadow-lg" style="animation-delay: 0.1s;">
-                <!-- Card Header -->
-                <div class="card-header text-center" style="padding: 2rem;">
-                    <h2 class="mb-0" style="font-family: 'Poppins', sans-serif; font-weight: 700;">Your Analysis Records
-                    </h2>
-                    <p class="mb-0 mt-2" style="opacity: 0.9;">Total Predictions: {{ predictions|length }}</p>
-                </div>
-
-                <!-- Card Body -->
-                <div class="card-body" style="padding: 0;">
-                    {% if predictions %}
-                    <!-- Modern Table -->
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead>
-                                <tr>
-                                    <th style="padding: 1.5rem; width: 10%;">
-                                        <i class="bi bi-hash me-1"></i>#
-                                    </th>
-                                    <th style="padding: 1.5rem; width: 15%;">
-                                        <i class="bi bi-filter-circle me-1"></i>Type
-                                    </th>
-                                    <th style="padding: 1.5rem; width: 30%;">
-                                        <i class="bi bi-file-earmark me-1"></i>Filename
-                                    </th>
-                                    <th style="padding: 1.5rem; width: 20%;">
-                                        <i class="bi bi-emoji-smile me-1"></i>Result
-                                    </th>
-                                    <th style="padding: 1.5rem; width: 25%;">
-                                        <i class="bi bi-clock me-1"></i>Date & Time
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for prediction in predictions %}
-                                <tr>
-                                    <td style="padding: 1.5rem; font-weight: 600;">
-                                        {{ loop.index }}
-                                    </td>
-                                    <td style="padding: 1.5rem;">
-                                        {% if prediction.file_type == 'image' %}
-                                        <span class="badge"
-                                            style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 0.5rem 1rem; border-radius: 50px;">
-                                            <i class="bi bi-image me-1"></i>Image
-                                        </span>
-                                        {% else %}
-                                        <span class="badge"
-                                            style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); padding: 0.5rem 1rem; border-radius: 50px;">
-                                            <i class="bi bi-music-note-beamed me-1"></i>Audio
-                                        </span>
-                                        {% endif %}
-                                    </td>
-                                    <td style="padding: 1.5rem;">
-                                        <div style="display: flex; align-items: center;">
-                                            <i class="bi bi-file-earmark-fill me-2"
-                                                style="color: var(--primary-color);"></i>
-                                            <span style="font-weight: 500;">{{ prediction.filename }}</span>
-                                        </div>
-                                    </td>
-                                    <td style="padding: 1.5rem;">
-                                        <span class="fw-bold" style="color: var(--primary-color); font-size: 1.05rem;">
-                                            {{ prediction.result }}
-                                        </span>
-                                    </td>
-                                    <td style="padding: 1.5rem; color: var(--text-light);">
-                                        <i class="bi bi-calendar-event me-1"></i>
-                                        {{ prediction.timestamp.strftime('%Y-%m-%d %H:%M') }}
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                    {% else %}
-                    <!-- Empty State -->
-                    <div class="text-center py-5" style="padding: 4rem 2rem;">
-                        <div
-                            style="width: 120px; height: 120px; margin: 0 auto 2rem; background: rgba(102, 126, 234, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                            <i class="bi bi-inbox" style="font-size: 4rem; color: var(--primary-color);"></i>
-                        </div>
-                        <h3 style="color: var(--text-dark); font-weight: 600;">No Predictions Yet</h3>
-                        <p class="text-muted mb-4">Upload your first file to get started with emotion detection!</p>
-                        <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg">
-                            <i class="bi bi-cloud-upload me-2"></i>Upload Now
-                        </a>
-                    </div>
-                    {% endif %}
-                </div>
-
-                <!-- Card Footer with Stats -->
-                {% if predictions %}
-                <div class="card-footer"
-                    style="background: rgba(102, 126, 234, 0.05); border-top: 1px solid rgba(0,0,0,0.05); padding: 1.5rem;">
-                    <div class="row text-center">
-                        <div class="col-md-4">
-                            <div class="stat-item">
-                                <i class="bi bi-image" style="font-size: 1.5rem; color: var(--primary-color);"></i>
-                                <h4 class="mt-2 mb-0">{{ predictions|selectattr('file_type', 'equalto',
-                                    'image')|list|length }}</h4>
-                                <small class="text-muted">Image Analyses</small>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="stat-item">
-                                <i class="bi bi-music-note-beamed"
-                                    style="font-size: 1.5rem; color: var(--success-color);"></i>
-                                <h4 class="mt-2 mb-0">{{ predictions|selectattr('file_type', 'equalto',
-                                    'audio')|list|length }}</h4>
-                                <small class="text-muted">Audio Analyses</small>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="stat-item">
-                                <i class="bi bi-graph-up" style="font-size: 1.5rem; color: var(--accent-color);"></i>
-                                <h4 class="mt-2 mb-0">{{ predictions|length }}</h4>
-                                <small class="text-muted">Total Predictions</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-            </div>
-
-            <!-- Back Button -->
-            <div class="text-center mt-4">
-                <a href="{{ url_for('dashboard') }}" class="btn btn-outline-light btn-lg">
-                    <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Add Bootstrap Icons -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
-<!-- Custom Styles -->
+{% block extra_head %}
 <style>
-    .btn-outline-light {
-        border: 2px solid rgba(255, 255, 255, 0.3);
-        color: white;
+    .history-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        margin-top: 16px;
+    }
+
+    .history-table thead th {
+        background: var(--primary);
+        color: #fff;
+        padding: 14px 18px;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
         font-weight: 600;
-        backdrop-filter: blur(10px);
-        background: rgba(255, 255, 255, 0.1);
+        text-align: left;
     }
 
-    .btn-outline-light:hover {
-        background: rgba(255, 255, 255, 0.2);
-        border-color: rgba(255, 255, 255, 0.5);
-        color: white;
-        transform: translateY(-2px);
+    .history-table thead th:first-child {
+        border-radius: var(--radius-md) 0 0 0;
     }
 
-    .stat-item {
-        padding: 1rem;
-        transition: transform 0.3s ease;
+    .history-table thead th:last-child {
+        border-radius: 0 var(--radius-md) 0 0;
     }
 
-    .stat-item:hover {
-        transform: scale(1.05);
+    .history-table tbody td {
+        padding: 14px 18px;
+        border-bottom: 1px solid #f1f5f9;
+        font-size: 0.9rem;
+        vertical-align: middle;
+    }
+
+    .history-table tbody tr {
+        transition: var(--transition);
+    }
+
+    .history-table tbody tr:hover {
+        background: rgba(245, 158, 11, 0.04);
+    }
+
+    .emotion-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 14px;
+        border-radius: var(--radius-xl);
+        font-weight: 600;
+        font-size: 0.85rem;
+        background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(255, 107, 53, 0.1));
+        color: var(--accent-hover);
+    }
+
+    .type-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 12px;
+        border-radius: var(--radius-sm);
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .type-badge.image {
+        background: rgba(59, 130, 246, 0.1);
+        color: var(--info);
+    }
+
+    .type-badge.audio {
+        background: rgba(139, 92, 246, 0.1);
+        color: var(--purple);
+    }
+
+    .empty-history {
+        text-align: center;
+        padding: 60px 20px;
+    }
+
+    .empty-history .empty-icon {
+        font-size: 4rem;
+        margin-bottom: 16px;
+    }
+
+    .empty-history h3 {
+        font-size: 1.3rem;
+        color: var(--primary);
+        margin-bottom: 8px;
+    }
+
+    .empty-history p {
+        color: var(--text-light);
+        max-width: 400px;
+        margin: 0 auto;
+    }
+
+    @media (max-width: 768px) {
+        .history-table thead {
+            display: none;
+        }
+
+        .history-table tbody tr {
+            display: block;
+            margin-bottom: 12px;
+            border: 1px solid #f1f5f9;
+            border-radius: var(--radius-md);
+            padding: 12px;
+        }
+
+        .history-table tbody td {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 4px;
+            border: none;
+        }
+
+        .history-table tbody td::before {
+            content: attr(data-label);
+            font-weight: 600;
+            font-size: 0.78rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+        }
     }
 </style>
+{% endblock %}
+
+{% block body %}
+<div class="dashboard-layout">
+    <!-- SIDEBAR -->
+    {% set active_page = 'history' %}
+    {% include '_sidebar.html' %}
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <button id="sidebarToggle"
+            style="display:none; position:fixed; top:16px; left:16px; z-index:600; width:44px; height:44px; background:var(--primary); color:#fff; border-radius:var(--radius-md); font-size:1.3rem; border:none; cursor:pointer;">☰</button>
+
+        <!-- ============================== -->
+        <!-- SECTION 1: Page Header         -->
+        <!-- ============================== -->
+        <div class="page-header">
+            <div>
+                <h1>Prediction History 🕐</h1>
+                <p style="color:var(--text-light); margin-top:4px;">All your past cat emotion analyses</p>
+            </div>
+            <div class="header-actions">
+                <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-sm">📸 New Analysis</a>
+            </div>
+        </div>
+
+        <!-- ============================== -->
+        <!-- SECTION 2: Quick Stats         -->
+        <!-- ============================== -->
+        {% if predictions %}
+        <div style="display:flex; gap:16px; margin-bottom:28px; flex-wrap:wrap;">
+            <div
+                style="flex:1; min-width:140px; background:#fff; border-radius:var(--radius-md); padding:20px; box-shadow:var(--shadow-sm); text-align:center;">
+                <div style="font-size:1.8rem; font-weight:800; color:var(--accent);">{{ predictions|length }}</div>
+                <div style="font-size:0.8rem; color:var(--text-light); font-weight:500; margin-top:4px;">Total Records
+                </div>
+            </div>
+            <div
+                style="flex:1; min-width:140px; background:#fff; border-radius:var(--radius-md); padding:20px; box-shadow:var(--shadow-sm); text-align:center;">
+                <div style="font-size:1.8rem; font-weight:800; color:var(--info);">{{ predictions |
+                    selectattr('file_type', 'equalto', 'image') | list | length }}</div>
+                <div style="font-size:0.8rem; color:var(--text-light); font-weight:500; margin-top:4px;">📸 Images</div>
+            </div>
+            <div
+                style="flex:1; min-width:140px; background:#fff; border-radius:var(--radius-md); padding:20px; box-shadow:var(--shadow-sm); text-align:center;">
+                <div style="font-size:1.8rem; font-weight:800; color:var(--purple);">{{ predictions |
+                    selectattr('file_type', 'equalto', 'audio') | list | length }}</div>
+                <div style="font-size:0.8rem; color:var(--text-light); font-weight:500; margin-top:4px;">🎵 Audio</div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- ============================== -->
+        <!-- SECTION 3: History Table       -->
+        <!-- ============================== -->
+        <div class="dash-card" style="margin-bottom:32px;">
+            {% if predictions %}
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Type</th>
+                        <th>Filename</th>
+                        <th>Emotion Detected</th>
+                        <th>Date & Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pred in predictions %}
+                    <tr>
+                        <td data-label="#" style="color:var(--text-light); font-weight:600;">{{ loop.index }}</td>
+                        <td data-label="Type">
+                            <span class="type-badge {{ pred.file_type }}">
+                                {% if pred.file_type == 'image' %}📸 Image{% else %}🎵 Audio{% endif %}
+                            </span>
+                        </td>
+                        <td data-label="File" style="font-weight:500;">{{ pred.filename }}</td>
+                        <td data-label="Emotion">
+                            <span class="emotion-badge">
+                                {% if pred.prediction_result in ['Happy', 'happy'] %}😸
+                                {% elif pred.prediction_result in ['Angry', 'angry'] %}😾
+                                {% elif pred.prediction_result in ['Sad', 'sad'] %}😿
+                                {% elif pred.prediction_result in ['Scared', 'scared', 'Fear', 'fear'] %}🙀
+                                {% else %}🐱
+                                {% endif %}
+                                {{ pred.prediction_result }}
+                            </span>
+                        </td>
+                        <td data-label="Date" style="color:var(--text-light); font-size:0.85rem;">{{
+                            pred.timestamp.strftime('%b %d, %Y —
+                            %I:%M %p') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-history">
+                <div class="empty-icon">🐱</div>
+                <h3>No Predictions Yet</h3>
+                <p>Upload a cat photo or audio file to get started with emotion analysis!</p>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-primary" style="margin-top:20px;">📸 Start
+                    Analyzing</a>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    if (window.innerWidth <= 768) document.getElementById('sidebarToggle').style.display = 'block';
+    window.addEventListener('resize', () => {
+        document.getElementById('sidebarToggle').style.display = window.innerWidth <= 768 ? 'block' : 'none';
+    });
+</script>
 {% endblock %}

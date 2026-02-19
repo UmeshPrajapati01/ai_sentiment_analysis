@@ -7,13 +7,21 @@ db = SQLAlchemy()
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=True, default='Cat Lover')
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
     # Relationship to predictions
     predictions = db.relationship('Prediction', backref='author', lazy=True)
 
+    @property
+    def display_name(self):
+        """Return user's name, or derive from email if not set."""
+        if self.name and self.name != 'Cat Lover':
+            return self.name
+        return self.email.split('@')[0].capitalize()
+
     def __repr__(self):
-        return f"User('{self.email}')"
+        return f"User('{self.name}', '{self.email}')"
 
 class Prediction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
