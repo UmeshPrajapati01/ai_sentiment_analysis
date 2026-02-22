@@ -98,6 +98,16 @@ def landing():
     return render_template('index.html')
 
 # ==========================================
+# ROUTE: PPT PRESENTATION
+# ==========================================
+
+@app.route('/ppt')
+def ppt():
+    """Serve the PPT-like presentation from ppt_like_work/index.html."""
+    ppt_dir = BASE_DIR / 'ppt_like_work'
+    return send_from_directory(str(ppt_dir), 'index.html')
+
+# ==========================================
 # ROUTES: AUTH (Register, Login, Logout)
 # ==========================================
 
