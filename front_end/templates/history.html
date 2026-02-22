@@ -1,11 +1,12 @@
 {% extends "base.html" %}
 
-{% block description %}MewConnect History - View all your past cat emotion predictions.{% endblock %}
+{% block description %}MewConnect History — View all your past cat emotion prediction results.{% endblock %}
 {% block title %}History | MewConnect{% endblock %}
 {% block page_id %}history{% endblock %}
 
 {% block extra_head %}
 <style>
+    /* History table overrides (light-card context) */
     .history-table {
         width: 100%;
         border-collapse: separate;
@@ -14,36 +15,33 @@
     }
 
     .history-table thead th {
-        background: var(--primary);
+        background: linear-gradient(135deg, #f59e0b, #fb923c);
         color: #fff;
         padding: 14px 18px;
-        font-size: 0.85rem;
+        font-size: 0.82rem;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        font-weight: 600;
+        font-weight: 700;
         text-align: left;
     }
 
     .history-table thead th:first-child {
-        border-radius: var(--radius-md) 0 0 0;
+        border-radius: 12px 0 0 0;
     }
 
     .history-table thead th:last-child {
-        border-radius: 0 var(--radius-md) 0 0;
+        border-radius: 0 12px 0 0;
     }
 
     .history-table tbody td {
-        padding: 14px 18px;
+        padding: 13px 18px;
         border-bottom: 1px solid #f1f5f9;
-        font-size: 0.9rem;
+        font-size: 0.88rem;
         vertical-align: middle;
+        color: #334155;
     }
 
-    .history-table tbody tr {
-        transition: var(--transition);
-    }
-
-    .history-table tbody tr:hover {
+    .history-table tbody tr:hover td {
         background: rgba(245, 158, 11, 0.04);
     }
 
@@ -51,12 +49,12 @@
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        padding: 6px 14px;
-        border-radius: var(--radius-xl);
-        font-weight: 600;
-        font-size: 0.85rem;
-        background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(255, 107, 53, 0.1));
-        color: var(--accent-hover);
+        padding: 5px 13px;
+        border-radius: 999px;
+        font-weight: 700;
+        font-size: 0.83rem;
+        background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(251, 146, 60, 0.12));
+        color: #b45309;
     }
 
     .type-badge {
@@ -64,44 +62,22 @@
         align-items: center;
         gap: 4px;
         padding: 4px 12px;
-        border-radius: var(--radius-sm);
-        font-size: 0.8rem;
-        font-weight: 600;
+        border-radius: 8px;
+        font-size: 0.78rem;
+        font-weight: 700;
     }
 
     .type-badge.image {
         background: rgba(59, 130, 246, 0.1);
-        color: var(--info);
+        color: #3b82f6;
     }
 
     .type-badge.audio {
         background: rgba(139, 92, 246, 0.1);
-        color: var(--purple);
+        color: #8b5cf6;
     }
 
-    .empty-history {
-        text-align: center;
-        padding: 60px 20px;
-    }
-
-    .empty-history .empty-icon {
-        font-size: 4rem;
-        margin-bottom: 16px;
-    }
-
-    .empty-history h3 {
-        font-size: 1.3rem;
-        color: var(--primary);
-        margin-bottom: 8px;
-    }
-
-    .empty-history p {
-        color: var(--text-light);
-        max-width: 400px;
-        margin: 0 auto;
-    }
-
-    @media (max-width: 768px) {
+    @media(max-width:768px) {
         .history-table thead {
             display: none;
         }
@@ -109,9 +85,10 @@
         .history-table tbody tr {
             display: block;
             margin-bottom: 12px;
-            border: 1px solid #f1f5f9;
-            border-radius: var(--radius-md);
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
             padding: 12px;
+            background: #fff;
         }
 
         .history-table tbody td {
@@ -124,9 +101,9 @@
 
         .history-table tbody td::before {
             content: attr(data-label);
-            font-weight: 600;
-            font-size: 0.78rem;
-            color: var(--text-light);
+            font-weight: 700;
+            font-size: 0.76rem;
+            color: #94a3b8;
             text-transform: uppercase;
         }
     }
@@ -135,116 +112,124 @@
 
 {% block body %}
 <div class="dashboard-layout">
-    <!-- SIDEBAR -->
     {% set active_page = 'history' %}
     {% include '_sidebar.html' %}
 
-    <!-- MAIN CONTENT -->
-    <main class="main-content">
-        <button id="sidebarToggle"
-            style="display:none; position:fixed; top:16px; left:16px; z-index:600; width:44px; height:44px; background:var(--primary); color:#fff; border-radius:var(--radius-md); font-size:1.3rem; border:none; cursor:pointer;">☰</button>
+    <main class="main-content" id="mainContent">
+        <button id="sidebarToggle" style="display:none;position:fixed;top:16px;left:16px;z-index:600;width:44px;height:44px;
+             background:#fff;border:1px solid #e2e8f0;border-radius:10px;font-size:1.2rem;
+             cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,0.1);align-items:center;justify-content:center;"
+            aria-label="Toggle sidebar">☰</button>
 
-        <!-- ============================== -->
-        <!-- SECTION 1: Page Header         -->
-        <!-- ============================== -->
+        <!-- Page Header -->
         <div class="page-header">
             <div>
                 <h1>Prediction History 🕐</h1>
-                <p style="color:var(--text-light); margin-top:4px;">All your past cat emotion analyses</p>
+                <p style="color:#94a3b8;margin-top:4px;font-size:0.9rem;">All your past cat emotion analyses</p>
             </div>
             <div class="header-actions">
-                <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-sm">📸 New Analysis</a>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-dash-primary btn-sm">📸 New Analysis</a>
             </div>
         </div>
 
-        <!-- ============================== -->
-        <!-- SECTION 2: Quick Stats         -->
-        <!-- ============================== -->
+        <!-- Quick Stats (only if records exist) -->
         {% if predictions %}
-        <div style="display:flex; gap:16px; margin-bottom:28px; flex-wrap:wrap;">
+        <div style="display:flex;gap:16px;margin-bottom:28px;flex-wrap:wrap;" class="reveal">
             <div
-                style="flex:1; min-width:140px; background:#fff; border-radius:var(--radius-md); padding:20px; box-shadow:var(--shadow-sm); text-align:center;">
-                <div style="font-size:1.8rem; font-weight:800; color:var(--accent);">{{ predictions|length }}</div>
-                <div style="font-size:0.8rem; color:var(--text-light); font-weight:500; margin-top:4px;">Total Records
-                </div>
+                style="flex:1;min-width:130px;background:#fff;border-radius:14px;padding:20px;box-shadow:0 2px 16px rgba(0,0,0,0.06);text-align:center;">
+                <div style="font-size:1.8rem;font-weight:800;color:#d97706;">{{ predictions|length }}</div>
+                <div style="font-size:0.8rem;color:#94a3b8;font-weight:600;margin-top:4px;">Total Records</div>
             </div>
             <div
-                style="flex:1; min-width:140px; background:#fff; border-radius:var(--radius-md); padding:20px; box-shadow:var(--shadow-sm); text-align:center;">
-                <div style="font-size:1.8rem; font-weight:800; color:var(--info);">{{ predictions |
-                    selectattr('file_type', 'equalto', 'image') | list | length }}</div>
-                <div style="font-size:0.8rem; color:var(--text-light); font-weight:500; margin-top:4px;">📸 Images</div>
+                style="flex:1;min-width:130px;background:#fff;border-radius:14px;padding:20px;box-shadow:0 2px 16px rgba(0,0,0,0.06);text-align:center;">
+                <div style="font-size:1.8rem;font-weight:800;color:#3b82f6;">{{ predictions | selectattr('file_type',
+                    'equalto', 'image') | list | length }}</div>
+                <div style="font-size:0.8rem;color:#94a3b8;font-weight:600;margin-top:4px;">📸 Images</div>
             </div>
             <div
-                style="flex:1; min-width:140px; background:#fff; border-radius:var(--radius-md); padding:20px; box-shadow:var(--shadow-sm); text-align:center;">
-                <div style="font-size:1.8rem; font-weight:800; color:var(--purple);">{{ predictions |
-                    selectattr('file_type', 'equalto', 'audio') | list | length }}</div>
-                <div style="font-size:0.8rem; color:var(--text-light); font-weight:500; margin-top:4px;">🎵 Audio</div>
+                style="flex:1;min-width:130px;background:#fff;border-radius:14px;padding:20px;box-shadow:0 2px 16px rgba(0,0,0,0.06);text-align:center;">
+                <div style="font-size:1.8rem;font-weight:800;color:#8b5cf6;">{{ predictions | selectattr('file_type',
+                    'equalto', 'audio') | list | length }}</div>
+                <div style="font-size:0.8rem;color:#94a3b8;font-weight:600;margin-top:4px;">🎵 Audio</div>
+            </div>
+            <div
+                style="flex:1;min-width:130px;background:#fff;border-radius:14px;padding:20px;box-shadow:0 2px 16px rgba(0,0,0,0.06);text-align:center;">
+                <div style="font-size:1.8rem;font-weight:800;color:#10b981;">{{ predictions |
+                    map(attribute='prediction_result') | unique | list | length }}</div>
+                <div style="font-size:0.8rem;color:#94a3b8;font-weight:600;margin-top:4px;">🎯 Emotions Found</div>
             </div>
         </div>
         {% endif %}
 
-        <!-- ============================== -->
-        <!-- SECTION 3: History Table       -->
-        <!-- ============================== -->
-        <div class="dash-card" style="margin-bottom:32px;">
+        <!-- Table -->
+        <div class="dash-card reveal" style="margin-bottom:32px;overflow:hidden;">
             {% if predictions %}
-            <table class="history-table">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Type</th>
-                        <th>Filename</th>
-                        <th>Emotion Detected</th>
-                        <th>Date & Time</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for pred in predictions %}
-                    <tr>
-                        <td data-label="#" style="color:var(--text-light); font-weight:600;">{{ loop.index }}</td>
-                        <td data-label="Type">
-                            <span class="type-badge {{ pred.file_type }}">
-                                {% if pred.file_type == 'image' %}📸 Image{% else %}🎵 Audio{% endif %}
-                            </span>
-                        </td>
-                        <td data-label="File" style="font-weight:500;">{{ pred.filename }}</td>
-                        <td data-label="Emotion">
-                            <span class="emotion-badge">
-                                {% if pred.prediction_result in ['Happy', 'happy'] %}😸
-                                {% elif pred.prediction_result in ['Angry', 'angry'] %}😾
-                                {% elif pred.prediction_result in ['Sad', 'sad'] %}😿
-                                {% elif pred.prediction_result in ['Scared', 'scared', 'Fear', 'fear'] %}🙀
-                                {% else %}🐱
-                                {% endif %}
-                                {{ pred.prediction_result }}
-                            </span>
-                        </td>
-                        <td data-label="Date" style="color:var(--text-light); font-size:0.85rem;">{{
-                            pred.timestamp.strftime('%b %d, %Y —
-                            %I:%M %p') }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <div style="overflow-x:auto;">
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Type</th>
+                            <th>Filename</th>
+                            <th>Emotion Detected</th>
+                            <th>Date &amp; Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for pred in predictions %}
+                        <tr>
+                            <td data-label="#" style="font-weight:700;color:#94a3b8;">{{ loop.index }}</td>
+                            <td data-label="Type">
+                                <span class="type-badge {{ pred.file_type }}">
+                                    {{ '📸 Image' if pred.file_type == 'image' else '🎵 Audio' }}
+                                </span>
+                            </td>
+                            <td data-label="File" style="font-weight:600;max-width:200px;word-break:break-word;">{{
+                                pred.filename }}</td>
+                            <td data-label="Emotion">
+                                <span class="emotion-badge">
+                                    {% set r = pred.prediction_result|lower %}
+                                    {% if r == 'happy' %}😸
+                                    {% elif r == 'angry' %}😾
+                                    {% elif r in ['sad','sadness'] %}😿
+                                    {% elif r in ['scared','fear'] %}🙀
+                                    {% elif r == 'curious' %}🔍
+                                    {% elif r == 'relaxed' %}😺
+                                    {% else %}🐱
+                                    {% endif %}
+                                    {{ pred.prediction_result }}
+                                </span>
+                            </td>
+                            <td data-label="Date" style="color:#94a3b8;font-size:0.84rem;">
+                                {{ pred.timestamp.strftime('%b %d, %Y — %I:%M %p') }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
             {% else %}
-            <div class="empty-history">
-                <div class="empty-icon">🐱</div>
-                <h3>No Predictions Yet</h3>
-                <p>Upload a cat photo or audio file to get started with emotion analysis!</p>
-                <a href="{{ url_for('dashboard') }}" class="btn btn-primary" style="margin-top:20px;">📸 Start
+            <div style="text-align:center;padding:64px 20px;">
+                <div style="font-size:4rem;margin-bottom:16px;" aria-hidden="true">🐱</div>
+                <h3 style="font-size:1.3rem;font-weight:800;color:#1e293b;margin-bottom:8px;">No Predictions Yet</h3>
+                <p style="color:#94a3b8;max-width:380px;margin:0 auto;">Upload a cat photo or audio file on the
+                    dashboard to get started with emotion analysis!</p>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-dash-primary" style="margin-top:24px;">📸 Start
                     Analyzing</a>
             </div>
             {% endif %}
         </div>
+
     </main>
 </div>
 {% endblock %}
 
 {% block extra_scripts %}
 <script>
-    if (window.innerWidth <= 768) document.getElementById('sidebarToggle').style.display = 'block';
-    window.addEventListener('resize', () => {
-        document.getElementById('sidebarToggle').style.display = window.innerWidth <= 768 ? 'block' : 'none';
-    });
+    (function () {
+        const toggle = document.getElementById('sidebarToggle');
+        const show = () => { if (toggle) toggle.style.display = window.innerWidth <= 768 ? 'flex' : 'none'; };
+        window.addEventListener('resize', show); show();
+    })();
 </script>
 {% endblock %}

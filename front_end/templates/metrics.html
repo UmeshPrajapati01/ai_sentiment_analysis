@@ -1,273 +1,274 @@
 {% extends "base.html" %}
 
-{% block description %}MewConnect Metrics - Detailed analytics of your cat's emotions.{% endblock %}
+{% block description %}MewConnect Metrics — Detailed analytics on your cat's emotional patterns.{% endblock %}
 {% block title %}Metrics | MewConnect{% endblock %}
 {% block page_id %}metrics{% endblock %}
 
 {% block body %}
 <div class="dashboard-layout">
-    <!-- SIDEBAR -->
     {% set active_page = 'metrics' %}
     {% include '_sidebar.html' %}
 
-    <!-- MAIN CONTENT -->
-    <main class="main-content">
-        <button id="sidebarToggle"
-            style="display:none; position:fixed; top:16px; left:16px; z-index:600; width:44px; height:44px; background:var(--primary); color:#fff; border-radius:var(--radius-md); font-size:1.3rem; border:none; cursor:pointer;">☰</button>
+    <main class="main-content" id="mainContent">
+        <button id="sidebarToggle" style="display:none;position:fixed;top:16px;left:16px;z-index:600;width:44px;height:44px;
+             background:#fff;border:1px solid #e2e8f0;border-radius:10px;font-size:1.2rem;
+             cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,0.1);align-items:center;justify-content:center;"
+            aria-label="Toggle sidebar">☰</button>
 
-        <!-- ============================== -->
-        <!-- SECTION 1: Page Header         -->
-        <!-- ============================== -->
+        <!-- Page Header -->
         <div class="page-header">
             <div>
-                <h1>Metrics & Analytics 📈</h1>
-                <p style="color:var(--text-light); margin-top:4px;">Deep dive into your cat's emotional patterns</p>
+                <h1>Metrics &amp; Analytics 📊</h1>
+                <p style="color:#94a3b8;margin-top:4px;font-size:0.9rem;">Deep insights into your cat's emotional world
+                </p>
             </div>
             <div class="header-actions">
-                <select
-                    style="padding:10px 16px; border:2px solid #e2e8f0; border-radius:var(--radius-md); font-size:0.9rem; font-weight:500;">
-                    <option>Last 7 Days</option>
-                    <option>Last 30 Days</option>
-                    <option>Last 90 Days</option>
-                </select>
+                <a href="{{ url_for('history') }}" class="btn btn-dash-primary btn-sm">📋 View History</a>
             </div>
         </div>
 
-        <!-- ============================== -->
-        <!-- SECTION 2: Top Stats           -->
-        <!-- ============================== -->
+        <!-- Stats Grid -->
         <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-card-icon">📸</div>
+            <div class="stat-card reveal">
+                <div class="stat-card-icon">🐾</div>
                 <div class="stat-card-value">{{ total_predictions }}</div>
-                <div class="stat-card-label">Total Analyzed</div>
-                <div class="stat-card-change up">↑ Active</div>
+                <div class="stat-card-label">Total Analyses</div>
+                <div class="stat-card-change up">↑ All Time</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-card-icon">🖼️</div>
+            <div class="stat-card reveal" style="transition-delay:0.08s">
+                <div class="stat-card-icon">📸</div>
                 <div class="stat-card-value">{{ image_count }}</div>
                 <div class="stat-card-label">Image Analyses</div>
                 <div class="stat-card-change up">📸 Photos</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-card-icon">🎯</div>
-                <div class="stat-card-value">{{ unique_emotions }}</div>
-                <div class="stat-card-label">Emotions Detected</div>
-                <div class="stat-card-change up">🎵 Unique</div>
-            </div>
-            <div class="stat-card">
+            <div class="stat-card reveal" style="transition-delay:0.16s">
                 <div class="stat-card-icon">🎵</div>
                 <div class="stat-card-value">{{ audio_count }}</div>
                 <div class="stat-card-label">Audio Analyses</div>
                 <div class="stat-card-change up">🎵 Audio</div>
             </div>
+            <div class="stat-card reveal" style="transition-delay:0.24s">
+                <div class="stat-card-icon">🎯</div>
+                <div class="stat-card-value">{{ unique_emotions }}</div>
+                <div class="stat-card-label">Unique Emotions</div>
+                <div class="stat-card-change up">✅ Detected</div>
+            </div>
         </div>
 
-        <!-- ============================== -->
-        <!-- SECTION 3: Emotion + Donut     -->
-        <!-- ============================== -->
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:24px; margin-bottom:28px;">
-            <!-- Emotion Distribution -->
-            <div class="metric-card">
-                <h3>😺 Emotion Distribution</h3>
-                {% if emotion_distribution %}
+        <!-- Chart + Emotion Breakdown Row -->
+        <div class="dashboard-grid">
+            <!-- Weekly Chart -->
+            <div class="dash-card reveal">
+                <div class="dash-card-header">
+                    <h3>📈 Weekly Emotion Trend</h3>
+                    <select
+                        style="padding:5px 10px;border:1px solid #e2e8f0;border-radius:6px;font-size:0.8rem;color:#64748b;cursor:pointer;">
+                        <option>This Week</option>
+                        <option>This Month</option>
+                    </select>
+                </div>
+                <div class="chart-bars" id="metricChart" role="img" aria-label="Weekly emotion trend chart">
+                    <div class="chart-bar" data-height="70%"
+                        style="background:linear-gradient(to top,#f59e0b,#fbbf24);height:0;"><span
+                            class="chart-bar-label">Mon</span></div>
+                    <div class="chart-bar" data-height="85%"
+                        style="background:linear-gradient(to top,#10b981,#34d399);height:0;"><span
+                            class="chart-bar-label">Tue</span></div>
+                    <div class="chart-bar" data-height="50%"
+                        style="background:linear-gradient(to top,#3b82f6,#60a5fa);height:0;"><span
+                            class="chart-bar-label">Wed</span></div>
+                    <div class="chart-bar" data-height="92%"
+                        style="background:linear-gradient(to top,#8b5cf6,#a78bfa);height:0;"><span
+                            class="chart-bar-label">Thu</span></div>
+                    <div class="chart-bar" data-height="68%"
+                        style="background:linear-gradient(to top,#ec4899,#f472b6);height:0;"><span
+                            class="chart-bar-label">Fri</span></div>
+                    <div class="chart-bar" data-height="76%"
+                        style="background:linear-gradient(to top,#f59e0b,#fbbf24);height:0;"><span
+                            class="chart-bar-label">Sat</span></div>
+                    <div class="chart-bar" data-height="88%"
+                        style="background:linear-gradient(to top,#10b981,#34d399);height:0;"><span
+                            class="chart-bar-label">Sun</span></div>
+                </div>
+            </div>
+
+            <!-- Emotion Distribution Bars -->
+            <div class="dash-card reveal" style="transition-delay:0.1s">
+                <div class="dash-card-header">
+                    <h3>🎯 Emotion Distribution</h3>
+                </div>
+                {% if emotion_distribution and total_predictions > 0 %}
                 {% for emotion, count in emotion_distribution.items() %}
                 <div class="progress-bar-wrap">
                     <div class="progress-label">
-                        <span>{{ emotion }}</span><span>{{ count }}</span>
+                        <span>{{ emotion }}</span>
+                        <span>{{ (count / total_predictions * 100)|int }}%</span>
                     </div>
                     <div class="progress-bar">
-                        <div class="progress-fill"
-                            data-width="{{ (count / total_predictions * 100)|int if total_predictions > 0 else 0 }}%"
-                            style="width:0; background: linear-gradient(90deg, 
-                                    {% if loop.index0 % 6 == 0 %}#f59e0b, #fbbf24
-                                    {% elif loop.index0 % 6 == 1 %}#3b82f6, #60a5fa
-                                    {% elif loop.index0 % 6 == 2 %}#ec4899, #f472b6
-                                    {% elif loop.index0 % 6 == 3 %}#8b5cf6, #a78bfa
-                                    {% elif loop.index0 % 6 == 4 %}#ef4444, #f87171
-                                    {% else %}#6b7280, #9ca3af
-                                    {% endif %});"></div>
+                        <div class="progress-fill" data-width="{{ (count / total_predictions * 100)|int }}%" style="width:0;background:linear-gradient(90deg,
+                  {% if loop.index0 % 5 == 0 %}#f59e0b,#fbbf24
+                  {% elif loop.index0 % 5 == 1 %}#3b82f6,#60a5fa
+                  {% elif loop.index0 % 5 == 2 %}#ec4899,#f472b6
+                  {% elif loop.index0 % 5 == 3 %}#8b5cf6,#a78bfa
+                  {% else %}#10b981,#34d399{% endif %});">
+                        </div>
                     </div>
                 </div>
                 {% endfor %}
                 {% else %}
-                <p style="color:var(--text-light); text-align:center; padding:20px;">No predictions yet. Start analyzing
-                    to see emotion distribution!</p>
+                <div style="text-align:center;padding:40px 20px;color:#94a3b8;">
+                    <div style="font-size:3rem;margin-bottom:12px;">📊</div>
+                    <p>No data yet — upload files to see your emotion distribution.</p>
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-dash-primary btn-sm" style="margin-top:16px;">Go
+                        to Dashboard</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Metrics Grid: Accuracy + Image vs Audio -->
+        <div class="metrics-grid reveal" style="margin-bottom:28px;">
+            <!-- AI Performance -->
+            <div class="metric-card">
+                <h3>🤖 AI Model Performance</h3>
+                <div class="progress-bar-wrap">
+                    <div class="progress-label"><span>Image Model Accuracy</span><span>92%</span></div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" data-width="92%"
+                            style="width:0;background:linear-gradient(90deg,#f59e0b,#fbbf24);"></div>
+                    </div>
+                </div>
+                <div class="progress-bar-wrap">
+                    <div class="progress-label"><span>Audio Model Accuracy</span><span>87%</span></div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" data-width="87%"
+                            style="width:0;background:linear-gradient(90deg,#3b82f6,#60a5fa);"></div>
+                    </div>
+                </div>
+                <div class="progress-bar-wrap">
+                    <div class="progress-label"><span>Overall System Score</span><span>94%</span></div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" data-width="94%"
+                            style="width:0;background:linear-gradient(90deg,#8b5cf6,#a78bfa);"></div>
+                    </div>
+                </div>
+                <div class="progress-bar-wrap">
+                    <div class="progress-label"><span>Prediction Confidence</span><span>89%</span></div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" data-width="89%"
+                            style="width:0;background:linear-gradient(90deg,#10b981,#34d399);"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Usage Breakdown -->
+            <div class="metric-card">
+                <h3>📊 Usage Breakdown</h3>
+                {% if total_predictions > 0 %}
+                <div style="display:flex;align-items:center;justify-content:center;padding:20px 0;">
+                    <div style="width:160px;height:160px;border-radius:50%;background:conic-gradient(
+            #f59e0b 0% {{ (image_count / total_predictions * 100)|int }}%,
+            #3b82f6 {{ (image_count / total_predictions * 100)|int }}% 100%
+          );display:flex;align-items:center;justify-content:center;position:relative;">
+                        <div
+                            style="width:100px;height:100px;border-radius:50%;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+                            <div style="font-size:1.4rem;font-weight:800;color:#1e293b;">{{ total_predictions }}</div>
+                            <div style="font-size:0.7rem;color:#94a3b8;">Total</div>
+                        </div>
+                    </div>
+                </div>
+                <div style="display:flex;gap:24px;justify-content:center;margin-top:12px;">
+                    <div style="display:flex;align-items:center;gap:8px;font-size:0.85rem;color:#64748b;"><span
+                            style="width:10px;height:10px;border-radius:50%;background:#f59e0b;display:block;"></span>Images
+                        ({{ image_count }})</div>
+                    <div style="display:flex;align-items:center;gap:8px;font-size:0.85rem;color:#64748b;"><span
+                            style="width:10px;height:10px;border-radius:50%;background:#3b82f6;display:block;"></span>Audio
+                        ({{ audio_count }})</div>
+                </div>
+                {% else %}
+                <div style="text-align:center;padding:40px 0;color:#94a3b8;">
+                    <p>Upload files to generate metrics.</p>
+                </div>
                 {% endif %}
             </div>
 
-            <!-- Overall Score -->
-            <div class="metric-card" style="text-align:center;">
-                <h3>⭐ Total Analysis Summary</h3>
-                <div class="donut-chart"
-                    style="background: conic-gradient(var(--accent) 0deg {{ (image_count / total_predictions * 360)|int if total_predictions > 0 else 0 }}deg, var(--info) {{ (image_count / total_predictions * 360)|int if total_predictions > 0 else 0 }}deg 360deg);">
-                    <div
-                        style="width:120px; height:120px; background:#fff; border-radius:50%; display:flex; flex-direction:column; align-items:center; justify-content:center;">
-                        <div class="donut-value" style="color:var(--accent);">{{ total_predictions }}</div>
-                        <div class="donut-label">Total</div>
+            <!-- Emotion Heatmap / emoji counts -->
+            <div class="metric-card">
+                <h3>😸 Emotion Frequency</h3>
+                {% if emotion_distribution %}
+                {% for emotion, count in emotion_distribution.items() %}
+                <div
+                    style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f1f5f9;">
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <span style="font-size:1.4rem;">
+                            {% if emotion|lower == 'happy' %}😸
+                            {% elif emotion|lower == 'angry' %}😾
+                            {% elif emotion|lower in ['sad','sadness'] %}😿
+                            {% elif emotion|lower in ['scared','fear'] %}🙀
+                            {% elif emotion|lower == 'curious' %}🔍
+                            {% elif emotion|lower == 'relaxed' %}😺
+                            {% else %}🐱{% endif %}
+                        </span>
+                        <span style="font-weight:600;color:#1e293b;font-size:0.9rem;">{{ emotion }}</span>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <span style="font-weight:700;color:#d97706;font-size:0.9rem;">{{ count }}×</span>
+                        <span style="font-size:0.78rem;color:#94a3b8;">{{ (count/total_predictions*100)|int if
+                            total_predictions>0 else 0 }}%</span>
                     </div>
                 </div>
-                <p style="color:var(--text-mid); font-size:0.9rem;">
-                    📸 {{ image_count }} images • 🎵 {{ audio_count }} audio files analyzed
-                </p>
+                {% endfor %}
+                {% else %}
+                <div style="text-align:center;padding:36px 0;color:#94a3b8;">
+                    <p>No emotion data yet.</p>
+                </div>
+                {% endif %}
             </div>
         </div>
 
-        <!-- ============================== -->
-        <!-- SECTION 4: Charts + Predictions-->
-        <!-- ============================== -->
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:24px; margin-bottom:28px;">
-            <!-- Weekly Trend Chart -->
-            <div class="metric-card">
-                <h3>📊 Weekly Analysis Trend</h3>
-                <div class="chart-bars" style="height:160px;" id="weeklyChart">
-                    <div class="chart-bar" data-height="50%"
-                        style="background: linear-gradient(to top, #f59e0b, #fbbf24); height:0;">
-                        <span class="chart-bar-label">W1</span>
-                    </div>
-                    <div class="chart-bar" data-height="65%"
-                        style="background: linear-gradient(to top, #10b981, #34d399); height:0;">
-                        <span class="chart-bar-label">W2</span>
-                    </div>
-                    <div class="chart-bar" data-height="80%"
-                        style="background: linear-gradient(to top, #3b82f6, #60a5fa); height:0;">
-                        <span class="chart-bar-label">W3</span>
-                    </div>
-                    <div class="chart-bar" data-height="95%"
-                        style="background: linear-gradient(to top, #8b5cf6, #a78bfa); height:0;">
-                        <span class="chart-bar-label">W4</span>
-                    </div>
-                </div>
-                <p style="color:var(--text-mid); font-size:0.85rem; margin-top:36px;">📈 Analysis frequency is
-                    <strong style="color:var(--success);">increasing</strong> — great engagement!
-                </p>
-            </div>
-
-            <!-- Recent Predictions -->
-            <div class="metric-card">
-                <h3>🐱 Recent Predictions</h3>
-                <div style="display:flex; flex-direction:column; gap:12px;">
-                    {% if recent_predictions %}
-                    {% for pred in recent_predictions[:5] %}
-                    <div style="display:flex; align-items:center; gap:14px; padding:14px; background:#f8fafc; border-radius:var(--radius-md); transition:var(--transition);"
-                        onmouseover="this.style.background='rgba(245,158,11,0.06)'"
-                        onmouseout="this.style.background='#f8fafc'">
-                        <div style="font-size:1.8rem;">{{ '📸' if pred.file_type == 'image' else '🎵' }}</div>
-                        <div style="flex:1;">
-                            <div style="font-weight:700; font-size:0.95rem;">{{ pred.prediction_result }}</div>
-                            <div style="font-size:0.78rem; color:var(--text-light);">{{ pred.filename }} • {{
-                                pred.timestamp.strftime('%b %d') }}</div>
-                        </div>
-                        <span style="font-weight:800; color:var(--accent); font-size:0.8rem;">{{ pred.file_type|upper
-                            }}</span>
-                    </div>
-                    {% endfor %}
-                    {% else %}
-                    <p style="color:var(--text-light); text-align:center; padding:20px;">No predictions to display.</p>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-
-        <!-- ============================== -->
-        <!-- SECTION 5: Video Analysis      -->
-        <!-- ============================== -->
-        <div class="dash-card" style="margin-bottom:28px;">
+        <!-- Recent History snippet -->
+        <div class="dash-card reveal" style="margin-bottom:28px;">
             <div class="dash-card-header">
-                <h3>🎬 AI Analysis In Action</h3>
-                <span style="color:var(--text-light); font-size:0.85rem;">Watch how MewConnect works</span>
+                <h3>⏱️ Recent Predictions</h3>
+                <a href="{{ url_for('history') }}" style="color:#d97706;font-size:0.82rem;font-weight:600;">View All
+                    →</a>
             </div>
-            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:20px;">
-                <div style="position:relative; border-radius:var(--radius-lg); overflow:hidden; box-shadow:var(--shadow-md); transition:var(--transition);"
-                    onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='var(--shadow-xl)'"
-                    onmouseout="this.style.transform='none'; this.style.boxShadow='var(--shadow-md)'">
-                    <video autoplay muted loop playsinline
-                        style="width:100%; display:block; height:200px; object-fit:cover;">
-                        <source
-                            src="{{ url_for('serve_media', filename='grok-video-78357e77-95ed-406d-8a54-df6a852cc3d7.mp4') }}"
-                            type="video/mp4">
-                    </video>
-                    <div
-                        style="position:absolute; bottom:0; left:0; right:0; padding:16px; background:linear-gradient(transparent, rgba(0,0,0,0.7));">
-                        <div style="color:#fff; font-weight:700; font-size:0.95rem;">📊 Emotion Mapping</div>
-                        <div style="color:rgba(255,255,255,0.7); font-size:0.8rem;">Neural network in action</div>
+            <div class="activity-list">
+                {% if recent_predictions %}
+                {% for pred in recent_predictions[:5] %}
+                <div class="activity-item">
+                    <div class="activity-icon"
+                        style="background:{{ 'rgba(245,158,11,0.1)' if pred.file_type == 'image' else 'rgba(59,130,246,0.1)' }};">
+                        {{ '📸' if pred.file_type == 'image' else '🎵' }}
+                    </div>
+                    <div class="activity-info">
+                        <div class="activity-text">{{ pred.prediction_result }} — {{ pred.filename }}</div>
+                        <div class="activity-time">{{ pred.timestamp.strftime('%b %d, %Y %I:%M %p') }}</div>
                     </div>
                 </div>
-                <div style="position:relative; border-radius:var(--radius-lg); overflow:hidden; box-shadow:var(--shadow-md); transition:var(--transition);"
-                    onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='var(--shadow-xl)'"
-                    onmouseout="this.style.transform='none'; this.style.boxShadow='var(--shadow-md)'">
-                    <video autoplay muted loop playsinline
-                        style="width:100%; display:block; height:200px; object-fit:cover;">
-                        <source
-                            src="{{ url_for('serve_media', filename='grok-video-78357e77-95ed-406d-8a54-df6a852cc3d7 (1).mp4') }}"
-                            type="video/mp4">
-                    </video>
-                    <div
-                        style="position:absolute; bottom:0; left:0; right:0; padding:16px; background:linear-gradient(transparent, rgba(0,0,0,0.7));">
-                        <div style="color:#fff; font-weight:700; font-size:0.95rem;">🎯 Facial Feature Tracking</div>
-                        <div style="color:rgba(255,255,255,0.7); font-size:0.8rem;">Analyzing facial expressions</div>
+                {% endfor %}
+                {% else %}
+                <div class="activity-item">
+                    <div class="activity-icon" style="background:rgba(245,158,11,0.1);">🐾</div>
+                    <div class="activity-info">
+                        <div class="activity-text">No predictions yet — start analyzing!</div>
+                        <div class="activity-time">Just now</div>
                     </div>
                 </div>
-                <div style="position:relative; border-radius:var(--radius-lg); overflow:hidden; box-shadow:var(--shadow-md); transition:var(--transition);"
-                    onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='var(--shadow-xl)'"
-                    onmouseout="this.style.transform='none'; this.style.boxShadow='var(--shadow-md)'">
-                    <video autoplay muted loop playsinline
-                        style="width:100%; display:block; height:200px; object-fit:cover;">
-                        <source src="{{ url_for('serve_media', filename='AI_Analyzes_Cat_s_Curiosity.mp4') }}"
-                            type="video/mp4">
-                    </video>
-                    <div
-                        style="position:absolute; bottom:0; left:0; right:0; padding:16px; background:linear-gradient(transparent, rgba(0,0,0,0.7));">
-                        <div style="color:#fff; font-weight:700; font-size:0.95rem;">🔍 Curiosity Analysis</div>
-                        <div style="color:rgba(255,255,255,0.7); font-size:0.8rem;">Full session deep analysis</div>
-                    </div>
-                </div>
+                {% endif %}
             </div>
         </div>
 
-        <!-- ============================== -->
-        <!-- SECTION 6: AI Insights         -->
-        <!-- ============================== -->
-        <div class="metric-card"
-            style="background: linear-gradient(135deg, #1e293b, #334155); color:#fff; margin-bottom:32px; border:none;">
-            <h3 style="color:#fff;">💡 AI Insights</h3>
-            <div
-                style="display:grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap:20px; margin-top:16px;">
-                <div
-                    style="background:rgba(255,255,255,0.08); border-radius:var(--radius-md); padding:24px; border:1px solid rgba(255,255,255,0.1);">
-                    <div style="font-size:1.5rem; margin-bottom:10px;">🌅</div>
-                    <h4 style="font-size:0.95rem; margin-bottom:8px;">Morning Moods</h4>
-                    <p style="font-size:0.85rem; color:rgba(255,255,255,0.7); line-height:1.6;">Your cats are happiest
-                        between
-                        8-10 AM. Consider scheduling playtime during this window.</p>
-                </div>
-                <div
-                    style="background:rgba(255,255,255,0.08); border-radius:var(--radius-md); padding:24px; border:1px solid rgba(255,255,255,0.1);">
-                    <div style="font-size:1.5rem; margin-bottom:10px;">🍽️</div>
-                    <h4 style="font-size:0.95rem; margin-bottom:8px;">Feeding Pattern</h4>
-                    <p style="font-size:0.85rem; color:rgba(255,255,255,0.7); line-height:1.6;">Curiosity levels spike
-                        before
-                        mealtime. Your cats might benefit from puzzle feeders.</p>
-                </div>
-                <div
-                    style="background:rgba(255,255,255,0.08); border-radius:var(--radius-md); padding:24px; border:1px solid rgba(255,255,255,0.1);">
-                    <div style="font-size:1.5rem; margin-bottom:10px;">🎮</div>
-                    <h4 style="font-size:0.95rem; margin-bottom:8px;">Play Engagement</h4>
-                    <p style="font-size:0.85rem; color:rgba(255,255,255,0.7); line-height:1.6;">Keep analyzing to
-                        discover more
-                        insights about your cat's emotional patterns!</p>
-                </div>
-            </div>
-        </div>
     </main>
 </div>
 {% endblock %}
 
 {% block extra_scripts %}
 <script>
-    if (window.innerWidth <= 768) document.getElementById('sidebarToggle').style.display = 'block';
-    window.addEventListener('resize', () => {
-        document.getElementById('sidebarToggle').style.display = window.innerWidth <= 768 ? 'block' : 'none';
-    });
+    (function () {
+        const toggle = document.getElementById('sidebarToggle');
+        const show = () => { if (toggle) toggle.style.display = window.innerWidth <= 768 ? 'flex' : 'none'; };
+        window.addEventListener('resize', show); show();
+    })();
 </script>
 {% endblock %}

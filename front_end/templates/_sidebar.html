@@ -1,8 +1,13 @@
-<!-- Shared Sidebar Component -->
-<aside class="sidebar" id="mainSidebar">
+<!-- _sidebar.html — Shared Sidebar Component -->
+<aside class="sidebar" id="mainSidebar" role="navigation" aria-label="Dashboard navigation">
     <div class="sidebar-logo">
-        <div class="logo-icon">🐱</div>
+        <div class="logo-icon" style="font-size:1.5rem;">🐱</div>
         <span>MewConnect</span>
+    </div>
+
+    <!-- Sidebar Overlay (mobile) -->
+    <div id="sidebarOverlay"
+        style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:499;backdrop-filter:blur(2px);">
     </div>
 
     <div class="sidebar-section">

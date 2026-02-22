@@ -1,44 +1,47 @@
 {% extends "base.html" %}
 
-{% block description %}Create your MewConnect account - Start understanding your cat's emotions today.{% endblock %}
+{% block description %}Create your MewConnect account — Start understanding your cat's emotions today.{% endblock %}
 {% block title %}Register | MewConnect{% endblock %}
 {% block page_id %}register{% endblock %}
 
 {% block body %}
-<!-- NAVBAR -->
-<nav class="navbar scrolled" id="mainNavbar">
+
+<!-- NAVBAR (dark/scrolled) -->
+<nav class="navbar scrolled" id="mainNavbar" role="navigation" aria-label="Main navigation">
     <div class="container">
-        <a href="{{ url_for('landing') }}" class="nav-logo">
+        <a href="{{ url_for('landing') }}" class="nav-logo" aria-label="MewConnect Home">
             <div class="logo-icon">🐱</div>
             <span>MewConnect</span>
         </a>
         <div class="nav-links" id="navLinks">
             <a href="{{ url_for('landing') }}">Home</a>
-            <a href="{{ url_for('register') }}">Features</a>
             <a href="{{ url_for('login') }}">Login</a>
             <a href="{{ url_for('register') }}" class="btn btn-primary btn-sm">Get Started</a>
         </div>
-        <div class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+        <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation" aria-expanded="false">
             <span></span><span></span><span></span>
-        </div>
+        </button>
     </div>
 </nav>
 
 <!-- REGISTER PAGE -->
 <div class="register-page">
     <div class="container">
+
         <!-- Header -->
-        <div class="register-header anim-fadeInDown">
-            <div style="font-size:3rem; margin-bottom:12px;">✨</div>
-            <h1>Discover What Makes Your Cat <span style="color:var(--accent);">Unique</span></h1>
+        <div class="register-header anim-down">
+            <div style="font-size:3rem;margin-bottom:12px;" aria-hidden="true">✨</div>
+            <h1>Discover What Makes Your Cat <span
+                    style="background:var(--g-brand);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">Unique</span>
+            </h1>
             <p>Explore our features, then create your free account below</p>
         </div>
 
         <!-- 3 Feature Boxes -->
         <div class="feature-boxes">
-            <div class="feature-box anim-scaleIn anim-delay-1" id="featureBox1">
+            <div class="feature-box anim-scale d1" id="featureBox1">
                 <div class="feature-box-media">
-                    <video autoplay muted loop playsinline id="bearVideo">
+                    <video autoplay muted loop playsinline>
                         <source
                             src="{{ url_for('serve_media', filename='grok-video-78357e77-95ed-406d-8a54-df6a852cc3d7.mp4') }}"
                             type="video/mp4">
@@ -48,12 +51,12 @@
                 <div class="feature-box-content">
                     <div class="feature-box-icon">🐻</div>
                     <h3>Friendly Companions</h3>
-                    <p>Every pet deserves a friend — even your cat. Our AI helps you understand what your furry
-                        companion truly feels.</p>
+                    <p>Every pet deserves a friend. Our AI helps you understand what your furry companion truly feels.
+                    </p>
                 </div>
             </div>
 
-            <div class="feature-box anim-scaleIn anim-delay-2" id="featureBox2">
+            <div class="feature-box anim-scale d2" id="featureBox2">
                 <div class="feature-box-media">
                     <video autoplay muted loop playsinline>
                         <source
@@ -65,12 +68,11 @@
                 <div class="feature-box-content">
                     <div class="feature-box-icon">😺</div>
                     <h3>Expression Analysis</h3>
-                    <p>Our cutting-edge neural network identifies 7+ cat emotions from a single photo with over 92%
-                        accuracy.</p>
+                    <p>Our neural network identifies 7+ cat emotions from a single photo with over 92% accuracy.</p>
                 </div>
             </div>
 
-            <div class="feature-box anim-scaleIn anim-delay-3" id="featureBox3">
+            <div class="feature-box anim-scale d3" id="featureBox3">
                 <div class="feature-box-media">
                     <video autoplay muted loop playsinline>
                         <source
@@ -89,7 +91,7 @@
         </div>
 
         <!-- Register Form -->
-        <div class="register-form-section anim-fadeInUp anim-delay-3" id="registerFormSection">
+        <div class="register-form-section anim-up d3" id="registerFormSection">
             <h2>Create an Account</h2>
             <p class="form-subtitle">Sign up and start your free journey 🐾</p>
 
@@ -97,49 +99,46 @@
                 <div class="form-group">
                     <label for="fullName">Full Name</label>
                     <input type="text" id="fullName" name="full_name" class="form-control"
-                        placeholder="Enter your full name" required>
+                        placeholder="Enter your full name" required autocomplete="name">
                 </div>
                 <div class="form-group">
                     <label for="email">Email Address</label>
                     <input type="email" id="email" name="email" class="form-control" placeholder="you@gmail.com"
-                        required>
+                        required autocomplete="email">
                 </div>
                 <div class="form-group">
                     <label for="password">Password</label>
                     <div style="position:relative;">
                         <input type="password" id="password" name="password" class="form-control"
-                            placeholder="Minimum 6 characters" required>
+                            placeholder="Minimum 6 characters" required autocomplete="new-password">
                         <button type="button" onclick="togglePassword('password')"
-                            style="position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:1.2rem;cursor:pointer;background:none;border:none;">
-                            👁️
-                        </button>
+                            style="position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:1.1rem;background:none;border:none;cursor:pointer;color:var(--c-text-2);"
+                            aria-label="Toggle password">👁️</button>
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="confirm_password">Confirm Password</label>
                     <div style="position:relative;">
                         <input type="password" id="confirm_password" name="confirm_password" class="form-control"
-                            placeholder="Repeat your password" required>
+                            placeholder="Repeat your password" required autocomplete="new-password">
                         <button type="button" onclick="togglePassword('confirm_password')"
-                            style="position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:1.2rem;cursor:pointer;background:none;border:none;">
-                            👁️
-                        </button>
+                            style="position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:1.1rem;background:none;border:none;cursor:pointer;color:var(--c-text-2);"
+                            aria-label="Toggle confirm password">👁️</button>
                     </div>
                 </div>
-                <button type="submit" class="btn btn-primary" style="width:100%; margin-bottom:20px;"
+                <button type="submit" class="btn btn-primary" style="width:100%;margin-bottom:20px;"
                     id="submitRegister">
                     🚀 Create Account
                 </button>
             </form>
 
             <div class="form-divider">Or sign up with</div>
-
             <div class="social-login">
-                <button class="social-btn" id="googleSignup">
-                    <span style="font-size:1.2rem;">G</span> Google
+                <button class="social-btn" id="googleSignup" type="button">
+                    <span style="font-weight:800;">G</span> Google
                 </button>
-                <button class="social-btn" id="facebookSignup">
-                    <span style="font-size:1.2rem;">f</span> Facebook
+                <button class="social-btn" id="facebookSignup" type="button">
+                    <span style="font-weight:800;">f</span> Facebook
                 </button>
             </div>
 
@@ -147,13 +146,17 @@
                 Already have an account? <a href="{{ url_for('login') }}">Sign in</a>
             </div>
         </div>
+
     </div>
 </div>
 
-<!-- FOOTER -->
-<footer style="background:var(--primary-dark); color:rgba(255,255,255,0.6); padding:30px 0; text-align:center;">
+<!-- Footer -->
+<footer role="contentinfo">
     <div class="container">
-        <p style="font-size:0.85rem;">© 2026 MewConnect. Made with 💛 for cat lovers.</p>
+        <div class="footer-bottom" style="justify-content:center; border-top:none; padding-top:0; padding-bottom:8px;">
+            <p>© 2026 MewConnect. Made with 💛 for cat lovers.</p>
+        </div>
     </div>
 </footer>
+
 {% endblock %}

@@ -1,116 +1,190 @@
-/* ===== MewConnect - Main JavaScript ===== */
-/* Integrated with Flask Backend */
+/* =====================================================
+   MewConnect — Main JS v2.0
+   Vanilla JS | No Frameworks | Flask-integrated
+   ===================================================== */
 
-// ===== NAVBAR SCROLL EFFECT =====
+// ────────────────────────────────────────────────────
+// PAGE TRANSITION OVERLAY
+// ────────────────────────────────────────────────────
+function initPageTransition() {
+  // Create overlay element
+  const overlay = document.createElement('div');
+  overlay.id = 'page-overlay';
+  overlay.style.cssText = `
+    position:fixed;inset:0;background:#0a0d14;z-index:99999;
+    pointer-events:none;opacity:0;
+    transition:opacity 0.35s cubic-bezier(0.4,0,0.2,1);
+  `;
+  document.body.appendChild(overlay);
+
+  // Fade in on page load
+  window.addEventListener('load', () => {
+    overlay.style.opacity = '0';
+  });
+
+  // Fade out on internal link click
+  document.querySelectorAll('a[href]:not([target]):not([href^="#"]):not([href^="mailto"])').forEach(link => {
+    link.addEventListener('click', e => {
+      const href = link.getAttribute('href');
+      if (!href || href.startsWith('http') || href.startsWith('//')) return;
+      e.preventDefault();
+      overlay.style.opacity = '1';
+      overlay.style.pointerEvents = 'all';
+      setTimeout(() => { window.location.href = href; }, 340);
+    });
+  });
+}
+
+// ────────────────────────────────────────────────────
+// NAVBAR
+// ────────────────────────────────────────────────────
 function initNavbar() {
   const navbar = document.querySelector('.navbar');
   if (!navbar) return;
 
-  window.addEventListener('scroll', () => {
-    if (window.scrollY > 50) {
-      navbar.classList.add('scrolled');
-    } else {
-      navbar.classList.remove('scrolled');
-    }
-  });
+  const handleScroll = () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 60);
+  };
+  window.addEventListener('scroll', handleScroll, { passive: true });
+  handleScroll();
 
-  // Mobile toggle
+  // Mobile hamburger toggle
   const toggle = document.querySelector('.nav-toggle');
   const links = document.querySelector('.nav-links');
   if (toggle && links) {
     toggle.addEventListener('click', () => {
-      links.classList.toggle('open');
-      toggle.classList.toggle('active');
+      const open = links.classList.toggle('open');
+      toggle.classList.toggle('active', open);
+      toggle.setAttribute('aria-expanded', open);
+    });
+    // Close on outside click
+    document.addEventListener('click', e => {
+      if (!navbar.contains(e.target)) {
+        links.classList.remove('open');
+        toggle.classList.remove('active');
+      }
     });
   }
 }
 
-// ===== HERO PARTICLES =====
+// ────────────────────────────────────────────────────
+// HERO PARTICLES
+// ────────────────────────────────────────────────────
 function initParticles() {
   const container = document.querySelector('.hero-particles');
   if (!container) return;
 
-  for (let i = 0; i < 30; i++) {
-    const particle = document.createElement('div');
-    particle.classList.add('particle');
-    const size = Math.random() * 6 + 3;
-    particle.style.width = `${size}px`;
-    particle.style.height = `${size}px`;
-    particle.style.left = `${Math.random() * 100}%`;
-    particle.style.top = `${Math.random() * 100}%`;
-    particle.style.animationDelay = `${Math.random() * 5}s`;
-    particle.style.animationDuration = `${Math.random() * 3 + 2}s`;
-    container.appendChild(particle);
+  const count = window.innerWidth < 768 ? 18 : 35;
+  for (let i = 0; i < count; i++) {
+    const p = document.createElement('div');
+    p.classList.add('particle');
+    const size = Math.random() * 5 + 2;
+    p.style.cssText = `
+      width:${size}px; height:${size}px;
+      left:${Math.random() * 100}%;
+      top:${Math.random() * 100}%;
+      animation-delay:${Math.random() * 6}s;
+      animation-duration:${Math.random() * 3 + 2.5}s;
+    `;
+    container.appendChild(p);
   }
 }
 
-// ===== FLOATING PAW PRINTS (Landing Page) =====
+// ────────────────────────────────────────────────────
+// FLOATING PAW PRINTS
+// ────────────────────────────────────────────────────
 function initPawPrints() {
   const hero = document.querySelector('.hero');
   if (!hero) return;
 
-  setInterval(() => {
+  const spawn = () => {
     const paw = document.createElement('span');
     paw.textContent = '🐾';
     paw.style.cssText = `
-      position: absolute;
-      font-size: ${Math.random() * 20 + 14}px;
-      left: ${Math.random() * 100}%;
-      top: ${Math.random() * 100}%;
-      pointer-events: none;
-      opacity: 0;
-      z-index: 1;
-      animation: pawPrint 3s ease forwards;
+      position:absolute;
+      font-size:${Math.random() * 18 + 12}px;
+      left:${Math.random() * 95}%;
+      top:${Math.random() * 90}%;
+      pointer-events:none; z-index:1;
+      opacity:0; animation:pawPrint 3s ease forwards;
     `;
     hero.appendChild(paw);
-    setTimeout(() => paw.remove(), 3000);
-  }, 2000);
-}
-
-// ===== SCROLL ANIMATIONS (Intersection Observer) =====
-function initScrollAnimations() {
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('anim-fadeInUp');
-        observer.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
-
-  document.querySelectorAll('.animate-on-scroll').forEach(el => {
-    observer.observe(el);
+    setTimeout(() => paw.remove(), 3100);
+  };
+  const interval = setInterval(spawn, 2200);
+  // Stop after page hidden
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) clearInterval(interval);
   });
 }
 
-// ===== FORM VALIDATION =====
-function validateEmail(email) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+// ────────────────────────────────────────────────────
+// SCROLL REVEAL (Intersection Observer)
+// ────────────────────────────────────────────────────
+function initScrollReveal() {
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('revealed');
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => io.observe(el));
+
+  // Legacy support for .animate-on-scroll
+  const io2 = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+        io2.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.animate-on-scroll').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(30px)';
+    el.style.transition = 'opacity 0.7s ease, transform 0.7s ease';
+    io2.observe(el);
+  });
 }
 
-function validatePassword(password) {
-  return password.length >= 6;
+// ────────────────────────────────────────────────────
+// COUNTER ANIMATION
+// ────────────────────────────────────────────────────
+function animateCounter(el, to, duration = 1400) {
+  const start = performance.now();
+  const from = 0;
+  const step = (ts) => {
+    const progress = Math.min((ts - start) / duration, 1);
+    const ease = 1 - Math.pow(1 - progress, 3); // cubic ease-out
+    el.textContent = Math.round(from + (to - from) * ease);
+    if (progress < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
 }
 
-function showFieldError(input, message) {
-  input.style.borderColor = '#ef4444';
-  let errorEl = input.parentElement.querySelector('.field-error');
-  if (!errorEl) {
-    errorEl = document.createElement('span');
-    errorEl.className = 'field-error';
-    errorEl.style.cssText = 'color: #ef4444; font-size: 0.78rem; margin-top: 4px; display: block;';
-    input.parentElement.appendChild(errorEl);
-  }
-  errorEl.textContent = message;
+function initCounters() {
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const el = entry.target;
+        const target = parseInt(el.getAttribute('data-count') || el.textContent, 10);
+        if (!isNaN(target)) animateCounter(el, target);
+        io.unobserve(el);
+      }
+    });
+  }, { threshold: 0.5 });
+
+  document.querySelectorAll('.stat-card-value, [data-count]').forEach(el => io.observe(el));
 }
 
-function clearFieldError(input) {
-  input.style.borderColor = '#e2e8f0';
-  const errorEl = input.parentElement.querySelector('.field-error');
-  if (errorEl) errorEl.remove();
-}
-
-// ===== TOAST NOTIFICATIONS =====
+// ────────────────────────────────────────────────────
+// TOAST NOTIFICATIONS
+// ────────────────────────────────────────────────────
 function showToast(message, type = 'success') {
   let toast = document.querySelector('.toast');
   if (!toast) {
@@ -118,196 +192,341 @@ function showToast(message, type = 'success') {
     toast.className = 'toast';
     document.body.appendChild(toast);
   }
-
+  const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
   toast.className = `toast ${type === 'error' ? 'error' : ''}`;
-  toast.innerHTML = `
-    <span style="font-size:1.3rem">${type === 'success' ? '✅' : '❌'}</span>
-    <span>${message}</span>
-  `;
+  toast.innerHTML = `<span style="font-size:1.2rem">${icon}</span><span>${message}</span>`;
+  requestAnimationFrame(() => toast.classList.add('show'));
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => toast.classList.remove('show'), 4000);
+}
+window.showToast = showToast; // expose globally for Jinja flash
 
-  requestAnimationFrame(() => {
-    toast.classList.add('show');
-  });
+// ────────────────────────────────────────────────────
+// FORM VALIDATION HELPERS
+// ────────────────────────────────────────────────────
+function validateEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
+function validatePassword(p) { return p.length >= 6; }
 
-  setTimeout(() => {
-    toast.classList.remove('show');
-  }, 3500);
+function setFieldError(input, msg) {
+  input.style.borderColor = '#ef4444';
+  let err = input.parentElement.querySelector('.field-error');
+  if (!err) {
+    err = document.createElement('span');
+    err.className = 'field-error';
+    err.style.cssText = 'color:#ef4444;font-size:0.78rem;margin-top:4px;display:block;';
+    input.parentElement.appendChild(err);
+  }
+  err.textContent = msg;
+}
+function clearFieldError(input) {
+  input.style.borderColor = '';
+  const err = input.parentElement.querySelector('.field-error');
+  if (err) err.remove();
 }
 
-// ===== REGISTER FORM - Client-side validation before submit =====
+// ────────────────────────────────────────────────────
+// REGISTER FORM
+// ────────────────────────────────────────────────────
 function initRegisterForm() {
   const form = document.getElementById('registerForm');
   if (!form) return;
 
-  form.addEventListener('submit', (e) => {
-    let isValid = true;
-
-    const fullName = form.querySelector('#fullName');
+  form.addEventListener('submit', e => {
+    let valid = true;
+    const name = form.querySelector('#fullName');
     const email = form.querySelector('#email');
-    const password = form.querySelector('#password');
-    const confirmPassword = form.querySelector('#confirm_password');
+    const pass = form.querySelector('#password');
+    const conf = form.querySelector('#confirm_password');
 
-    // Clear previous errors
-    [fullName, email, password].forEach(clearFieldError);
-    if (confirmPassword) clearFieldError(confirmPassword);
+    [name, email, pass, conf].filter(Boolean).forEach(clearFieldError);
 
-    if (fullName && !fullName.value.trim()) {
-      showFieldError(fullName, 'Full name is required');
-      isValid = false;
-    }
-    if (!validateEmail(email.value)) {
-      showFieldError(email, 'Please enter a valid Gmail address');
-      isValid = false;
-    }
-    if (!validatePassword(password.value)) {
-      showFieldError(password, 'Password must be at least 6 characters');
-      isValid = false;
-    }
-    if (confirmPassword && password.value !== confirmPassword.value) {
-      showFieldError(confirmPassword, 'Passwords do not match');
-      isValid = false;
-    }
+    if (name && !name.value.trim()) { setFieldError(name, 'Full name is required'); valid = false; }
+    if (email && !validateEmail(email.value)) { setFieldError(email, 'Enter a valid email'); valid = false; }
+    if (pass && !validatePassword(pass.value)) { setFieldError(pass, 'Min 6 characters required'); valid = false; }
+    if (conf && pass && pass.value !== conf.value) { setFieldError(conf, 'Passwords do not match'); valid = false; }
 
-    if (!isValid) {
-      e.preventDefault(); // Stop form submission if validation fails
-    }
-    // If valid, form submits normally to Flask backend via POST
+    if (!valid) { e.preventDefault(); return; }
+
+    const btn = form.querySelector('[type=submit]');
+    if (btn) { btn.innerHTML = '⏳ Creating Account...'; btn.disabled = true; }
+  });
+
+  form.querySelectorAll('.form-control').forEach(input => {
+    input.addEventListener('input', () => clearFieldError(input));
   });
 }
 
-// ===== LOGIN FORM - Client-side validation before submit =====
+// ────────────────────────────────────────────────────
+// LOGIN FORM
+// ────────────────────────────────────────────────────
 function initLoginForm() {
   const form = document.getElementById('loginForm');
   if (!form) return;
 
-  form.addEventListener('submit', (e) => {
-    let isValid = true;
-
+  form.addEventListener('submit', e => {
+    let valid = true;
     const email = form.querySelector('#loginEmail');
-    const password = form.querySelector('#loginPassword');
+    const pass = form.querySelector('#loginPassword');
 
-    [email, password].forEach(clearFieldError);
+    [email, pass].forEach(clearFieldError);
 
-    if (!validateEmail(email.value)) {
-      showFieldError(email, 'Please enter a valid email');
-      isValid = false;
-    }
-    if (!password.value) {
-      showFieldError(password, 'Password is required');
-      isValid = false;
-    }
+    if (!validateEmail(email.value)) { setFieldError(email, 'Enter a valid email'); valid = false; }
+    if (!pass.value) { setFieldError(pass, 'Password is required'); valid = false; }
 
-    if (!isValid) {
-      e.preventDefault(); // Stop form submission if validation fails
-    }
-    // If valid, form submits normally to Flask backend via POST
+    if (!valid) { e.preventDefault(); return; }
+
+    const btn = form.querySelector('[type=submit]');
+    if (btn) { btn.innerHTML = '⏳ Connecting...'; btn.disabled = true; }
   });
 }
 
-// ===== DASHBOARD INIT =====
-function initDashboard() {
-  // Init chart bars animation
-  initChartBars();
-
-  // Init sidebar toggle for mobile
-  initSidebarToggle();
+// ────────────────────────────────────────────────────
+// PASSWORD TOGGLE
+// ────────────────────────────────────────────────────
+function togglePassword(id) {
+  const el = document.getElementById(id);
+  if (el) el.type = el.type === 'password' ? 'text' : 'password';
 }
+window.togglePassword = togglePassword;
 
-// ===== PROFILE INIT =====
-function initProfile() {
-  initSidebarToggle();
+// ────────────────────────────────────────────────────
+// UPLOAD FORM — drag & drop + progress
+// ────────────────────────────────────────────────────
+function initUploadForm() {
+  const form = document.getElementById('uploadForm');
+  const dropZone = document.getElementById('dropZone');
+  const fileIn = document.getElementById('file');
+  const fileLabel = document.getElementById('fileLabel');
+  const btn = document.getElementById('analyzeBtn');
 
-  // Animate progress bars on profile page
-  setTimeout(() => {
-    document.querySelectorAll('.progress-fill').forEach(bar => {
-      const target = bar.getAttribute('data-width');
-      bar.style.width = target;
+  if (!form) return;
+
+  // Drag & Drop
+  if (dropZone && fileIn) {
+    ['dragenter', 'dragover'].forEach(ev => {
+      dropZone.addEventListener(ev, e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
     });
-  }, 300);
-
-  initChartBars();
-}
-
-// ===== METRICS INIT =====
-function initMetrics() {
-  // Animate progress bars
-  setTimeout(() => {
-    document.querySelectorAll('.progress-fill').forEach(bar => {
-      const target = bar.getAttribute('data-width');
-      bar.style.width = target;
+    ['dragleave', 'drop'].forEach(ev => {
+      dropZone.addEventListener(ev, e => { e.preventDefault(); dropZone.classList.remove('drag-over'); });
     });
-  }, 300);
+    dropZone.addEventListener('drop', e => {
+      const files = e.dataTransfer.files;
+      if (files.length) {
+        fileIn.files = files;
+        if (fileLabel) fileLabel.textContent = '✅ ' + files[0].name;
+      }
+    });
+    dropZone.addEventListener('click', () => fileIn.click());
+  }
 
-  // Init chart bars
-  initChartBars();
+  if (fileIn && fileLabel) {
+    fileIn.addEventListener('change', () => {
+      if (fileIn.files.length) fileLabel.textContent = '✅ ' + fileIn.files[0].name;
+    });
+  }
 
-  initSidebarToggle();
+  form.addEventListener('submit', () => {
+    if (btn) { btn.innerHTML = '⏳ Analyzing...'; btn.disabled = true; btn.style.opacity = '0.75'; }
+  });
 }
 
-// ===== CHART BARS ANIMATION =====
+// ────────────────────────────────────────────────────
+// CHART BARS ANIMATION
+// ────────────────────────────────────────────────────
 function initChartBars() {
-  const bars = document.querySelectorAll('.chart-bar');
-  bars.forEach((bar, i) => {
-    setTimeout(() => {
-      const height = bar.getAttribute('data-height');
-      bar.style.height = height;
-    }, i * 80);
+  document.querySelectorAll('.chart-bar').forEach((bar, i) => {
+    const h = bar.getAttribute('data-height') || '50%';
+    bar.style.height = '0';
+    setTimeout(() => { bar.style.height = h; }, i * 90);
   });
 }
 
-// ===== SIDEBAR TOGGLE =====
+// ────────────────────────────────────────────────────
+// PROGRESS BAR ANIMATION
+// ────────────────────────────────────────────────────
+function initProgressBars() {
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const w = entry.target.getAttribute('data-width') || '0%';
+        entry.target.style.width = w;
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.4 });
+  document.querySelectorAll('.progress-fill').forEach(el => io.observe(el));
+}
+
+// ────────────────────────────────────────────────────
+// SIDEBAR TOGGLE (mobile)
+// ────────────────────────────────────────────────────
 function initSidebarToggle() {
   const toggle = document.getElementById('sidebarToggle');
   const sidebar = document.querySelector('.sidebar');
-  if (toggle && sidebar) {
-    toggle.addEventListener('click', () => {
-      sidebar.classList.toggle('open');
+  const overlay = document.getElementById('sidebarOverlay');
+  if (!toggle || !sidebar) return;
+
+  toggle.addEventListener('click', () => {
+    const open = sidebar.classList.toggle('open');
+    if (overlay) overlay.style.display = open ? 'block' : 'none';
+  });
+  if (overlay) {
+    overlay.addEventListener('click', () => {
+      sidebar.classList.remove('open');
+      overlay.style.display = 'none';
     });
   }
 }
 
-// ===== PASSWORD VISIBILITY TOGGLE =====
-function togglePassword(inputId) {
-  const input = document.getElementById(inputId);
-  if (input) {
-    input.type = input.type === 'password' ? 'text' : 'password';
-  }
+// ────────────────────────────────────────────────────
+// LAZY VIDEO LOADING
+// ────────────────────────────────────────────────────
+function initLazyVideos() {
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const video = entry.target;
+        video.querySelectorAll('source').forEach(source => {
+          if (source.dataset.src) {
+            source.src = source.dataset.src;
+            source.removeAttribute('data-src');
+          }
+        });
+        video.load();
+        io.unobserve(video);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('video[data-lazy]').forEach(v => io.observe(v));
 }
 
-// ===== UPLOAD FORM ENHANCEMENTS =====
-function initUploadForm() {
-  const form = document.getElementById('uploadForm');
-  if (!form) return;
-
-  const analyzeBtn = document.getElementById('analyzeBtn');
-
-  form.addEventListener('submit', function () {
-    if (analyzeBtn) {
-      analyzeBtn.innerHTML = '⏳ Analyzing...';
-      analyzeBtn.disabled = true;
-      analyzeBtn.style.opacity = '0.7';
-    }
+// ────────────────────────────────────────────────────
+// VIDEO HOVER PLAY/PAUSE
+// ────────────────────────────────────────────────────
+function initVideoHover() {
+  document.querySelectorAll('.video-card-wrap video, .gallery-card video').forEach(video => {
+    const parent = video.closest('[data-video-hover]');
+    if (!parent) return;
+    parent.addEventListener('mouseenter', () => video.play());
+    parent.addEventListener('mouseleave', () => { video.pause(); });
   });
 }
 
-// ===== INIT ON DOM READY =====
+// ────────────────────────────────────────────────────
+// SMOOTH SCROLL for anchor links
+// ────────────────────────────────────────────────────
+function initSmoothScroll() {
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+}
+
+// ────────────────────────────────────────────────────
+// MOBILE RESPONSIVE — sidebar show/hide on resize
+// ────────────────────────────────────────────────────
+function initResponsive() {
+  const toggle = document.getElementById('sidebarToggle');
+  if (!toggle) return;
+  const show = () => { toggle.style.display = window.innerWidth <= 768 ? 'flex' : 'none'; };
+  window.addEventListener('resize', show);
+  show();
+}
+
+// ────────────────────────────────────────────────────
+// HERO NUMBER STATS COUNTER
+// ────────────────────────────────────────────────────
+function initHeroStats() {
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const el = entry.target;
+      const to = parseInt(el.getAttribute('data-count'), 10);
+      if (!isNaN(to)) animateCounter(el, to);
+      io.unobserve(el);
+    });
+  }, { threshold: 0.6 });
+  document.querySelectorAll('.hero-stat-num[data-count]').forEach(el => io.observe(el));
+}
+
+// ────────────────────────────────────────────────────
+// ACTIVE NAV LINK based on scroll
+// ────────────────────────────────────────────────────
+function initActiveNav() {
+  const sections = document.querySelectorAll('section[id]');
+  if (!sections.length) return;
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        document.querySelectorAll('.nav-links a').forEach(a => {
+          a.classList.toggle('active-link', a.getAttribute('href') === '#' + entry.target.id);
+        });
+      }
+    });
+  }, { threshold: 0.5 });
+  sections.forEach(s => io.observe(s));
+}
+
+// ────────────────────────────────────────────────────
+// PAGE-SPECIFIC INIT
+// ────────────────────────────────────────────────────
+function initDashboard() {
+  initChartBars();
+  initSidebarToggle();
+  initResponsive();
+  initCounters();
+}
+
+function initProfile() {
+  initSidebarToggle();
+  initResponsive();
+  initProgressBars();
+  initChartBars();
+}
+
+function initMetrics() {
+  initSidebarToggle();
+  initResponsive();
+  initProgressBars();
+  initChartBars();
+}
+
+function initHistory() {
+  initSidebarToggle();
+  initResponsive();
+}
+
+// ────────────────────────────────────────────────────
+// MAIN INIT
+// ────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+  initPageTransition();
   initNavbar();
   initParticles();
   initPawPrints();
-  initScrollAnimations();
+  initScrollReveal();
+  initSmoothScroll();
   initRegisterForm();
   initLoginForm();
   initUploadForm();
+  initLazyVideos();
+  initHeroStats();
+  initActiveNav();
+  initProgressBars();
 
-  // Page-specific init
   const page = document.body.getAttribute('data-page');
   if (page === 'dashboard') initDashboard();
   if (page === 'profile') initProfile();
   if (page === 'metrics') initMetrics();
-  if (page === 'history') initSidebarToggle();
+  if (page === 'history') initHistory();
 
-  // Form input focus animations
+  // Input focus helpers
   document.querySelectorAll('.form-control').forEach(input => {
     input.addEventListener('focus', () => clearFieldError(input));
   });
