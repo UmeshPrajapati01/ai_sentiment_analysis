@@ -1,14 +1,6 @@
-*.jpg
-*.jpeg
-*.png
-*.gif
-*.bmp
-*.mp4
-*.avi 
-*.mp3
-*.wav
 *.venv
 .venv
+data_analysis
 
 
 
