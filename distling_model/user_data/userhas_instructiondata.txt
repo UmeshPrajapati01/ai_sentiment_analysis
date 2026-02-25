@@ -1,0 +1,53 @@
+Upload instructions for image and audio data
+
+Please follow these exact steps when uploading dataset files so the training pipeline can read them:
+
+1) Directory layout (required)
+   - Place class folders directly under `user_data/image_data` and `user_data/audion_data`.
+   - Do NOT create nested subfolders inside each class folder — only one level of folders (the class name).
+
+2) Class folder naming
+   - Each folder name must be the class label you want the model to learn (for example: `cat`, `dog`, `happy`, `sad`).
+
+3) Files inside class folders
+   - Put all files for that class directly inside its folder.
+   - Example structure:
+     user_data/
+       image_data/
+         cat/
+           img_001.jpg
+           img_002.png
+         dog/
+           dog_001.jpg
+       audion_data/
+         cat/
+           cat_001.wav
+         dog/
+           dog_001.wav
+
+4) Allowed file types
+   - Images: .jpg, .jpeg, .png, .bmp, .tif
+   - Audio:  .wav, .mp3, .flac, .ogg
+
+5) Filename recommendations
+   - Filenames should be ASCII-safe, without special characters. Use short, unique names (e.g., `cat_001.jpg`).
+
+6) Dataset quality recommendations (optional but recommended)
+   - Aim for at least 30–50 samples per class as a minimum for basic training.
+   - Prefer consistent sample quality and sampling rates for audio (e.g., 16 kHz or 44.1 kHz WAV).
+
+7) Clean-up and validation
+   - Remove hidden system files (e.g., .DS_Store, thumbs.db) from folders.
+   - Ensure there are no mixed nested folders — only class folders present under `image_data` and `audion_data`.
+
+8) If you need help converting formats
+   - Convert images with ImageMagick: `magick input.png -resize 512x512 output.jpg`
+   - Convert audio with ffmpeg: `ffmpeg -i input.mp3 -ar 16000 -ac 1 output.wav`
+
+9) When ready
+   - Upload or copy the class folders and files into these folders. Once files are present, tell me and I will verify the layout and optionally move/normalize files.
+
+If you want, provide a short list of class names now and I will create the empty folders for you.
+
+---
+Generated upload instructions (do not delete this file).
