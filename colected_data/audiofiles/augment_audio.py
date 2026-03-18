@@ -24,11 +24,11 @@ from collections import defaultdict
 # ── Config ─────────────────────────────────────────────────────────────────
 AUDIO_BASE  = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                            '..', '..', 'data', 'processed', 'audio')
-TARGET_COUNT = 240   # desired files per class after augmentation
+TARGET_COUNT = 1000   # Massive target to hit 99% accuracy
 SR           = 16000 # resample rate
 
-# Classes to augment (only underrepresented ones)
-AUGMENT_CLASSES = ['angry', 'sad', 'fearful']
+# Classes to augment (all to hit the 1000 target)
+AUGMENT_CLASSES = ['angry', 'sad', 'fearful', 'happy']
 
 # ── Augmentation functions ──────────────────────────────────────────────────
 

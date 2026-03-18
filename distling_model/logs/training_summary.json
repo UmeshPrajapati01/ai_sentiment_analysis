@@ -1,0 +1,14 @@
+{
+  "audio": {
+    "supervised_acc": 0.6,
+    "distilled_acc": 0.5,
+    "supervised_f1": 0.5666666666666667,
+    "distilled_f1": 0.4
+  },
+  "image": {
+    "supervised_acc": 0.67,
+    "distilled_acc": 0.76,
+    "supervised_f1": 0.6671949110930023,
+    "distilled_f1": 0.757517725175376
+  }
+}

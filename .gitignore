@@ -1,12 +1,52 @@
-*.jpg
-*.jpeg
-*.png
-*.gif
-*.bmp
-*.mp4
-*.avi 
-*.mp3
+# ==========================================
+# MEOWCONNECT CLEAN GITIGNORE (EXCLUDES 10K+ DATA FILES)
+# ==========================================
+
+# ── Python System Files ──
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+.venv/
+env/
+venv/
+*.egg-info/
+*.egg
+
+# ── Large Data (The 10k Change Problem!) ──
+# We ignore the thousands of generated meows and raw data
+data/
+colected_data/
+uploads/
+outputs/
 *.wav
-*.venv
-.venv/s
-.vnv
+*.mp3
+*.npy
+*.mp4
+
+# ── Model Weights (Large Files) ──
+# Exclude heavy weights (keep logic and scalers if needed)
+models/*.keras
+models/*.pth
+models/*.h5
+models/*.pth.tar
+!models/*.pkl
+
+# ── Database ──
+database/*.db
+
+# ── IDE & Local Settings ──
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# ── Project Metadata ──
+server.log
+training_log.txt
+*.png
+*.txt
+!requirements.txt
+!README.md
+!audio_labels.txt
+!classes.txt
