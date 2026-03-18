@@ -1,29 +1,9 @@
-<<<<<<< HEAD
-fastapi
-uvicorn
-python-multipart
-streamlit
-requests
-opencv-python-headless
-librosa
-soundfile
-noisereduce
-scikit-learn
-=======
->>>>>>> 6b31393ff2aec9e717b9fbf0b1a3ce23c58c566b
 numpy
 pandas
 matplotlib
 seaborn
-<<<<<<< HEAD
-tenserflow
-flask
-resampy
-ffmpeg-python
-=======
 scikit-learn
 librosa
 joblib
 llvmlite
 Flask-Login
->>>>>>> 6b31393ff2aec9e717b9fbf0b1a3ce23c58c566b

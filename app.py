@@ -298,8 +298,8 @@ def serve_assets(filename):
 # RUN APP
 # ==========================================
 if __name__ == '__main__':
-    print("============================================================")
-    print("  MewConnect - Cat Emotion Recognition System")
-    print("  Starting at http://127.0.0.1:5000")
-    print("============================================================")
+    print("=" * 60)
+    print("  🐱 MewConnect - Cat Emotion Recognition System")
+    print("  🌐 Starting at http://127.0.0.1:5000")
+    print("=" * 60)
     app.run(debug=True, port=5000)

@@ -1,4 +1,3 @@
-
 import torch
 import numpy as np
 import librosa
@@ -21,8 +20,7 @@ def predict_image(image_path):
     
     try:
         image = Image.open(image_path).convert('RGB')
-        image_tensor = image_transforms(image).unsqueeze(0) # Add batch dimension
-        image_tensor = image_tensor.to(loader.device)
+        image_tensor = image_transforms(image).unsqueeze(0).to(loader.device)
         
         with torch.no_grad():
             outputs = loader.image_model(image_tensor)
