@@ -27,10 +27,15 @@ outputs/
 # ── Model Weights (Large Files) ──
 # Exclude heavy weights (keep logic and scalers if needed)
 models/*.keras
+backend/models/*.keras
 models/*.pth
+backend/models/*.pth
 models/*.h5
+backend/models/*.h5
 models/*.pth.tar
+backend/models/*.pth.tar
 !models/*.pkl
+!backend/models/*.pkl
 
 # ── Database ──
 database/*.db
