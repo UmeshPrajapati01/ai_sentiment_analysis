@@ -191,29 +191,24 @@
     <!-- Charts + Activity -->
     <div class="dashboard-grid">
       <div class="dash-card reveal">
-        <div class="dash-card-header"><h3>📊 Emotion Activity</h3></div>
-        <div class="chart-bars" id="emotionChart" role="img" aria-label="Weekly emotion chart">
-          <div class="chart-bar" data-height="65%" style="background:linear-gradient(to top,#00e5ff,#00b8d9);height:0;"><span class="chart-bar-label">Mon</span></div>
-          <div class="chart-bar" data-height="82%" style="background:linear-gradient(to top,#10b981,#34d399);height:0;"><span class="chart-bar-label">Tue</span></div>
-          <div class="chart-bar" data-height="45%" style="background:linear-gradient(to top,#a855f7,#c084fc);height:0;"><span class="chart-bar-label">Wed</span></div>
-          <div class="chart-bar" data-height="90%" style="background:linear-gradient(to top,#ec4899,#f472b6);height:0;"><span class="chart-bar-label">Thu</span></div>
-          <div class="chart-bar" data-height="72%" style="background:linear-gradient(to top,#f59e0b,#fbbf24);height:0;"><span class="chart-bar-label">Fri</span></div>
-          <div class="chart-bar" data-height="58%" style="background:linear-gradient(to top,#00e5ff,#00b8d9);height:0;"><span class="chart-bar-label">Sat</span></div>
-          <div class="chart-bar" data-height="95%" style="background:linear-gradient(to top,#10b981,#34d399);height:0;"><span class="chart-bar-label">Sun</span></div>
+        <div class="dash-card-header"><h3>📊 Emotion Activity</h3>
+          <span style="font-size:0.75rem;color:#94a3b8;" id="emotionActivitySub">Daily scans</span>
         </div>
+        <canvas id="emotionChart" height="160"></canvas>
       </div>
       <div class="dash-card reveal" style="transition-delay:0.1s">
         <div class="dash-card-header"><h3>⏱️ Recent Activity</h3><a href="{{ url_for('history') }}" style="color:#00e5ff;font-size:0.82rem;font-weight:600;">View All →</a></div>
-        <div class="activity-list">
+        <div class="activity-list" id="activityList" style="max-height:280px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.1) transparent;">
           {% if recent_predictions %}
           {% for pred in recent_predictions %}
-          <div class="activity-item">
+          <div class="activity-item" id="act-{{ pred.id }}" style="position:relative;">
             <div class="activity-icon" style="background:{{ 'rgba(0,229,255,0.1)' if pred.file_type == 'image' else ('rgba(168,85,247,0.1)' if pred.file_type == 'audio' else 'rgba(16,185,129,0.1)') }};">{{ '📸' if pred.file_type == 'image' else ('🎵' if pred.file_type == 'audio' else '🔀') }}</div>
             <div class="activity-info"><div class="activity-text">{{ pred.prediction_result }} — {{ pred.filename }}</div><div class="activity-time">{{ pred.timestamp.strftime('%b %d, %Y %I:%M %p') }}</div></div>
+            <button class="act-delete-btn" onclick="deleteActivity({{ pred.id }}, this)" title="Delete this entry" aria-label="Delete">✕</button>
           </div>
           {% endfor %}
           {% else %}
-          <div class="activity-item"><div class="activity-icon" style="background:rgba(0,229,255,0.1);">🐾</div><div class="activity-info"><div class="activity-text">No predictions yet — upload a file to start!</div><div class="activity-time">Just now</div></div></div>
+          <div class="activity-item" id="act-empty"><div class="activity-icon" style="background:rgba(0,229,255,0.1);">🐾</div><div class="activity-info"><div class="activity-text">No predictions yet — upload a file to start!</div><div class="activity-time">Just now</div></div></div>
           {% endif %}
         </div>
       </div>
@@ -222,11 +217,11 @@
     <!-- Analytics Charts Row -->
     <div class="analytics-charts-grid reveal">
 
-      <!-- Line Chart: Model Accuracy -->
+      <!-- Line Chart: Cumulative Predictions -->
       <div class="dash-card analytics-card">
         <div class="dash-card-header">
-          <h3>📈 Model Accuracy</h3>
-          <span style="font-size:0.75rem;color:#94a3b8;">Last 8 weeks</span>
+          <h3>📈 Prediction Growth</h3>
+          <span style="font-size:0.75rem;color:#94a3b8;">Last 8 days</span>
         </div>
         <canvas id="accuracyChart" height="180"></canvas>
       </div>
@@ -235,18 +230,18 @@
       <div class="dash-card analytics-card">
         <div class="dash-card-header">
           <h3>🥧 Emotion Distribution</h3>
-          <span style="font-size:0.75rem;color:#94a3b8;">All analyses</span>
+          <span style="font-size:0.75rem;color:#94a3b8;">Your analyses</span>
         </div>
         <div style="position:relative;max-width:220px;margin:0 auto;">
           <canvas id="emotionPieChart" height="220"></canvas>
         </div>
       </div>
 
-      <!-- Scatter Plot: Per-Hour User Analysis -->
+      <!-- Bar Chart: Hourly Activity Today -->
       <div class="dash-card analytics-card">
         <div class="dash-card-header">
-          <h3>⏰ Hourly User Activity</h3>
-          <span style="font-size:0.75rem;color:#94a3b8;">~1k users · demo</span>
+          <h3>⏰ Today's Activity</h3>
+          <span style="font-size:0.75rem;color:#94a3b8;">By hour</span>
         </div>
         <canvas id="scatterChart" height="180"></canvas>
       </div>
@@ -455,178 +450,158 @@ const FLASK_MESSAGES = {{ get_flashed_messages(with_categories=true) | tojson }}
   });
 })();
 
-/* ── Analytics Charts ── */
+/* ── Activity delete ── */
+  window.deleteActivity = async function(predId, btn) {
+    const item = document.getElementById('act-' + predId);
+    if (!item) return;
+    item.classList.add('removing');
+    try {
+      await fetch('/history/delete/' + predId, { method: 'POST' });
+    } catch(e) {}
+    setTimeout(() => {
+      item.remove();
+      // Show empty state if list is now empty
+      const list = document.getElementById('activityList');
+      if (list && !list.querySelector('.activity-item')) {
+        list.innerHTML = '<div class="activity-item" id="act-empty"><div class="activity-icon" style="background:rgba(0,229,255,0.1);">🐾</div><div class="activity-info"><div class="activity-text">No predictions yet — upload a file to start!</div><div class="activity-time">Just now</div></div></div>';
+      }
+    }, 320);
+  };
+
+
+/* ── Analytics Charts - Real Data ── */
 document.addEventListener('DOMContentLoaded', function () {
 
-  // Shared chart defaults
   Chart.defaults.color = '#94a3b8';
   Chart.defaults.font.family = "'Inter', sans-serif";
   Chart.defaults.font.size = 11;
 
-  // ── 1. Line Chart: Model Accuracy ──
+  const EMOTION_COLORS = {
+    'Happy':'rgba(0,229,255,0.85)','Angry':'rgba(239,68,68,0.85)',
+    'Sad':'rgba(168,85,247,0.85)','Sadness':'rgba(168,85,247,0.85)',
+    'Scared':'rgba(245,158,11,0.85)','Fear':'rgba(245,158,11,0.85)',
+    'Curious':'rgba(16,185,129,0.85)','Relaxed':'rgba(236,72,153,0.85)',
+    'Fighting':'rgba(239,68,68,0.7)','Paining':'rgba(245,158,11,0.7)',
+    'Defense':'rgba(99,102,241,0.85)','MotherCall':'rgba(236,72,153,0.85)',
+  };
+  function emotionColor(label) {
+    const base = label.split('/')[0].trim();
+    return EMOTION_COLORS[base] || 'rgba(100,116,139,0.85)';
+  }
+  const GRID = 'rgba(255,255,255,0.05)';
+
+  // 1. Emotion Activity bar chart
+  let actChart = null;
+  const actCtx = document.getElementById('emotionChart');
+  if (actCtx) {
+    actChart = new Chart(actCtx, {
+      type: 'bar',
+      data: { labels: [], datasets: [{ label: 'Scans', data: [], backgroundColor: [], borderRadius: 6, borderSkipped: false }] },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.y} scan${ctx.parsed.y !== 1 ? 's' : ''}` } } },
+        scales: { y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: GRID } }, x: { grid: { display: false }, ticks: { maxTicksLimit: 10 } } }
+      }
+    });
+  }
+
+  // 2. Growth line chart
+  let growthChart = null;
   const accCtx = document.getElementById('accuracyChart');
   if (accCtx) {
-    const weeks = ['Wk 1','Wk 2','Wk 3','Wk 4','Wk 5','Wk 6','Wk 7','Wk 8'];
-    new Chart(accCtx, {
+    growthChart = new Chart(accCtx, {
       type: 'line',
-      data: {
-        labels: weeks,
-        datasets: [
-          {
-            label: 'Image Model',
-            data: [88.2, 89.5, 90.1, 91.3, 90.8, 92.4, 93.1, 94.0],
-            borderColor: '#00e5ff',
-            backgroundColor: 'rgba(0,229,255,0.08)',
-            borderWidth: 2.5,
-            pointBackgroundColor: '#00e5ff',
-            pointRadius: 4,
-            tension: 0.4,
-            fill: true,
-          },
-          {
-            label: 'Audio Model',
-            data: [82.0, 83.4, 84.1, 85.6, 84.9, 86.2, 87.5, 88.8],
-            borderColor: '#a855f7',
-            backgroundColor: 'rgba(168,85,247,0.08)',
-            borderWidth: 2.5,
-            pointBackgroundColor: '#a855f7',
-            pointRadius: 4,
-            tension: 0.4,
-            fill: true,
-          }
-        ]
-      },
+      data: { labels: [], datasets: [{ label: 'Total Predictions', data: [], borderColor: '#00e5ff', backgroundColor: 'rgba(0,229,255,0.08)', borderWidth: 2.5, pointBackgroundColor: '#00e5ff', pointRadius: 4, tension: 0.4, fill: true }] },
       options: {
         responsive: true,
-        plugins: {
-          legend: { position: 'top', labels: { boxWidth: 12, padding: 16 } },
-          tooltip: { mode: 'index', intersect: false }
-        },
-        scales: {
-          y: {
-            min: 78, max: 98,
-            ticks: { callback: v => v + '%' },
-            grid: { color: 'rgba(255,255,255,0.05)' }
-          },
-          x: { grid: { color: 'rgba(255,255,255,0.04)' } }
-        }
+        plugins: { legend: { position: 'top', labels: { boxWidth: 12, padding: 16 } }, tooltip: { mode: 'index', intersect: false } },
+        scales: { y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: GRID } }, x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { maxTicksLimit: 8 } } }
       }
     });
   }
 
-  // ── 2. Doughnut Chart: Emotion Distribution ──
+  // 3. Doughnut chart
+  let pieChart = null;
   const pieCtx = document.getElementById('emotionPieChart');
   if (pieCtx) {
-    new Chart(pieCtx, {
+    pieChart = new Chart(pieCtx, {
       type: 'doughnut',
-      data: {
-        labels: ['Happy 😸','Angry 😾','Sad 😿','Scared 🙀','Curious 🔍','Relaxed 😺'],
-        datasets: [{
-          data: [32, 14, 18, 10, 16, 10],
-          backgroundColor: [
-            'rgba(0,229,255,0.85)',
-            'rgba(239,68,68,0.85)',
-            'rgba(168,85,247,0.85)',
-            'rgba(245,158,11,0.85)',
-            'rgba(16,185,129,0.85)',
-            'rgba(236,72,153,0.85)',
-          ],
-          borderColor: '#0b0f1a',
-          borderWidth: 3,
-          hoverOffset: 8,
-        }]
-      },
+      data: { labels: [], datasets: [{ data: [], backgroundColor: [], borderColor: '#0b0f1a', borderWidth: 3, hoverOffset: 8 }] },
       options: {
-        responsive: true,
-        cutout: '62%',
-        plugins: {
-          legend: {
-            position: 'bottom',
-            labels: { boxWidth: 10, padding: 10, font: { size: 10 } }
-          },
-          tooltip: {
-            callbacks: { label: ctx => ` ${ctx.label}: ${ctx.parsed}%` }
-          }
-        }
+        responsive: true, cutout: '62%',
+        plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, padding: 10, font: { size: 10 } } }, tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.parsed}` } } }
       }
     });
   }
 
-  // ── 3. Scatter Plot: Per-Hour User Activity ──
-  const scatterCtx = document.getElementById('scatterChart');
-  if (scatterCtx) {
-    // Generate ~1000 demo data points spread across 24 hours
-    function genScatter(count, peakHour, spread, baseY, rangeY) {
-      const pts = [];
-      for (let i = 0; i < count; i++) {
-        const h = Math.max(0, Math.min(23, peakHour + (Math.random() - 0.5) * spread * 2));
-        const y = baseY + Math.random() * rangeY;
-        pts.push({ x: parseFloat(h.toFixed(2)), y: parseFloat(y.toFixed(1)) });
-      }
-      return pts;
-    }
-    new Chart(scatterCtx, {
-      type: 'scatter',
-      data: {
-        datasets: [
-          {
-            label: 'Image Analyses',
-            data: genScatter(420, 14, 5, 1, 9),
-            backgroundColor: 'rgba(0,229,255,0.55)',
-            pointRadius: 3,
-            pointHoverRadius: 5,
-          },
-          {
-            label: 'Audio Analyses',
-            data: genScatter(340, 10, 6, 1, 9),
-            backgroundColor: 'rgba(168,85,247,0.55)',
-            pointRadius: 3,
-            pointHoverRadius: 5,
-          },
-          {
-            label: 'Fusion Analyses',
-            data: genScatter(240, 18, 4, 1, 9),
-            backgroundColor: 'rgba(236,72,153,0.55)',
-            pointRadius: 3,
-            pointHoverRadius: 5,
-          }
-        ]
-      },
+  // 4. Hourly stacked bar chart
+  let hourlyChart = null;
+  const hourCtx = document.getElementById('scatterChart');
+  if (hourCtx) {
+    hourlyChart = new Chart(hourCtx, {
+      type: 'bar',
+      data: { labels: [], datasets: [
+        { label: 'Image',  data: [], backgroundColor: 'rgba(0,229,255,0.7)',  borderRadius: 4 },
+        { label: 'Audio',  data: [], backgroundColor: 'rgba(168,85,247,0.7)', borderRadius: 4 },
+        { label: 'Fusion', data: [], backgroundColor: 'rgba(236,72,153,0.7)', borderRadius: 4 },
+      ]},
       options: {
         responsive: true,
-        plugins: {
-          legend: { position: 'top', labels: { boxWidth: 10, padding: 14 } },
-          tooltip: {
-            callbacks: {
-              label: ctx => {
-                const h = Math.floor(ctx.parsed.x);
-                const ampm = h >= 12 ? 'PM' : 'AM';
-                const h12 = h % 12 || 12;
-                return ` ${ctx.dataset.label} @ ${h12}${ampm}`;
-              }
-            }
-          }
-        },
-        scales: {
-          x: {
-            min: 0, max: 23,
-            title: { display: true, text: 'Hour of Day', color: '#64748b' },
-            ticks: {
-              stepSize: 3,
-              callback: v => { const h = v % 12 || 12; return h + (v >= 12 ? 'pm' : 'am'); }
-            },
-            grid: { color: 'rgba(255,255,255,0.04)' }
-          },
-          y: {
-            min: 0, max: 10,
-            title: { display: true, text: 'Analyses / session', color: '#64748b' },
-            grid: { color: 'rgba(255,255,255,0.04)' }
-          }
-        }
+        plugins: { legend: { position: 'top', labels: { boxWidth: 10, padding: 14 } }, tooltip: { mode: 'index', intersect: false } },
+        scales: { x: { stacked: true, grid: { display: false }, ticks: { maxTicksLimit: 8 } }, y: { stacked: true, beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: GRID } } }
       }
     });
   }
 
+  async function fetchAndUpdate() {
+    try {
+      const res = await fetch('/api/chart-data');
+      if (!res.ok) return;
+      const d = await res.json();
+
+      if (actChart) {
+        const max = Math.max(...d.daily_activity.values, 1);
+        actChart.data.labels = d.daily_activity.labels;
+        actChart.data.datasets[0].data = d.daily_activity.values;
+        actChart.data.datasets[0].backgroundColor = d.daily_activity.values.map(v => {
+          const a = (0.3 + (v / max) * 0.6).toFixed(2);
+          return 'rgba(0,229,255,' + a + ')';
+        });
+        actChart.update('none');
+      }
+
+      if (growthChart) {
+        growthChart.data.labels = d.cumulative.labels;
+        growthChart.data.datasets[0].data = d.cumulative.values;
+        growthChart.update('none');
+      }
+
+      if (pieChart) {
+        const labels = Object.keys(d.emotion_distribution);
+        const values = Object.values(d.emotion_distribution);
+        if (labels.length > 0) {
+          const ICONS = {Happy:'😸',Angry:'😾',Sad:'😿',Sadness:'😿',Scared:'🙀',Fear:'🙀',Curious:'🔍',Relaxed:'😺',Fighting:'⚔️',Paining:'😣',Defense:'🛡️',MotherCall:'📣'};
+          pieChart.data.labels = labels.map(l => (ICONS[l.split('/')[0].trim()] || '🐱') + ' ' + l);
+          pieChart.data.datasets[0].data = values;
+          pieChart.data.datasets[0].backgroundColor = labels.map(l => emotionColor(l));
+          pieChart.update('none');
+        }
+      }
+
+      if (hourlyChart) {
+        const s = 6;
+        hourlyChart.data.labels = d.hourly.labels.slice(s);
+        hourlyChart.data.datasets[0].data = d.hourly.image.slice(s);
+        hourlyChart.data.datasets[1].data = d.hourly.audio.slice(s);
+        hourlyChart.data.datasets[2].data = d.hourly.fusion.slice(s);
+        hourlyChart.update('none');
+      }
+
+    } catch(e) { console.warn('Chart update failed:', e); }
+  }
+
+  fetchAndUpdate();
+  setInterval(fetchAndUpdate, 10000);
 });
 </script>
 {% endblock %}

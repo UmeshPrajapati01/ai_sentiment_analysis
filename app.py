@@ -291,6 +291,118 @@ def clear_history():
     flash('History cleared successfully. 🗑️', 'success')
     return redirect(url_for('history'))
 
+@app.route('/history/delete/<int:pred_id>', methods=['POST'])
+@login_required
+def delete_prediction(pred_id):
+    pred = Prediction.query.filter_by(id=pred_id, user_id=current_user.id).first()
+    if pred:
+        db.session.delete(pred)
+        db.session.commit()
+        return jsonify({'ok': True})
+    return jsonify({'ok': False}), 404
+
+@app.route('/settings', methods=['GET'])
+@login_required
+def settings():
+    return render_template('settings.html')
+
+@app.route('/settings/save', methods=['POST'])
+@login_required
+def settings_save():
+    section = request.form.get('section')
+
+    if section == 'account':
+        display_name = request.form.get('display_name', '').strip()
+        if display_name:
+            current_user.name = display_name
+            db.session.commit()
+            flash('Account info updated. 🎉', 'success')
+        else:
+            flash('Display name cannot be empty.', 'danger')
+
+    elif section == 'password':
+        current_pw  = request.form.get('current_password', '')
+        new_pw      = request.form.get('new_password', '')
+        confirm_pw  = request.form.get('confirm_password', '')
+        if not bcrypt.check_password_hash(current_user.password_hash, current_pw):
+            flash('Current password is incorrect.', 'danger')
+        elif len(new_pw) < 6:
+            flash('New password must be at least 6 characters.', 'danger')
+        elif new_pw != confirm_pw:
+            flash('Passwords do not match.', 'danger')
+        else:
+            current_user.password_hash = bcrypt.generate_password_hash(new_pw).decode('utf-8')
+            db.session.commit()
+            flash('Password updated successfully. 🔒', 'success')
+
+    elif section == 'notifications':
+        # Stored client-side via localStorage; just acknowledge
+        flash('Notification preferences saved. 🔔', 'success')
+
+    return redirect(url_for('settings'))
+
+def chart_data():
+    from datetime import timedelta
+
+    all_preds = Prediction.query.filter_by(user_id=current_user.id).all()
+
+    today = datetime.utcnow().date()
+
+    # ── 1. Emotion distribution — normalize casing ──
+    emotion_map = {}
+    for p in all_preds:
+        raw = p.prediction_result.strip()
+        # keep multi-word results (e.g. "Sad / Paining") as-is, capitalize first letter
+        key = raw[0].upper() + raw[1:] if raw else raw
+        emotion_map[key] = emotion_map.get(key, 0) + 1
+
+    # ── 2. Date range: first prediction → today (max 30 days) ──
+    if all_preds:
+        first_date = min(p.timestamp.date() for p in all_preds)
+        start_date = max(first_date, today - timedelta(days=29))
+    else:
+        start_date = today
+
+    num_days = (today - start_date).days + 1
+    daily_labels, daily_values, cum_labels, cumulative = [], [], [], []
+    running = 0
+    for i in range(num_days):
+        d = start_date + timedelta(days=i)
+        count = sum(1 for p in all_preds if p.timestamp.date() == d)
+        running += count
+        label = d.strftime('%b %d')
+        daily_labels.append(label)
+        daily_values.append(count)
+        cum_labels.append(label)
+        cumulative.append(running)
+
+    # ── 3. Hourly breakdown today ──
+    hourly = {h: {'image': 0, 'audio': 0, 'fusion': 0} for h in range(24)}
+    for p in all_preds:
+        if p.timestamp.date() == today:
+            h = p.timestamp.hour
+            t = p.file_type if p.file_type in ('image', 'audio', 'fusion') else 'image'
+            hourly[h][t] += 1
+
+    return jsonify({
+        'emotion_distribution': emotion_map,
+        'daily_activity': {'labels': daily_labels, 'values': daily_values},
+        'hourly': {
+            'labels': [f'{h}:00' for h in range(24)],
+            'image':  [hourly[h]['image']  for h in range(24)],
+            'audio':  [hourly[h]['audio']  for h in range(24)],
+            'fusion': [hourly[h]['fusion'] for h in range(24)],
+        },
+        'cumulative': {'labels': cum_labels, 'values': cumulative},
+        'totals': {
+            'total':  len(all_preds),
+            'image':  sum(1 for p in all_preds if p.file_type == 'image'),
+            'audio':  sum(1 for p in all_preds if p.file_type == 'audio'),
+            'fusion': sum(1 for p in all_preds if p.file_type == 'fusion'),
+        }
+    })
+
+
 @app.route('/media/<path:filename>')
 def serve_media(filename):
     return send_from_directory(str(BASE_DIR / 'front_end' / 'images_videos'), filename)

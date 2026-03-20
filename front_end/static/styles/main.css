@@ -559,3 +559,135 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:60px 0 3
 .popup-snooze-label{display:inline-flex;align-items:center;gap:7px;font-size:0.78rem;color:#94a3b8;cursor:pointer;margin-bottom:18px;user-select:none;}
 .popup-snooze-label input[type="checkbox"]{width:14px;height:14px;accent-color:#00e5ff;cursor:pointer;}
 .popup-snooze-label:hover{color:#64748b;}
+
+/* =====================================================
+   Settings Page
+   ===================================================== */
+.settings-label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--dash-text2);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom: 7px;
+}
+
+.settings-input {
+  width: 100%;
+  padding: 11px 14px;
+  background: rgba(255,255,255,0.04);
+  border: 1.5px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  color: var(--dash-text);
+  font-size: 0.92rem;
+  transition: var(--t-fast);
+}
+
+.settings-input:focus {
+  border-color: var(--cyan);
+  background: rgba(0,229,255,0.04);
+  box-shadow: 0 0 0 3px rgba(0,229,255,0.1);
+  outline: none;
+}
+
+/* Toggle switch */
+.settings-toggle {
+  position: relative;
+  display: inline-block;
+  width: 46px;
+  height: 26px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.settings-toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.settings-toggle-slider {
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0.1);
+  border-radius: 999px;
+  border: 1.5px solid rgba(255,255,255,0.12);
+  transition: all 0.3s var(--ease);
+}
+
+.settings-toggle-slider::before {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  left: 3px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255,255,255,0.4);
+  border-radius: 50%;
+  transition: all 0.3s var(--ease);
+}
+
+.settings-toggle input:checked + .settings-toggle-slider {
+  background: linear-gradient(135deg, var(--cyan), var(--purple));
+  border-color: transparent;
+  box-shadow: 0 0 14px rgba(0,229,255,0.3);
+}
+
+.settings-toggle input:checked + .settings-toggle-slider::before {
+  transform: translateX(20px) translateY(-50%);
+  background: #fff;
+}
+
+/* =====================================================
+   Activity List — delete button + scroll cap
+   ===================================================== */
+.activity-list::-webkit-scrollbar { width: 4px; }
+.activity-list::-webkit-scrollbar-track { background: transparent; }
+.activity-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+.act-delete-btn {
+  flex-shrink: 0;
+  margin-left: auto;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: transparent;
+  border: 1px solid transparent;
+  color: rgba(255,255,255,0.2);
+  font-size: 0.7rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  opacity: 0;
+}
+
+.activity-item:hover .act-delete-btn {
+  opacity: 1;
+  border-color: rgba(239,68,68,0.3);
+  color: rgba(239,68,68,0.7);
+  background: rgba(239,68,68,0.07);
+}
+
+.act-delete-btn:hover {
+  background: rgba(239,68,68,0.15) !important;
+  color: #ef4444 !important;
+  transform: scale(1.1);
+}
+
+.activity-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+.activity-item.removing {
+  opacity: 0;
+  transform: translateX(20px);
+  pointer-events: none;
+}

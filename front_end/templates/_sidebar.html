@@ -27,7 +27,7 @@
     <div class="sidebar-section">
     <div class="sidebar-section-title">System</div>
     <a href="{{ url_for('plans') }}" class="sidebar-link {{ 'active' if active_page == 'plans' }}"><span class="link-icon">💎</span> Plans & Credits</a>
-    <a href="#" class="sidebar-link"><span class="link-icon">⚙️</span> Settings</a>
+    <a href="{{ url_for('settings') }}" class="sidebar-link {{ 'active' if active_page == 'settings' }}"><span class="link-icon">⚙️</span> Settings</a>
     <a href="{{ url_for('logout') }}" class="sidebar-link" style="color:rgba(239,68,68,0.7);"><span class="link-icon">🚪</span> Logout</a>
   </div>
 
