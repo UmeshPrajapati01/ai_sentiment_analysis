@@ -1,320 +1,632 @@
 {% extends "base.html" %}
-
-{% block description %}MewConnect Dashboard — Upload cat photos and audio to detect emotions instantly.{% endblock %}
-{% block title %}Dashboard | MewConnect{% endblock %}
+{% block title %}Dashboard | MeowMood{% endblock %}
 {% block page_id %}dashboard{% endblock %}
 
 {% block body %}
 <div class="dashboard-layout">
+  {% set active_page = 'dashboard' %}
+  {% include '_sidebar.html' %}
 
-    <!-- SIDEBAR -->
-    {% set active_page = 'dashboard' %}
-    {% include '_sidebar.html' %}
+  <main class="main-content" id="mainContent">
+    <button id="sidebarToggle" style="display:none;position:fixed;top:16px;left:16px;z-index:600;width:44px;height:44px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;font-size:1.2rem;cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,0.1);align-items:center;justify-content:center;" aria-label="Toggle sidebar">☰</button>
 
-    <!-- MAIN CONTENT -->
-    <main class="main-content" id="mainContent">
+    <!-- Header -->
+    <div class="page-header">
+      <div>
+        <h1>Welcome back, <span style="background:linear-gradient(135deg,#00e5ff,#a855f7);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">{{ current_user.display_name }}</span> 👋</h1>
+        <p>Here's what's happening with your furry friends</p>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <a href="#uploadSection" class="btn-dash btn btn-sm" onclick="document.getElementById('uploadSection').scrollIntoView({behavior:'smooth'});return false;">📸 Image</a>
+        <a href="#fusionSection" class="btn btn-purple btn-sm" onclick="document.getElementById('fusionSection').scrollIntoView({behavior:'smooth'});return false;">🔀 Fusion</a>
+      </div>
+    </div>
 
-        <!-- Mobile Toggle -->
-        <button id="sidebarToggle" style="display:none;position:fixed;top:16px;left:16px;z-index:600;width:44px;height:44px;
-             background:#fff;border:1px solid #e2e8f0;border-radius:10px;font-size:1.2rem;
-             cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,0.1);align-items:center;justify-content:center;"
-            aria-label="Toggle sidebar">☰</button>
-
-        <!-- ── Page Header ── -->
-        <div class="page-header">
-            <div>
-                <h1>Welcome back, <span style="color:#d97706;" id="welcomeName">{{ current_user.display_name }}</span>!
-                    👋</h1>
-                <p style="color:#94a3b8;margin-top:4px;font-size:0.9rem;">Here's what's happening with your furry
-                    friends</p>
-            </div>
-            <div class="header-actions">
-                <button class="btn btn-dash-primary btn-sm" id="uploadBtn"
-                    onclick="document.getElementById('uploadSection').scrollIntoView({behavior:'smooth'})">
-                    📸 Upload Photo
-                </button>
-            </div>
+    <!-- Credits Widget -->
+    <div class="credits-widget reveal">
+      <div class="credits-icon">⚡</div>
+      <div class="credits-info">
+        <div class="credits-label">Available Credits</div>
+        <div class="credits-value {% if current_user.credits <= 5 %}low{% elif current_user.credits <= 20 %}medium{% endif %}" id="creditsDisplay">
+          {{ current_user.credits }}{% if current_user.plan == 'yearly' %} <span style="font-size:0.9rem;color:#94a3b8;">/ ∞</span>{% endif %}
         </div>
-
-        <!-- ── Stats Cards ── -->
-        <div class="stats-grid">
-            <div class="stat-card reveal">
-                <div class="stat-card-icon">🐾</div>
-                <div class="stat-card-value" id="statTotal">{{ total_predictions }}</div>
-                <div class="stat-card-label">Total Predictions</div>
-                <div class="stat-card-change up">↑ Active</div>
-            </div>
-            <div class="stat-card reveal" style="transition-delay:0.08s">
-                <div class="stat-card-icon">📸</div>
-                <div class="stat-card-value" id="statImages">{{ image_count }}</div>
-                <div class="stat-card-label">Image Analyses</div>
-                <div class="stat-card-change up">📸 Photos</div>
-            </div>
-            <div class="stat-card reveal" style="transition-delay:0.16s">
-                <div class="stat-card-icon">🎵</div>
-                <div class="stat-card-value" id="statAudio">{{ audio_count }}</div>
-                <div class="stat-card-label">Audio Analyses</div>
-                <div class="stat-card-change up">🎵 Audio</div>
-            </div>
-            <div class="stat-card reveal" style="transition-delay:0.24s">
-                <div class="stat-card-icon">🎯</div>
-                <div class="stat-card-value" id="statEmotions">{{ unique_emotions }}</div>
-                <div class="stat-card-label">Emotions Found</div>
-                <div class="stat-card-change up">✅ Unique</div>
-            </div>
+        <div class="credits-bar-wrap">
+          {% set max_cr = plans[current_user.plan]['credits'] %}
+          {% set pct = [((current_user.credits / max_cr) * 100)|int, 100]|min if max_cr > 0 else 100 %}
+          <div class="credits-bar"><div class="credits-bar-fill" id="creditsBarFill" style="width:{{ pct }}%;"></div></div>
         </div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+        <span class="credits-plan-badge plan-{{ current_user.plan }}">{{ current_user.plan_label }}</span>
+        {% if current_user.plan == 'free' %}
+        <a href="{{ url_for('plans') }}" class="btn btn-primary btn-sm" style="font-size:0.72rem;padding:6px 14px;">⬆ Upgrade</a>
+        {% endif %}
+      </div>
+    </div>
 
-        <!-- ── Upload & Analyze ── -->
-        <div class="dash-card reveal" id="uploadSection" style="margin-bottom:28px;">
-            <div class="dash-card-header">
-                <h3>📸 Upload &amp; Analyze</h3>
-                <span style="color:#94a3b8;font-size:0.82rem;">Drag &amp; drop or select a file</span>
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card reveal"><div class="stat-card-icon">🐾</div><div class="stat-card-value" data-count="{{ total_predictions }}">{{ total_predictions }}</div><div class="stat-card-label">Total Predictions</div><div class="stat-card-change">↑ All Time</div></div>
+      <div class="stat-card reveal" style="transition-delay:0.08s"><div class="stat-card-icon">📸</div><div class="stat-card-value" data-count="{{ image_count }}">{{ image_count }}</div><div class="stat-card-label">Image Analyses</div><div class="stat-card-change">📸 Photos</div></div>
+      <div class="stat-card reveal" style="transition-delay:0.16s"><div class="stat-card-icon">🎵</div><div class="stat-card-value" data-count="{{ audio_count }}">{{ audio_count }}</div><div class="stat-card-label">Audio Analyses</div><div class="stat-card-change">🎵 Audio</div></div>
+      <div class="stat-card reveal" style="transition-delay:0.24s"><div class="stat-card-icon">🎯</div><div class="stat-card-value" data-count="{{ unique_emotions }}">{{ unique_emotions }}</div><div class="stat-card-label">Emotions Found</div><div class="stat-card-change">✅ Unique</div></div>
+    </div>
+
+    <!-- Upload Boxes: Image + Audio side by side -->
+    <div class="upload-grid reveal" id="uploadSection">
+
+      <!-- IMAGE BOX -->
+      <div class="upload-box image-box">
+        <div class="upload-box-header">
+          <div class="upload-box-icon">📸</div>
+          <div><div class="upload-box-title">Image Analysis</div><div class="upload-box-sub">Upload a cat photo to detect emotion</div></div>
+        </div>
+        <form method="POST" action="{{ url_for('dashboard') }}" enctype="multipart/form-data" id="imageForm">
+          <input type="hidden" name="file_type" value="image">
+          <div class="scan-wrap" id="imageScanWrap">
+            <div class="drop-zone" id="imageDropZone" role="button" tabindex="0" aria-label="Image drop zone">
+              <div class="drop-zone-icon">🖼️</div>
+              <p class="drop-zone-text" id="imageFileLabel">Drag & drop or click to select</p>
+              <p class="drop-zone-hint">PNG, JPG, JPEG, GIF supported</p>
             </div>
-            <form method="POST" action="{{ url_for('dashboard') }}" enctype="multipart/form-data" id="uploadForm">
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:16px;">
-                    <div class="form-group" style="margin-bottom:0;">
-                        <label for="file_type">Analysis Type</label>
-                        <select name="file_type" id="file_type" class="form-control" style="cursor:pointer;">
-                            <option value="image">🖼️ Image (Photo of Cat)</option>
-                            <option value="audio">🎵 Audio (Cat Sound)</option>
-                        </select>
-                    </div>
-                    <div class="form-group" style="margin-bottom:0;">
-                        <label for="file">Select File</label>
-                        <input type="file" name="file" id="file" class="form-control"
-                            accept=".png,.jpg,.jpeg,.gif,.mp3,.wav" required style="padding:10px 14px;">
-                    </div>
-                </div>
-
-                <!-- Drag & Drop Zone -->
-                <div id="dropZone" role="button" tabindex="0" aria-label="Drop zone for file upload">
-                    <div style="font-size:2.8rem;margin-bottom:12px;" aria-hidden="true">📁</div>
-                    <p style="color:#64748b;font-size:0.92rem;" id="fileLabel">Drag &amp; drop your file here, or click
-                        Select File above</p>
-                    <p style="color:#94a3b8;font-size:0.78rem;margin-top:8px;">Supported: PNG, JPG, JPEG, GIF, MP3, WAV
-                    </p>
-                </div>
-
-                <button type="submit" class="btn btn-dash-primary" style="width:100%;" id="analyzeBtn">
-                    🔍 Analyze Emotion
-                </button>
-            </form>
-
-            <!-- Prediction Result -->
-            {% if prediction %}
-            <div class="prediction-result">
-                <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
-                    <div style="font-size:3.5rem;">
-                        {% if prediction|lower in ['happy'] %}😸
-                        {% elif prediction|lower in ['angry'] %}😾
-                        {% elif prediction|lower in ['sad'] %}😿
-                        {% elif prediction|lower in ['scared','fear'] %}🙀
-                        {% elif prediction|lower in ['curious'] %}🔍
-                        {% elif prediction|lower in ['relaxed'] %}😺
-                        {% else %}🐱
-                        {% endif %}
-                    </div>
-                    <div>
-                        <h3 style="font-size:1.1rem;font-weight:800;color:var(--dash-text);margin-bottom:4px;">Emotion
-                            Detected</h3>
-                        <p
-                            style="font-size:2rem;font-weight:900;background:var(--g-brand);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">
-                            {{ prediction }}
-                        </p>
-                    </div>
-                </div>
-            </div>
+          </div>
+          <input type="file" name="file" id="imageFile" accept=".png,.jpg,.jpeg,.gif" required style="display:none;">
+          <button type="submit" class="btn-dash btn" style="width:100%;margin-top:12px;" id="imageAnalyzeBtn">🔍 Analyze Image</button>
+        </form>
+        {% if prediction and request.form.get('file_type') == 'image' %}
+        {% set r = prediction|lower %}
+        <div class="result-box show image-box">
+          <div class="result-label">Emotion Detected</div>
+          <div class="result-emotion">
+            {% if r == 'happy' %}😸{% elif r == 'angry' %}😾{% elif r in ['sad','sadness'] %}😿{% elif r in ['scared','fear'] %}🙀{% elif r == 'curious' %}🔍{% elif r == 'relaxed' %}😺{% else %}🐱{% endif %}
+            {{ prediction }}
+          </div>
+        </div>
+        <div class="emotion-hint-bar hint-image">
+          <span class="hint-icon">
+            {% if r == 'happy' %}😸{% elif r == 'angry' %}😾{% elif r in ['sad','sadness'] %}😿{% elif r in ['scared','fear'] %}🙀{% elif r == 'curious' %}🔍{% elif r == 'relaxed' %}😺{% else %}🐱{% endif %}
+          </span>
+          <div class="hint-text">
+            <span class="hint-title">{{ prediction }} — </span>
+            {% if r == 'happy' %}Ears up, eyes soft and slow-blinking. Your cat is content — great time for play or cuddles!
+            {% elif r == 'angry' %}Ears flat, pupils narrow. Give your cat space and avoid direct eye contact.
+            {% elif r in ['sad','sadness'] %}Curled up, quiet, low energy. Check for discomfort or loneliness — extra attention helps.
+            {% elif r in ['scared','fear'] %}Wide eyes, puffed tail, crouched. Remove the stressor and let your cat hide if needed.
+            {% elif r == 'curious' %}Ears forward, whiskers spread, alert gaze. Engage with a toy or new object!
+            {% elif r == 'relaxed' %}Loose body, slow blink, soft posture. Your cat feels completely safe and at ease.
+            {% else %}Emotion detected. Observe body language for more context.
             {% endif %}
+          </div>
         </div>
+        {% endif %}
+      </div>
 
-        <!-- ── Charts & Activity ── -->
-        <div class="dashboard-grid">
-            <!-- Chart Card -->
-            <div class="dash-card reveal">
-                <div class="dash-card-header">
-                    <h3>📊 Emotion Activity</h3>
-                    <select
-                        style="padding:5px 10px;border:1px solid #e2e8f0;border-radius:6px;font-size:0.8rem;color:#64748b;cursor:pointer;">
-                        <option>This Week</option>
-                        <option>This Month</option>
-                    </select>
-                </div>
-                <div class="chart-bars" id="emotionChart" role="img" aria-label="Weekly emotion chart">
-                    <div class="chart-bar" data-height="65%"
-                        style="background:linear-gradient(to top,#f59e0b,#fbbf24);height:0;"><span
-                            class="chart-bar-label">Mon</span></div>
-                    <div class="chart-bar" data-height="82%"
-                        style="background:linear-gradient(to top,#10b981,#34d399);height:0;"><span
-                            class="chart-bar-label">Tue</span></div>
-                    <div class="chart-bar" data-height="45%"
-                        style="background:linear-gradient(to top,#3b82f6,#60a5fa);height:0;"><span
-                            class="chart-bar-label">Wed</span></div>
-                    <div class="chart-bar" data-height="90%"
-                        style="background:linear-gradient(to top,#8b5cf6,#a78bfa);height:0;"><span
-                            class="chart-bar-label">Thu</span></div>
-                    <div class="chart-bar" data-height="72%"
-                        style="background:linear-gradient(to top,#ec4899,#f472b6);height:0;"><span
-                            class="chart-bar-label">Fri</span></div>
-                    <div class="chart-bar" data-height="58%"
-                        style="background:linear-gradient(to top,#f59e0b,#fbbf24);height:0;"><span
-                            class="chart-bar-label">Sat</span></div>
-                    <div class="chart-bar" data-height="95%"
-                        style="background:linear-gradient(to top,#10b981,#34d399);height:0;"><span
-                            class="chart-bar-label">Sun</span></div>
-                </div>
-                <div style="display:flex;gap:16px;margin-top:38px;flex-wrap:wrap;">
-                    <div style="display:flex;align-items:center;gap:5px;font-size:0.78rem;color:#64748b;"><span
-                            style="width:8px;height:8px;border-radius:50%;background:#f59e0b;display:inline-block;"></span>Happy
-                    </div>
-                    <div style="display:flex;align-items:center;gap:5px;font-size:0.78rem;color:#64748b;"><span
-                            style="width:8px;height:8px;border-radius:50%;background:#10b981;display:inline-block;"></span>Relaxed
-                    </div>
-                    <div style="display:flex;align-items:center;gap:5px;font-size:0.78rem;color:#64748b;"><span
-                            style="width:8px;height:8px;border-radius:50%;background:#3b82f6;display:inline-block;"></span>Curious
-                    </div>
-                    <div style="display:flex;align-items:center;gap:5px;font-size:0.78rem;color:#64748b;"><span
-                            style="width:8px;height:8px;border-radius:50%;background:#8b5cf6;display:inline-block;"></span>Playful
-                    </div>
-                </div>
-            </div>
-
-            <!-- Recent Activity -->
-            <div class="dash-card reveal" style="transition-delay:0.1s">
-                <div class="dash-card-header">
-                    <h3>⏱️ Recent Activity</h3>
-                    <a href="{{ url_for('history') }}" style="color:#d97706;font-size:0.82rem;font-weight:600;">View All
-                        →</a>
-                </div>
-                <div class="activity-list">
-                    {% if recent_predictions %}
-                    {% for pred in recent_predictions %}
-                    <div class="activity-item">
-                        <div class="activity-icon"
-                            style="background:{{ 'rgba(245,158,11,0.1)' if pred.file_type == 'image' else 'rgba(59,130,246,0.1)' }};">
-                            {{ '📸' if pred.file_type == 'image' else '🎵' }}
-                        </div>
-                        <div class="activity-info">
-                            <div class="activity-text">{{ pred.prediction_result }} — {{ pred.filename }}</div>
-                            <div class="activity-time">{{ pred.timestamp.strftime('%b %d, %Y %I:%M %p') }}</div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                    {% else %}
-                    <div class="activity-item">
-                        <div class="activity-icon" style="background:rgba(245,158,11,0.1);">🐾</div>
-                        <div class="activity-info">
-                            <div class="activity-text">No predictions yet — upload a file to start!</div>
-                            <div class="activity-time">Just now</div>
-                        </div>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
+      <!-- AUDIO BOX -->
+      <div class="upload-box audio-box" id="audioSection">
+        <div class="upload-box-header">
+          <div class="upload-box-icon">🎵</div>
+          <div><div class="upload-box-title">Audio Analysis</div><div class="upload-box-sub">Upload a cat sound to detect emotion</div></div>
         </div>
-
-        <!-- ── Video Gallery ── -->
-        <div class="dash-card reveal" style="margin-bottom:28px;">
-            <div class="dash-card-header">
-                <h3>🎬 Cat Emotion Episodes</h3>
-                <span style="color:#94a3b8;font-size:0.82rem;">AI analysis in action</span>
+        <form method="POST" action="{{ url_for('dashboard') }}" enctype="multipart/form-data" id="audioForm">
+          <input type="hidden" name="file_type" value="audio">
+          <div class="scan-wrap" id="audioScanWrap">
+            <div class="drop-zone" id="audioDropZone" role="button" tabindex="0" aria-label="Audio drop zone">
+              <div class="drop-zone-icon">🎙️</div>
+              <p class="drop-zone-text" id="audioFileLabel">Drag & drop or click to select</p>
+              <p class="drop-zone-hint">MP3, WAV supported</p>
             </div>
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;">
-                <div class="video-card-wrap">
-                    <video autoplay muted loop playsinline
-                        style="width:100%;height:190px;object-fit:cover;display:block;">
-                        <source
-                            src="{{ url_for('serve_media', filename='grok-video-78357e77-95ed-406d-8a54-df6a852cc3d7 (3).mp4') }}"
-                            type="video/mp4">
-                    </video>
-                    <div
-                        style="position:absolute;bottom:0;left:0;right:0;padding:14px;background:linear-gradient(transparent,rgba(0,0,0,0.75));">
-                        <div style="color:#fff;font-weight:700;font-size:0.88rem;">😸 Happy Analysis</div>
-                        <div style="color:rgba(255,255,255,0.65);font-size:0.76rem;">Playful kitten detected</div>
-                    </div>
-                </div>
-                <div class="video-card-wrap">
-                    <video autoplay muted loop playsinline
-                        style="width:100%;height:190px;object-fit:cover;display:block;">
-                        <source
-                            src="{{ url_for('serve_media', filename='grok-video-f7857bed-98a3-4edc-8ef9-9413cf876406 (1).mp4') }}"
-                            type="video/mp4">
-                    </video>
-                    <div
-                        style="position:absolute;bottom:0;left:0;right:0;padding:14px;background:linear-gradient(transparent,rgba(0,0,0,0.75));">
-                        <div style="color:#fff;font-weight:700;font-size:0.88rem;">🔍 Curiosity Detected</div>
-                        <div style="color:rgba(255,255,255,0.65);font-size:0.76rem;">Exploring new environment</div>
-                    </div>
-                </div>
-                <div class="video-card-wrap">
-                    <video autoplay muted loop playsinline
-                        style="width:100%;height:190px;object-fit:cover;display:block;">
-                        <source
-                            src="{{ url_for('serve_media', filename='grok-video-f7857bed-98a3-4edc-8ef9-9413cf876406 (2).mp4') }}"
-                            type="video/mp4">
-                    </video>
-                    <div
-                        style="position:absolute;bottom:0;left:0;right:0;padding:14px;background:linear-gradient(transparent,rgba(0,0,0,0.75));">
-                        <div style="color:#fff;font-weight:700;font-size:0.88rem;">😺 Relaxed Mood</div>
-                        <div style="color:rgba(255,255,255,0.65);font-size:0.76rem;">Calm and content</div>
-                    </div>
-                </div>
-            </div>
+          </div>
+          <input type="file" name="file" id="audioFile" accept=".mp3,.wav" required style="display:none;">
+          <button type="submit" class="btn btn-purple btn-sm" style="width:100%;margin-top:12px;padding:12px;" id="audioAnalyzeBtn">🎵 Analyze Audio</button>
+        </form>
+        {% if prediction and request.form.get('file_type') == 'audio' %}
+        {% set r = prediction|lower %}
+        <div class="result-box show audio-box">
+          <div class="result-label">Emotion Detected</div>
+          <div class="result-emotion">
+            {% if r == 'happy' %}😸{% elif r == 'angry' %}😾{% elif r in ['sad','sadness'] %}😿{% elif r in ['scared','fear'] %}🙀{% elif r == 'curious' %}🔍{% elif r == 'relaxed' %}😺{% else %}🐱{% endif %}
+            {{ prediction }}
+          </div>
         </div>
-
-        <!-- ── Emotion Guide ── -->
-        <div class="dash-card reveal"
-            style="background:linear-gradient(135deg,#1e293b,#0f172a);border:none;margin-bottom:28px;">
-            <div class="dash-card-header" style="border-bottom-color:rgba(255,255,255,0.08);">
-                <h3 style="color:#fff;">💡 Emotion Guide</h3>
-                <span style="color:rgba(255,255,255,0.4);font-size:0.82rem;">What each emotion looks like</span>
-            </div>
-            <div class="emotion-guide-grid">
-                <div class="emotion-guide-item">
-                    <div style="font-size:2.2rem;margin-bottom:8px;">😸</div>
-                    <div style="font-weight:700;color:#fff;font-size:0.9rem;">Happy</div>
-                    <div style="font-size:0.76rem;color:rgba(255,255,255,0.5);margin-top:4px;">Ears up, eyes soft</div>
-                </div>
-                <div class="emotion-guide-item">
-                    <div style="font-size:2.2rem;margin-bottom:8px;">😾</div>
-                    <div style="font-weight:700;color:#fff;font-size:0.9rem;">Angry</div>
-                    <div style="font-size:0.76rem;color:rgba(255,255,255,0.5);margin-top:4px;">Ears flat, slits</div>
-                </div>
-                <div class="emotion-guide-item">
-                    <div style="font-size:2.2rem;margin-bottom:8px;">😿</div>
-                    <div style="font-weight:700;color:#fff;font-size:0.9rem;">Sad</div>
-                    <div style="font-size:0.76rem;color:rgba(255,255,255,0.5);margin-top:4px;">Curled, quiet</div>
-                </div>
-                <div class="emotion-guide-item">
-                    <div style="font-size:2.2rem;margin-bottom:8px;">🙀</div>
-                    <div style="font-weight:700;color:#fff;font-size:0.9rem;">Scared</div>
-                    <div style="font-size:0.76rem;color:rgba(255,255,255,0.5);margin-top:4px;">Wide eyes, puffed</div>
-                </div>
-                <div class="emotion-guide-item">
-                    <div style="font-size:2.2rem;margin-bottom:8px;">🔍</div>
-                    <div style="font-weight:700;color:#fff;font-size:0.9rem;">Curious</div>
-                    <div style="font-size:0.76rem;color:rgba(255,255,255,0.5);margin-top:4px;">Ears alert, whiskers
-                        forward</div>
-                </div>
-                <div class="emotion-guide-item">
-                    <div style="font-size:2.2rem;margin-bottom:8px;">😺</div>
-                    <div style="font-weight:700;color:#fff;font-size:0.9rem;">Relaxed</div>
-                    <div style="font-size:0.76rem;color:rgba(255,255,255,0.5);margin-top:4px;">Slow blink, loose body
-                    </div>
-                </div>
-            </div>
+        <div class="emotion-hint-bar hint-audio">
+          <span class="hint-icon">
+            {% if r == 'happy' %}😸{% elif r == 'angry' %}😾{% elif r in ['sad','sadness'] %}😿{% elif r in ['scared','fear'] %}🙀{% elif r == 'curious' %}🔍{% elif r == 'relaxed' %}😺{% else %}🐱{% endif %}
+          </span>
+          <div class="hint-text">
+            <span class="hint-title">{{ prediction }} — </span>
+            {% if r == 'happy' %}Trilling or chirping sounds. Your cat is in a great mood — respond with gentle talk!
+            {% elif r == 'angry' %}Hissing, growling or yowling. Back off and give your cat room to calm down.
+            {% elif r in ['sad','sadness'] %}Low, mournful meows. Your cat may be lonely or unwell — check in with them.
+            {% elif r in ['scared','fear'] %}High-pitched cries or silence. Comfort from a distance and remove the threat.
+            {% elif r == 'curious' %}Short, inquisitive chirps. Your cat is exploring — encourage with interactive toys.
+            {% elif r == 'relaxed' %}Soft purring or quiet breathing. All is well — your cat is perfectly comfortable.
+            {% else %}Vocalization detected. Listen for patterns to understand your cat better.
+            {% endif %}
+          </div>
         </div>
+        {% endif %}
+      </div>
+    </div>
 
-    </main>
+    <!-- FUSION BOX -->
+    <div class="fusion-box reveal" id="fusionSection">
+      <div class="fusion-box-header">
+        <div class="fusion-icon">🔀</div>
+        <div>
+          <div class="fusion-title">Fusion Mode</div>
+          <div class="fusion-sub">Combine image + audio for a deeper multi-modal emotion reading</div>
+        </div>
+      </div>
+      <div class="fusion-inputs">
+        <div class="fusion-input-wrap">
+          <label>Cat Photo</label>
+          <div class="fusion-drop" id="fusionImageDrop" role="button" tabindex="0">
+            <div class="fusion-drop-icon">🖼️</div>
+            <div class="fusion-drop-text" id="fusionImageLabel">Drop image here</div>
+          </div>
+          <input type="file" id="fusionImageFile" accept=".png,.jpg,.jpeg,.gif" style="display:none;">
+        </div>
+        <div class="fusion-input-wrap">
+          <label>Cat Sound</label>
+          <div class="fusion-drop" id="fusionAudioDrop" role="button" tabindex="0">
+            <div class="fusion-drop-icon">🎙️</div>
+            <div class="fusion-drop-text" id="fusionAudioLabel">Drop audio here</div>
+          </div>
+          <input type="file" id="fusionAudioFile" accept=".mp3,.wav" style="display:none;">
+        </div>
+      </div>
+      <button class="fusion-btn" id="fusionBtn">🔀 Run Fusion Analysis</button>
+      <div class="fusion-result" id="fusionResult">
+        <div style="font-size:0.82rem;color:rgba(255,255,255,0.5);margin-bottom:10px;">Fusion Analysis Complete</div>
+        <div class="fusion-result-grid">
+          <div class="fusion-result-item"><div class="label">📸 Image</div><div class="value" id="fusionImageResult">—</div></div>
+          <div class="fusion-result-item main-result"><div class="label">🔀 Combined</div><div class="value" id="fusionCombinedResult">—</div></div>
+          <div class="fusion-result-item"><div class="label">🎵 Audio</div><div class="value" id="fusionAudioResult">—</div></div>
+        </div>
+        <!-- Fusion hint bars — populated by JS -->
+        <div id="fusionHints" style="margin-top:14px;display:flex;flex-direction:column;gap:8px;"></div>
+      </div>
+    </div>
+
+    <!-- Charts + Activity -->
+    <div class="dashboard-grid">
+      <div class="dash-card reveal">
+        <div class="dash-card-header"><h3>📊 Emotion Activity</h3></div>
+        <div class="chart-bars" id="emotionChart" role="img" aria-label="Weekly emotion chart">
+          <div class="chart-bar" data-height="65%" style="background:linear-gradient(to top,#00e5ff,#00b8d9);height:0;"><span class="chart-bar-label">Mon</span></div>
+          <div class="chart-bar" data-height="82%" style="background:linear-gradient(to top,#10b981,#34d399);height:0;"><span class="chart-bar-label">Tue</span></div>
+          <div class="chart-bar" data-height="45%" style="background:linear-gradient(to top,#a855f7,#c084fc);height:0;"><span class="chart-bar-label">Wed</span></div>
+          <div class="chart-bar" data-height="90%" style="background:linear-gradient(to top,#ec4899,#f472b6);height:0;"><span class="chart-bar-label">Thu</span></div>
+          <div class="chart-bar" data-height="72%" style="background:linear-gradient(to top,#f59e0b,#fbbf24);height:0;"><span class="chart-bar-label">Fri</span></div>
+          <div class="chart-bar" data-height="58%" style="background:linear-gradient(to top,#00e5ff,#00b8d9);height:0;"><span class="chart-bar-label">Sat</span></div>
+          <div class="chart-bar" data-height="95%" style="background:linear-gradient(to top,#10b981,#34d399);height:0;"><span class="chart-bar-label">Sun</span></div>
+        </div>
+      </div>
+      <div class="dash-card reveal" style="transition-delay:0.1s">
+        <div class="dash-card-header"><h3>⏱️ Recent Activity</h3><a href="{{ url_for('history') }}" style="color:#00e5ff;font-size:0.82rem;font-weight:600;">View All →</a></div>
+        <div class="activity-list">
+          {% if recent_predictions %}
+          {% for pred in recent_predictions %}
+          <div class="activity-item">
+            <div class="activity-icon" style="background:{{ 'rgba(0,229,255,0.1)' if pred.file_type == 'image' else ('rgba(168,85,247,0.1)' if pred.file_type == 'audio' else 'rgba(16,185,129,0.1)') }};">{{ '📸' if pred.file_type == 'image' else ('🎵' if pred.file_type == 'audio' else '🔀') }}</div>
+            <div class="activity-info"><div class="activity-text">{{ pred.prediction_result }} — {{ pred.filename }}</div><div class="activity-time">{{ pred.timestamp.strftime('%b %d, %Y %I:%M %p') }}</div></div>
+          </div>
+          {% endfor %}
+          {% else %}
+          <div class="activity-item"><div class="activity-icon" style="background:rgba(0,229,255,0.1);">🐾</div><div class="activity-info"><div class="activity-text">No predictions yet — upload a file to start!</div><div class="activity-time">Just now</div></div></div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Analytics Charts Row -->
+    <div class="analytics-charts-grid reveal">
+
+      <!-- Line Chart: Model Accuracy -->
+      <div class="dash-card analytics-card">
+        <div class="dash-card-header">
+          <h3>📈 Model Accuracy</h3>
+          <span style="font-size:0.75rem;color:#94a3b8;">Last 8 weeks</span>
+        </div>
+        <canvas id="accuracyChart" height="180"></canvas>
+      </div>
+
+      <!-- Doughnut Chart: Emotion Distribution -->
+      <div class="dash-card analytics-card">
+        <div class="dash-card-header">
+          <h3>🥧 Emotion Distribution</h3>
+          <span style="font-size:0.75rem;color:#94a3b8;">All analyses</span>
+        </div>
+        <div style="position:relative;max-width:220px;margin:0 auto;">
+          <canvas id="emotionPieChart" height="220"></canvas>
+        </div>
+      </div>
+
+      <!-- Scatter Plot: Per-Hour User Analysis -->
+      <div class="dash-card analytics-card">
+        <div class="dash-card-header">
+          <h3>⏰ Hourly User Activity</h3>
+          <span style="font-size:0.75rem;color:#94a3b8;">~1k users · demo</span>
+        </div>
+        <canvas id="scatterChart" height="180"></canvas>
+      </div>
+
+    </div>
+
+    <!-- Emotion Guide -->
+    <div class="dash-card reveal" style="background:linear-gradient(135deg,#0b0f1a,#111827);border:1px solid rgba(0,229,255,0.1);">
+      <div class="dash-card-header" style="border-bottom-color:rgba(255,255,255,0.06);"><h3 style="color:#fff;">💡 Emotion Guide</h3><span style="color:rgba(255,255,255,0.3);font-size:0.8rem;">What each emotion looks like</span></div>
+      <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-top:4px;">
+        {% for emoji, name, desc in [('😸','Happy','Ears up, eyes soft'),('😾','Angry','Ears flat, slits'),('😿','Sad','Curled, quiet'),('🙀','Scared','Wide eyes, puffed'),('🔍','Curious','Ears alert, whiskers forward'),('😺','Relaxed','Slow blink, loose body')] %}
+        <div style="text-align:center;padding:14px 8px;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);">
+          <div style="font-size:2rem;margin-bottom:6px;">{{ emoji }}</div>
+          <div style="font-weight:700;color:#fff;font-size:0.85rem;">{{ name }}</div>
+          <div style="font-size:0.7rem;color:rgba(255,255,255,0.35);margin-top:4px;">{{ desc }}</div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+  </main>
 </div>
+
+<!-- CREDIT USED POPUP -->
+<div class="credit-popup-overlay" id="creditUsedPopup">
+  <div class="credit-popup">
+    <button class="credit-popup-close" onclick="closePopup('creditUsedPopup')">✕</button>
+    <span class="popup-icon">⚡</span>
+    <h3>Credits Used</h3>
+    <div class="popup-badge deduct" id="creditUsedBadge">— credits used</div>
+    <p id="creditUsedMsg">Analysis complete. Credits have been deducted from your account.</p>
+    <label class="popup-snooze-label">
+      <input type="checkbox" id="snoozeCreditsPopup" onchange="handleSnoozeChange(this)">
+      <span>Don't show for 24h</span>
+    </label>
+    <div class="popup-actions">
+      <button class="btn btn-ghost btn-sm" onclick="closePopup('creditUsedPopup')">Got it</button>
+      <a href="{{ url_for('plans') }}" class="btn btn-primary btn-sm">View Plans</a>
+    </div>
+  </div>
+</div>
+
+<!-- CREDITS EXHAUSTED POPUP -->
+<div class="credit-popup-overlay" id="creditExhaustedPopup">
+  <div class="credit-popup">
+    <button class="credit-popup-close" onclick="closePopup('creditExhaustedPopup')">✕</button>
+    <span class="popup-icon">😿</span>
+    <h3>Credits Exhausted</h3>
+    <div class="popup-badge warning">0 credits remaining</div>
+    <p>Your free credits are over. Subscribe to a plan to continue analyzing your cat's emotions.</p>
+    <div class="popup-actions">
+      <button class="btn btn-ghost btn-sm" onclick="closePopup('creditExhaustedPopup')">Maybe later</button>
+      <a href="{{ url_for('plans') }}" class="btn btn-primary btn-sm">🚀 Subscribe Now</a>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
 
 {% block extra_scripts %}
 <script>
-    // Show mobile toggle on small screens
-    (function () {
-        const toggle = document.getElementById('sidebarToggle');
-        const show = () => { if (toggle) toggle.style.display = window.innerWidth <= 768 ? 'flex' : 'none'; };
-        window.addEventListener('resize', show); show();
-    })();
+const FLASK_MESSAGES = {{ get_flashed_messages(with_categories=true) | tojson }};
+
+(function(){
+  // Mobile sidebar toggle visibility
+  const toggle = document.getElementById('sidebarToggle');
+  const show = () => { if(toggle) toggle.style.display = window.innerWidth <= 768 ? 'flex' : 'none'; };
+  window.addEventListener('resize', show); show();
+
+  setupDropBox('imageDropZone','imageFile','imageFileLabel','imageScanWrap','imageForm','imageAnalyzeBtn',false);
+  setupDropBox('audioDropZone','audioFile','audioFileLabel','audioScanWrap','audioForm','audioAnalyzeBtn',true);
+
+  function setupDropBox(dropId, inputId, labelId, wrapId, formId, btnId, isPurple) {
+    const drop = document.getElementById(dropId), input = document.getElementById(inputId);
+    const label = document.getElementById(labelId), wrap = document.getElementById(wrapId);
+    const form = document.getElementById(formId), btn = document.getElementById(btnId);
+    if (!drop || !input) return;
+    drop.addEventListener('click', () => input.click());
+    drop.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' ') input.click(); });
+    ['dragenter','dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('drag-over'); }));
+    ['dragleave','drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('drag-over'); }));
+    drop.addEventListener('drop', e => { if(e.dataTransfer.files.length){ input.files = e.dataTransfer.files; label.textContent = '✅ ' + e.dataTransfer.files[0].name; }});
+    input.addEventListener('change', () => { if(input.files.length) label.textContent = '✅ ' + input.files[0].name; });
+    if(form) form.addEventListener('submit', () => {
+      if(wrap){ wrap.classList.add('scanning'); if(isPurple) wrap.classList.add('scanning-purple'); }
+      if(btn){ btn.textContent = '⏳ Analyzing...'; btn.disabled = true; }
+    });
+  }
+
+  setupFusionDrop('fusionImageDrop','fusionImageFile','fusionImageLabel');
+  setupFusionDrop('fusionAudioDrop','fusionAudioFile','fusionAudioLabel');
+
+  function setupFusionDrop(dropId, inputId, labelId) {
+    const drop = document.getElementById(dropId), input = document.getElementById(inputId), label = document.getElementById(labelId);
+    if(!drop||!input) return;
+    drop.addEventListener('click', () => input.click());
+    drop.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' ') input.click(); });
+    ['dragenter','dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('drag-over'); }));
+    ['dragleave','drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('drag-over'); }));
+    drop.addEventListener('drop', e => { if(e.dataTransfer.files.length){ input.files = e.dataTransfer.files; label.textContent = '✅ ' + e.dataTransfer.files[0].name; }});
+    input.addEventListener('change', () => { if(input.files.length) label.textContent = '✅ ' + input.files[0].name; });
+  }
+
+  const fusionBtn = document.getElementById('fusionBtn');
+  if(fusionBtn) {
+    fusionBtn.addEventListener('click', async () => {
+      const imgFile = document.getElementById('fusionImageFile').files[0];
+      const audFile = document.getElementById('fusionAudioFile').files[0];
+      if(!imgFile || !audFile){ showToast('Please select both an image and audio file.','error'); return; }
+      fusionBtn.textContent = '⏳ Analyzing...'; fusionBtn.disabled = true;
+      const fd = new FormData();
+      fd.append('image_file', imgFile);
+      fd.append('audio_file', audFile);
+      try {
+        const res = await fetch('/fusion', { method:'POST', body:fd });
+        const data = await res.json();
+        if(data.error === 'credits_exhausted'){ openPopup('creditExhaustedPopup'); return; }
+        if(data.error){ showToast(data.error,'error'); return; }
+        document.getElementById('fusionImageResult').textContent = data.image || '—';
+        document.getElementById('fusionAudioResult').textContent = data.audio || '—';
+        document.getElementById('fusionCombinedResult').textContent = data.fusion || '—';
+        const result = document.getElementById('fusionResult');
+        result.classList.add('show');
+        result.scrollIntoView({behavior:'smooth',block:'nearest'});
+        // Render fusion hint bars
+        renderFusionHints(data.image, data.audio);
+        showCreditUsedPopup(data.credits_used, 'fusion', data.credits_remaining);
+      } catch(e){ showToast('Error running fusion analysis.','error'); }
+      finally { fusionBtn.textContent = '🔀 Run Fusion Analysis'; fusionBtn.disabled = false; }
+    });
+  }
+
+  function openPopup(id){ document.getElementById(id).classList.add('show'); }
+  function closePopup(id){ document.getElementById(id).classList.remove('show'); }
+  window.closePopup = closePopup;
+
+  // ── Emotion hint data ──
+  const EMOTION_HINTS = {
+    happy:   { emoji:'😸', visual:'Ears up, eyes soft and slow-blinking. Great time for play or cuddles!',   audio:'Trilling or chirping sounds. Respond with gentle talk and affection.' },
+    angry:   { emoji:'😾', visual:'Ears flat, pupils narrow, tail lashing. Give space — avoid eye contact.',  audio:'Hissing or growling detected. Back off and let your cat calm down.' },
+    sad:     { emoji:'😿', visual:'Curled up, low energy, withdrawn. Check for discomfort or loneliness.',    audio:'Low mournful meows. Your cat may be lonely or unwell — check in.' },
+    sadness: { emoji:'😿', visual:'Curled up, low energy, withdrawn. Check for discomfort or loneliness.',    audio:'Low mournful meows. Your cat may be lonely or unwell — check in.' },
+    scared:  { emoji:'🙀', visual:'Wide eyes, puffed tail, crouched low. Remove the stressor and let them hide.', audio:'High-pitched cries. Comfort from a distance and remove the threat.' },
+    fear:    { emoji:'🙀', visual:'Wide eyes, puffed tail, crouched low. Remove the stressor and let them hide.', audio:'High-pitched cries. Comfort from a distance and remove the threat.' },
+    curious: { emoji:'🔍', visual:'Ears forward, whiskers spread, alert gaze. Engage with a toy or new object!', audio:'Short inquisitive chirps. Encourage exploration with interactive toys.' },
+    relaxed: { emoji:'😺', visual:'Loose body, slow blink, soft posture. Your cat feels completely safe.',     audio:'Soft purring or quiet breathing. All is well — perfectly comfortable.' },
+  };
+
+  function renderFusionHints(imgEmotion, audEmotion) {
+    const container = document.getElementById('fusionHints');
+    if (!container) return;
+    container.innerHTML = '';
+    const imgKey = (imgEmotion || '').toLowerCase();
+    const audKey = (audEmotion || '').toLowerCase();
+    const imgData = EMOTION_HINTS[imgKey];
+    const audData = EMOTION_HINTS[audKey];
+    if (imgData) {
+      container.innerHTML += `<div class="emotion-hint-bar hint-image"><span class="hint-icon">${imgData.emoji}</span><div class="hint-text"><span class="hint-title">📸 Image (${imgEmotion}) — </span>${imgData.visual}</div></div>`;
+    }
+    if (audData) {
+      container.innerHTML += `<div class="emotion-hint-bar hint-audio"><span class="hint-icon">${audData.emoji}</span><div class="hint-text"><span class="hint-title">🎵 Audio (${audEmotion}) — </span>${audData.audio}</div></div>`;
+    }
+    // Combined tip if emotions differ
+    if (imgKey && audKey && imgKey !== audKey) {
+      container.innerHTML += `<div class="emotion-hint-bar hint-fusion"><span class="hint-icon">🔀</span><div class="hint-text"><span class="hint-title">Combined insight — </span>Visual and audio signals differ. Your cat may be in a transitional emotional state. Observe closely and respond to the stronger cue.</div></div>`;
+    }
+  }
+
+  function showCreditUsedPopup(cost, type, remaining) {
+    // Check 24h snooze
+    const snoozedUntil = localStorage.getItem('creditPopupSnoozedUntil');
+    if (snoozedUntil && Date.now() < parseInt(snoozedUntil)) return;
+
+    const badge = document.getElementById('creditUsedBadge'), msg = document.getElementById('creditUsedMsg');
+    const icons = {image:'📸',audio:'🎵',fusion:'🔀'};
+    badge.textContent = `${icons[type]||'⚡'} ${cost} credit${cost>1?'s':''} used`;
+    msg.textContent = `${type.charAt(0).toUpperCase()+type.slice(1)} analysis complete. You have ${remaining} credit${remaining!==1?'s':''} remaining.`;
+    // Reset checkbox state
+    const cb = document.getElementById('snoozeCreditsPopup');
+    if (cb) cb.checked = false;
+    openPopup('creditUsedPopup');
+    const disp = document.getElementById('creditsDisplay');
+    if(disp) disp.textContent = remaining;
+  }
+
+  window.handleSnoozeChange = function(cb) {
+    if (cb.checked) {
+      localStorage.setItem('creditPopupSnoozedUntil', Date.now() + 24 * 60 * 60 * 1000);
+    } else {
+      localStorage.removeItem('creditPopupSnoozedUntil');
+    }
+  };
+
+  document.addEventListener('DOMContentLoaded', () => {
+    (FLASK_MESSAGES || []).forEach(([cat, msg]) => {
+      if(msg === 'credits_exhausted'){ openPopup('creditExhaustedPopup'); }
+      else if(msg && msg.startsWith('credit_used:')){
+        const parts = msg.split(':');
+        showCreditUsedPopup(parseInt(parts[1]), parts[2]||'image', parseInt('{{ current_user.credits }}'));
+      }
+    });
+  });
+
+  document.querySelectorAll('.credit-popup-overlay').forEach(overlay => {
+    overlay.addEventListener('click', e => { if(e.target === overlay) overlay.classList.remove('show'); });
+  });
+})();
+
+/* ── Analytics Charts ── */
+document.addEventListener('DOMContentLoaded', function () {
+
+  // Shared chart defaults
+  Chart.defaults.color = '#94a3b8';
+  Chart.defaults.font.family = "'Inter', sans-serif";
+  Chart.defaults.font.size = 11;
+
+  // ── 1. Line Chart: Model Accuracy ──
+  const accCtx = document.getElementById('accuracyChart');
+  if (accCtx) {
+    const weeks = ['Wk 1','Wk 2','Wk 3','Wk 4','Wk 5','Wk 6','Wk 7','Wk 8'];
+    new Chart(accCtx, {
+      type: 'line',
+      data: {
+        labels: weeks,
+        datasets: [
+          {
+            label: 'Image Model',
+            data: [88.2, 89.5, 90.1, 91.3, 90.8, 92.4, 93.1, 94.0],
+            borderColor: '#00e5ff',
+            backgroundColor: 'rgba(0,229,255,0.08)',
+            borderWidth: 2.5,
+            pointBackgroundColor: '#00e5ff',
+            pointRadius: 4,
+            tension: 0.4,
+            fill: true,
+          },
+          {
+            label: 'Audio Model',
+            data: [82.0, 83.4, 84.1, 85.6, 84.9, 86.2, 87.5, 88.8],
+            borderColor: '#a855f7',
+            backgroundColor: 'rgba(168,85,247,0.08)',
+            borderWidth: 2.5,
+            pointBackgroundColor: '#a855f7',
+            pointRadius: 4,
+            tension: 0.4,
+            fill: true,
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position: 'top', labels: { boxWidth: 12, padding: 16 } },
+          tooltip: { mode: 'index', intersect: false }
+        },
+        scales: {
+          y: {
+            min: 78, max: 98,
+            ticks: { callback: v => v + '%' },
+            grid: { color: 'rgba(255,255,255,0.05)' }
+          },
+          x: { grid: { color: 'rgba(255,255,255,0.04)' } }
+        }
+      }
+    });
+  }
+
+  // ── 2. Doughnut Chart: Emotion Distribution ──
+  const pieCtx = document.getElementById('emotionPieChart');
+  if (pieCtx) {
+    new Chart(pieCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Happy 😸','Angry 😾','Sad 😿','Scared 🙀','Curious 🔍','Relaxed 😺'],
+        datasets: [{
+          data: [32, 14, 18, 10, 16, 10],
+          backgroundColor: [
+            'rgba(0,229,255,0.85)',
+            'rgba(239,68,68,0.85)',
+            'rgba(168,85,247,0.85)',
+            'rgba(245,158,11,0.85)',
+            'rgba(16,185,129,0.85)',
+            'rgba(236,72,153,0.85)',
+          ],
+          borderColor: '#0b0f1a',
+          borderWidth: 3,
+          hoverOffset: 8,
+        }]
+      },
+      options: {
+        responsive: true,
+        cutout: '62%',
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { boxWidth: 10, padding: 10, font: { size: 10 } }
+          },
+          tooltip: {
+            callbacks: { label: ctx => ` ${ctx.label}: ${ctx.parsed}%` }
+          }
+        }
+      }
+    });
+  }
+
+  // ── 3. Scatter Plot: Per-Hour User Activity ──
+  const scatterCtx = document.getElementById('scatterChart');
+  if (scatterCtx) {
+    // Generate ~1000 demo data points spread across 24 hours
+    function genScatter(count, peakHour, spread, baseY, rangeY) {
+      const pts = [];
+      for (let i = 0; i < count; i++) {
+        const h = Math.max(0, Math.min(23, peakHour + (Math.random() - 0.5) * spread * 2));
+        const y = baseY + Math.random() * rangeY;
+        pts.push({ x: parseFloat(h.toFixed(2)), y: parseFloat(y.toFixed(1)) });
+      }
+      return pts;
+    }
+    new Chart(scatterCtx, {
+      type: 'scatter',
+      data: {
+        datasets: [
+          {
+            label: 'Image Analyses',
+            data: genScatter(420, 14, 5, 1, 9),
+            backgroundColor: 'rgba(0,229,255,0.55)',
+            pointRadius: 3,
+            pointHoverRadius: 5,
+          },
+          {
+            label: 'Audio Analyses',
+            data: genScatter(340, 10, 6, 1, 9),
+            backgroundColor: 'rgba(168,85,247,0.55)',
+            pointRadius: 3,
+            pointHoverRadius: 5,
+          },
+          {
+            label: 'Fusion Analyses',
+            data: genScatter(240, 18, 4, 1, 9),
+            backgroundColor: 'rgba(236,72,153,0.55)',
+            pointRadius: 3,
+            pointHoverRadius: 5,
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position: 'top', labels: { boxWidth: 10, padding: 14 } },
+          tooltip: {
+            callbacks: {
+              label: ctx => {
+                const h = Math.floor(ctx.parsed.x);
+                const ampm = h >= 12 ? 'PM' : 'AM';
+                const h12 = h % 12 || 12;
+                return ` ${ctx.dataset.label} @ ${h12}${ampm}`;
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            min: 0, max: 23,
+            title: { display: true, text: 'Hour of Day', color: '#64748b' },
+            ticks: {
+              stepSize: 3,
+              callback: v => { const h = v % 12 || 12; return h + (v >= 12 ? 'pm' : 'am'); }
+            },
+            grid: { color: 'rgba(255,255,255,0.04)' }
+          },
+          y: {
+            min: 0, max: 10,
+            title: { display: true, text: 'Analyses / session', color: '#64748b' },
+            grid: { color: 'rgba(255,255,255,0.04)' }
+          }
+        }
+      }
+    });
+  }
+
+});
 </script>
 {% endblock %}

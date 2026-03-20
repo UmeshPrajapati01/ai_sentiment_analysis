@@ -1,418 +1,212 @@
 {% extends "base.html" %}
-
-{% block description %}MewConnect — AI-powered cat emotion recognition. Understand every purr, whisker twitch, and
-gaze.{% endblock %}
-{% block title %}MewConnect | Everybody Needs a Friend{% endblock %}
+{% block title %}MeowMood | AI-Powered Cat Emotion Recognition{% endblock %}
 {% block page_id %}landing{% endblock %}
 
 {% block body %}
-
-<!-- ==============================
-     NAVBAR
-============================== -->
+<!-- NAVBAR -->
 <nav class="navbar" id="mainNavbar" role="navigation" aria-label="Main navigation">
-    <div class="container">
-        <a href="{{ url_for('home') }}" class="nav-logo" aria-label="MewConnect Home">
-            <div class="logo-icon">🐱</div>
-            <span>MewConnect</span>
-        </a>
-        <nav class="nav-links" id="navLinks">
-            <a href="#featuresSection">Features</a>
-            <a href="#videoSection">How It Works</a>
-            <a href="#gallerySection">Gallery</a>
-            <a href="{{ url_for('login') }}">Login</a>
-            <a href="{{ url_for('register') }}" class="btn btn-primary btn-sm">Get Started →</a>
-        </nav>
-        <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation" aria-expanded="false">
-            <span></span><span></span><span></span>
-        </button>
-    </div>
+  <div class="container">
+    <a href="{{ url_for('home') }}" class="nav-logo" aria-label="MeowMood Home">
+      <div class="logo-mark">🐱</div>
+      <div class="logo-text">
+        <span class="logo-name">Meow<span class="mood">Mood</span></span>
+        <span class="logo-sub">AI-Powered Cat Emotion Recognition</span>
+      </div>
+    </a>
+    <nav class="nav-links" id="navLinks">
+      <a href="#featuresSection">Features</a>
+      <a href="#videoSection">How It Works</a>
+      <a href="#gallerySection">Gallery</a>
+      <a href="{{ url_for('login') }}">Login</a>
+      <a href="{{ url_for('register') }}" class="btn btn-primary btn-sm">Get Started →</a>
+    </nav>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
 </nav>
 
-<!-- ==============================
-     HERO
-============================== -->
+<!-- HERO -->
 <section class="hero" id="heroSection">
-    <div class="hero-grid-bg"></div>
-    <div class="hero-particles" id="heroParticles" aria-hidden="true"></div>
-
-    <div class="container">
-        <div class="hero-inner">
-
-            <!-- Left: Copy -->
-            <div class="hero-content">
-                <div class="hero-badge anim-down d1">
-                    <span class="badge-dot"></span>
-                    🐾 AI-Powered Emotion Recognition
-                </div>
-                <h1 class="anim-up d1">
-                    Everybody Needs<br>
-                    A <span class="highlight">Friend</span> In Life
-                </h1>
-                <p class="hero-subtitle anim-up d2">
-                    Cats are intelligent, curious, and deeply expressive. Discover the emotions behind every purr,
-                    every whisker twitch, and every gentle gaze with MewConnect.
-                </p>
-                <div class="hero-actions anim-up d3">
-                    <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg" id="getStartedBtn">
-                        🚀 Get Started Free
-                    </a>
-                    <a href="#videoSection" class="btn btn-ghost btn-lg">
-                        ▶ &nbsp;Watch It Work
-                    </a>
-                </div>
-                <div class="hero-stats anim-up d4">
-                    <div>
-                        <div class="hero-stat-num" data-count="12500">12500</div>
-                        <div class="hero-stat-label">Cat Analyses</div>
-                    </div>
-                    <div>
-                        <div class="hero-stat-num" data-count="98">98</div>
-                        <div class="hero-stat-label">% Accuracy</div>
-                    </div>
-                    <div>
-                        <div class="hero-stat-num" data-count="7">7</div>
-                        <div class="hero-stat-label">Emotions Detected</div>
-                    </div>
-                </div>
+  <div class="hero-grid"></div>
+  <div class="hero-particles" id="heroParticles" aria-hidden="true"></div>
+  <div class="container">
+    <div class="hero-inner">
+      <div class="hero-content">
+        <div class="hero-badge anim-down d1">
+          <span class="dot"></span>
+          🐾 AI-Powered Emotion Recognition
+        </div>
+        <h1 class="anim-up d1">
+          Understand Every<br><span class="hl">Meow & Mood</span>
+        </h1>
+        <p class="hero-sub anim-up d2">
+          MeowMood uses deep learning to decode your cat's emotions from photos and sounds — in real time, with stunning accuracy.
+        </p>
+        <div class="hero-actions anim-up d3">
+          <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">🚀 Start Free</a>
+          <a href="#videoSection" class="btn btn-ghost btn-lg">▶ &nbsp;See It Work</a>
+        </div>
+        <div class="hero-stats anim-up d4">
+          <div><div class="hero-stat-num" data-count="12500">12500</div><div class="hero-stat-label">Cat Analyses</div></div>
+          <div><div class="hero-stat-num" data-count="98">98</div><div class="hero-stat-label">% Accuracy</div></div>
+          <div><div class="hero-stat-num" data-count="7">7</div><div class="hero-stat-label">Emotions Detected</div></div>
+        </div>
+      </div>
+      <div class="hero-visual anim-scale d2">
+        <div class="hero-card">
+          <div class="hero-video-wrap">
+            <video autoplay muted loop playsinline preload="metadata">
+              <source src="{{ url_for('serve_media', filename='close-up-of-a-fluffy-cat-sitting-on-a-dark-surface.mp4') }}" type="video/mp4">
+            </video>
+            <div class="hero-video-overlay">
+              <span class="hero-live-badge">🔴 Live AI Analysis</span>
             </div>
-
-            <!-- Right: Visual -->
-            <div class="hero-visual anim-scale d2">
-                <div class="hero-visual-card">
-                    <div class="hero-video-wrap">
-                        <video autoplay muted loop playsinline preload="metadata">
-                            <source src="{{ url_for('serve_media', filename='AI_Analyzes_Cat_s_Curiosity.mp4') }}"
-                                type="video/mp4">
-                        </video>
-                        <div class="hero-video-overlay">
-                            <span class="hero-video-label">🔴 Live AI Analysis</span>
-                        </div>
-                    </div>
-                    <!-- Floating mini-cards -->
-                    <div class="hero-mini-cards"
-                        style="margin-top:14px; position:static; flex-direction:row; flex-wrap:wrap; gap:8px; display:flex;">
-                        <div class="hero-mini-card">
-                            <span class="mini-card-dot" style="background:#10b981;"></span>
-                            <span class="mini-card-text">😸 Happy — 94%</span>
-                        </div>
-                        <div class="hero-mini-card">
-                            <span class="mini-card-dot" style="background:#f59e0b;"></span>
-                            <span class="mini-card-text">🔍 Curious — 78%</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div><!-- /hero-inner -->
+          </div>
+          <div class="hero-mini-cards">
+            <div class="hero-mini-card"><span class="mini-dot" style="background:#10b981;"></span><span class="mini-text">😸 Happy — 94%</span></div>
+            <div class="hero-mini-card"><span class="mini-dot" style="background:#00e5ff;"></span><span class="mini-text">🔍 Curious — 78%</span></div>
+          </div>
+        </div>
+      </div>
     </div>
-
-    <!-- Social Sidebar -->
-    <div class="social-sidebar" aria-label="Social links">
-        <a href="#" title="Follow on X" aria-label="X">𝕏</a>
-        <a href="#" title="YouTube" aria-label="YouTube">▶</a>
-        <a href="#" title="Instagram" aria-label="Instagram">◎</a>
-    </div>
+  </div>
 </section>
 
-<!-- ==============================
-     FEATURES
-============================== -->
+<!-- FEATURES -->
 <section class="features-section" id="featuresSection">
-    <div class="container">
-        <div class="reveal" style="text-align:center;">
-            <div class="section-label">Core Capabilities</div>
-            <h2 class="section-title">Why <span class="hl">MewConnect?</span></h2>
-            <p class="section-desc" style="margin:0 auto;">
-                Understanding your cat's emotions has never been easier. Our AI reads their expressions and sounds in
-                real-time.
-            </p>
-        </div>
-
-        <div class="features-grid">
-            <div class="feature-card reveal" style="transition-delay:0.05s">
-                <div class="feature-icon">🔍</div>
-                <h3>Emotion Detection</h3>
-                <p>Upload a photo and our convolutional neural network identifies happiness, fear, curiosity, anger, and
-                    more in under 2 seconds.</p>
-            </div>
-            <div class="feature-card reveal" style="transition-delay:0.15s">
-                <div class="feature-icon">🎵</div>
-                <h3>Vocal Analysis</h3>
-                <p>Upload an audio clip of your cat's meow, purr, or hiss. Our audio model decodes the emotional state
-                    behind every sound.</p>
-            </div>
-            <div class="feature-card reveal" style="transition-delay:0.25s">
-                <div class="feature-icon">📊</div>
-                <h3>Emotion Tracking</h3>
-                <p>Monitor your cat's emotional patterns over time with beautiful, interactive charts and detailed
-                    history logs.</p>
-            </div>
-            <div class="feature-card reveal" style="transition-delay:0.05s">
-                <div class="feature-icon">🧠</div>
-                <h3>AI-Powered Insights</h3>
-                <p>Receive actionable insights based on emotional trends to improve your cat's well-being and bond with
-                    you.</p>
-            </div>
-            <div class="feature-card reveal" style="transition-delay:0.15s">
-                <div class="feature-icon">💛</div>
-                <h3>Build Connection</h3>
-                <p>Strengthen your bond by truly understanding what your furry friend is feeling — every day, every
-                    moment.</p>
-            </div>
-            <div class="feature-card reveal" style="transition-delay:0.25s">
-                <div class="feature-icon">🔒</div>
-                <h3>Private & Secure</h3>
-                <p>Your data is encrypted and private. We never share your cat's data with anyone. Your trust is our
-                    priority.</p>
-            </div>
-        </div>
+  <div class="container">
+    <div class="reveal" style="text-align:center;">
+      <div class="section-label">Core Capabilities</div>
+      <h2 class="section-title">Why <span class="hl">MeowMood?</span></h2>
+      <p class="section-desc" style="margin:0 auto;">Understanding your cat's emotions has never been this precise or this fast.</p>
     </div>
+    <div class="features-grid">
+      <div class="feature-card reveal" style="transition-delay:0.05s"><div class="feature-icon">🔍</div><h3>Emotion Detection</h3><p>Upload a photo and our CNN identifies happiness, fear, curiosity, anger and more in under 2 seconds.</p></div>
+      <div class="feature-card reveal" style="transition-delay:0.15s"><div class="feature-icon">🎵</div><h3>Vocal Analysis</h3><p>Upload an audio clip of your cat's meow or hiss. Our model decodes the emotional state behind every sound.</p></div>
+      <div class="feature-card reveal" style="transition-delay:0.25s"><div class="feature-icon">🔀</div><h3>Fusion Mode</h3><p>Combine image + audio together for a deeper, multi-modal emotion reading with higher confidence.</p></div>
+      <div class="feature-card reveal" style="transition-delay:0.05s"><div class="feature-icon">📊</div><h3>Emotion Tracking</h3><p>Monitor your cat's emotional patterns over time with interactive charts and detailed history logs.</p></div>
+      <div class="feature-card reveal" style="transition-delay:0.15s"><div class="feature-icon">🧠</div><h3>AI Insights</h3><p>Receive actionable insights based on emotional trends to improve your cat's well-being.</p></div>
+      <div class="feature-card reveal" style="transition-delay:0.25s"><div class="feature-icon">🔒</div><h3>Private & Secure</h3><p>Your data is encrypted and private. We never share your cat's data with anyone.</p></div>
+    </div>
+  </div>
 </section>
 
-<!-- ==============================
-     VIDEO SECTION
-============================== -->
+<!-- VIDEO SECTION -->
 <section class="video-section" id="videoSection">
-    <div class="container">
-        <div style="text-align:center;" class="reveal">
-            <div class="section-label">See It In Action</div>
-            <h2 class="section-title">Watch Our <span class="hl">AI Understand</span><br>Your Cat</h2>
-            <p class="section-desc" style="margin:0 auto; margin-top:12px;">
-                Our neural network processes facial geometry, whisker position, ear orientation, and pupil dilation
-                simultaneously.
-            </p>
-        </div>
-
-        <div class="video-grid">
-            <!-- Video Player -->
-            <div class="video-frame reveal-left">
-                <video autoplay muted loop playsinline id="mainDemoVideo">
-                    <source src="{{ url_for('serve_media', filename='AI_Analyzes_Cat_s_Curiosity.mp4') }}"
-                        type="video/mp4">
-                </video>
-                <div class="play-overlay" id="playOverlay" role="button" aria-label="Play/Pause demo video">
-                    <button class="play-btn" id="playPauseBtn" aria-label="Toggle playback">⏸</button>
-                </div>
-            </div>
-
-            <!-- Feature List -->
-            <div class="video-info reveal-right">
-                <div class="section-label">How It Works</div>
-                <h3 class="section-title" style="font-size:1.8rem;">Real-Time Analysis<br><span class="hl">Step by
-                        Step</span></h3>
-                <div class="video-feature-list" style="margin-top:24px;">
-                    <div class="video-feature-item">
-                        <div class="vf-icon">📸</div>
-                        <div class="vf-text">
-                            <h4>Upload Your Cat's Photo or Audio</h4>
-                            <p>PNG, JPG, MP3, or WAV — all supported. Drag & drop or click to upload.</p>
-                        </div>
-                    </div>
-                    <div class="video-feature-item">
-                        <div class="vf-icon">🧠</div>
-                        <div class="vf-text">
-                            <h4>AI Processes in Milliseconds</h4>
-                            <p>Our CNN analyzes 47 facial key-points and vocal frequency patterns simultaneously.</p>
-                        </div>
-                    </div>
-                    <div class="video-feature-item">
-                        <div class="vf-icon">📊</div>
-                        <div class="vf-text">
-                            <h4>Get Emotion Results Instantly</h4>
-                            <p>Receive a labeled emotion result with confidence score, saved to your history.</p>
-                        </div>
-                    </div>
-                    <div class="video-feature-item">
-                        <div class="vf-icon">📈</div>
-                        <div class="vf-text">
-                            <h4>Track Patterns Over Time</h4>
-                            <p>View your dashboard metrics and watch your cat's emotional trends evolve.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <div class="container">
+    <div style="text-align:center;" class="reveal">
+      <div class="section-label">See It In Action</div>
+      <h2 class="section-title">Watch Our <span class="hl">AI Understand</span><br>Your Cat</h2>
+      <p class="section-desc" style="margin:0 auto;margin-top:12px;">Our neural network processes facial geometry, whisker position, ear orientation, and vocal frequency simultaneously.</p>
     </div>
+    <div class="video-grid">
+      <div class="video-frame reveal-left">
+        <video autoplay muted loop playsinline id="mainDemoVideo">
+          <source src="{{ url_for('serve_media', filename='split-screen-style-left-side-shows-a-cats-face-wit.mp4') }}" type="video/mp4">
+        </video>
+        <div class="play-overlay" id="playOverlay" role="button" aria-label="Play/Pause demo video">
+          <button class="play-btn" id="playPauseBtn" aria-label="Toggle playback">⏸</button>
+        </div>
+      </div>
+      <div class="video-info reveal-right">
+        <div class="section-label">How It Works</div>
+        <h3 class="section-title" style="font-size:1.8rem;">Real-Time Analysis<br><span class="hl">Step by Step</span></h3>
+        <div class="video-feature-list">
+          <div class="video-feature-item"><div class="vf-icon">📸</div><div class="vf-text"><h4>Upload Photo or Audio</h4><p>PNG, JPG, MP3, WAV — all supported. Drag & drop or click to upload.</p></div></div>
+          <div class="video-feature-item"><div class="vf-icon">🧠</div><div class="vf-text"><h4>AI Processes in Milliseconds</h4><p>Our CNN analyzes facial key-points and vocal frequency patterns simultaneously.</p></div></div>
+          <div class="video-feature-item"><div class="vf-icon">🔀</div><div class="vf-text"><h4>Fusion Mode Available</h4><p>Upload both image and audio for a combined multi-modal emotion result.</p></div></div>
+          <div class="video-feature-item"><div class="vf-icon">📈</div><div class="vf-text"><h4>Track Patterns Over Time</h4><p>View dashboard metrics and watch your cat's emotional trends evolve.</p></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
 
-<!-- ==============================
-     GALLERY
-============================== -->
+<!-- GALLERY -->
 <section class="gallery-section" id="gallerySection">
-    <div class="container">
-        <div style="text-align:center;" class="reveal">
-            <div class="section-label">Live Demos</div>
-            <h2 class="section-title">Emotion <span class="hl">Episodes</span></h2>
-            <p class="section-desc" style="margin:0 auto;">
-                Real analyzed cat behavior clips — see exactly what our AI recognizes.
-            </p>
-        </div>
-        <div class="gallery-grid">
-            <div class="gallery-card reveal" style="transition-delay:0.05s">
-                <video autoplay muted loop playsinline>
-                    <source
-                        src="{{ url_for('serve_media', filename='grok-video-78357e77-95ed-406d-8a54-df6a852cc3d7 (3).mp4') }}"
-                        type="video/mp4">
-                </video>
-                <div class="gallery-card-overlay">
-                    <div>
-                        <div class="gallery-card-tag">😸 Happy</div>
-                        <div class="gallery-card-title">Joyful Kitten</div>
-                        <div class="gallery-card-desc">Playful energy, ears forward</div>
-                    </div>
-                </div>
-            </div>
-            <div class="gallery-card reveal" style="transition-delay:0.15s">
-                <video autoplay muted loop playsinline>
-                    <source
-                        src="{{ url_for('serve_media', filename='grok-video-f7857bed-98a3-4edc-8ef9-9413cf876406 (1).mp4') }}"
-                        type="video/mp4">
-                </video>
-                <div class="gallery-card-overlay">
-                    <div>
-                        <div class="gallery-card-tag">🔍 Curious</div>
-                        <div class="gallery-card-title">Explorer Mode</div>
-                        <div class="gallery-card-desc">Investigating, whiskers alert</div>
-                    </div>
-                </div>
-            </div>
-            <div class="gallery-card reveal" style="transition-delay:0.25s">
-                <video autoplay muted loop playsinline>
-                    <source
-                        src="{{ url_for('serve_media', filename='grok-video-f7857bed-98a3-4edc-8ef9-9413cf876406 (2).mp4') }}"
-                        type="video/mp4">
-                </video>
-                <div class="gallery-card-overlay">
-                    <div>
-                        <div class="gallery-card-tag">😺 Relaxed</div>
-                        <div class="gallery-card-title">Zen Moment</div>
-                        <div class="gallery-card-desc">Calm, soft eyes, content</div>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <div class="container">
+    <div style="text-align:center;" class="reveal">
+      <div class="section-label">Live Demos</div>
+      <h2 class="section-title">Emotion <span class="hl">Episodes</span></h2>
+      <p class="section-desc" style="margin:0 auto;">Real analyzed cat behavior clips — see exactly what our AI recognizes.</p>
     </div>
+    <div class="gallery-grid">
+      <div class="gallery-card reveal" style="transition-delay:0.05s">
+        <video autoplay muted loop playsinline><source src="{{ url_for('serve_media', filename='a-happy-playful-kitten-with-ears-perked-up-bright-.mp4') }}" type="video/mp4"></video>
+        <div class="gallery-card-overlay"><div><div class="gallery-tag">😸 Happy</div><div class="gallery-title">Joyful Kitten</div><div class="gallery-desc">Playful energy, ears forward</div></div></div>
+      </div>
+      <div class="gallery-card reveal" style="transition-delay:0.15s">
+        <video autoplay muted loop playsinline><source src="{{ url_for('serve_media', filename='a-cat-with-wide-alert-eyes-and-forward-pointing-wh.mp4') }}" type="video/mp4"></video>
+        <div class="gallery-card-overlay"><div><div class="gallery-tag">🔍 Curious</div><div class="gallery-title">Explorer Mode</div><div class="gallery-desc">Investigating, whiskers alert</div></div></div>
+      </div>
+      <div class="gallery-card reveal" style="transition-delay:0.25s">
+        <video autoplay muted loop playsinline><source src="{{ url_for('serve_media', filename='a-cat-lying-on-a-cozy-surface-eyes-half-closed-doi.mp4') }}" type="video/mp4"></video>
+        <div class="gallery-card-overlay"><div><div class="gallery-tag">😺 Relaxed</div><div class="gallery-title">Zen Moment</div><div class="gallery-desc">Calm, soft eyes, content</div></div></div>
+      </div>
+    </div>
+  </div>
 </section>
 
-<!-- ==============================
-     TESTIMONIALS
-============================== -->
+<!-- TESTIMONIALS -->
 <section class="testimonials-section" id="testimonialsSection">
-    <div class="container">
-        <div style="text-align:center;" class="reveal">
-            <div class="section-label">Cat Lover Stories</div>
-            <h2 class="section-title">Trusted by <span class="hl">Cat Parents</span></h2>
-        </div>
-        <div class="testimonials-grid">
-            <div class="testimonial-card reveal" style="transition-delay:0.05s">
-                <div class="testimonial-stars">★★★★★</div>
-                <p class="testimonial-text">"I never knew my cat Mochi was anxious until MewConnect showed me the
-                    pattern. We fixed her environment and she's so much happier now!"</p>
-                <div class="testimonial-author">
-                    <div class="t-avatar">🐱</div>
-                    <div>
-                        <div class="t-name">Priya Sharma</div>
-                        <div class="t-role">Cat Mom, Bangalore</div>
-                    </div>
-                </div>
-            </div>
-            <div class="testimonial-card reveal" style="transition-delay:0.15s">
-                <div class="testimonial-stars">★★★★★</div>
-                <p class="testimonial-text">"The audio analysis is incredible. It correctly identified that my cat's
-                    vocalization was fear-based. I'm now more attentive to her needs."</p>
-                <div class="testimonial-author">
-                    <div class="t-avatar">😺</div>
-                    <div>
-                        <div class="t-name">James Mwangi</div>
-                        <div class="t-role">Pet Enthusiast, Nairobi</div>
-                    </div>
-                </div>
-            </div>
-            <div class="testimonial-card reveal" style="transition-delay:0.25s">
-                <div class="testimonial-stars">★★★★★</div>
-                <p class="testimonial-text">"The dashboard metrics helped me understand my rescue cat's emotional
-                    journey from fearful to happy over 3 months. Amazing progress!"</p>
-                <div class="testimonial-author">
-                    <div class="t-avatar">😸</div>
-                    <div>
-                        <div class="t-name">Sofia Andrade</div>
-                        <div class="t-role">Veterinary Nurse, São Paulo</div>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <div class="container">
+    <div style="text-align:center;" class="reveal">
+      <div class="section-label">Cat Lover Stories</div>
+      <h2 class="section-title">Trusted by <span class="hl">Cat Parents</span></h2>
     </div>
+    <div class="testimonials-grid">
+      <div class="testimonial-card reveal" style="transition-delay:0.05s"><div class="t-stars">★★★★★</div><p class="t-text">"I never knew my cat Mochi was anxious until MeowMood showed me the pattern. We fixed her environment and she's so much happier now!"</p><div class="t-author"><div class="t-avatar">🐱</div><div><div class="t-name">Priya Sharma</div><div class="t-role">Cat Mom, Bangalore</div></div></div></div>
+      <div class="testimonial-card reveal" style="transition-delay:0.15s"><div class="t-stars">★★★★★</div><p class="t-text">"The audio analysis is incredible. It correctly identified that my cat's vocalization was fear-based. I'm now more attentive to her needs."</p><div class="t-author"><div class="t-avatar">😺</div><div><div class="t-name">James Mwangi</div><div class="t-role">Pet Enthusiast, Nairobi</div></div></div></div>
+      <div class="testimonial-card reveal" style="transition-delay:0.25s"><div class="t-stars">★★★★★</div><p class="t-text">"The fusion mode blew my mind — combining photo and audio gave a much more accurate reading of my rescue cat's emotional state."</p><div class="t-author"><div class="t-avatar">😸</div><div><div class="t-name">Sofia Andrade</div><div class="t-role">Veterinary Nurse, São Paulo</div></div></div></div>
+    </div>
+  </div>
 </section>
 
-<!-- ==============================
-     CTA
-============================== -->
+<!-- CTA -->
 <section class="cta-section" id="ctaSection">
-    <div class="container">
-        <div class="cta-card reveal">
-            <div style="font-size:4rem;margin-bottom:20px;">🐾</div>
-            <h2>Ready to Understand Your Cat?</h2>
-            <p>Join thousands of cat lovers who are deepening their connection every single day using MewConnect.</p>
-            <div class="cta-buttons">
-                <a href="{{ url_for('register') }}" class="btn btn-primary btn-xl">🚀 Start Free Today</a>
-                <a href="{{ url_for('login') }}" class="btn btn-ghost btn-lg">Already a member? Log in →</a>
-            </div>
-        </div>
+  <div class="container">
+    <div class="cta-card reveal">
+      <div style="font-size:4rem;margin-bottom:20px;">🐾</div>
+      <h2>Ready to Understand Your Cat?</h2>
+      <p>Join thousands of cat lovers deepening their connection every day using MeowMood.</p>
+      <div class="cta-buttons">
+        <a href="{{ url_for('register') }}" class="btn btn-primary btn-xl">🚀 Start Free Today</a>
+        <a href="{{ url_for('login') }}" class="btn btn-ghost btn-lg">Already a member? Log in →</a>
+      </div>
     </div>
+  </div>
 </section>
 
-<!-- ==============================
-     FOOTER
-============================== -->
+<!-- FOOTER -->
 <footer role="contentinfo">
-    <div class="container">
-        <div class="footer-grid">
-            <div class="footer-brand">
-                <h3><span style="font-size:1.4rem;">🐱</span> MewConnect</h3>
-                <p>AI-powered cat emotion recognition. Built by cat lovers, for cat lovers. Understand your companion
-                    better, every day.</p>
-            </div>
-            <div class="footer-col">
-                <h4>Product</h4>
-                <a href="#featuresSection">Features</a>
-                <a href="#videoSection">How It Works</a>
-                <a href="#gallerySection">Gallery</a>
-                <a href="{{ url_for('register') }}">Get Started</a>
-            </div>
-            <div class="footer-col">
-                <h4>Account</h4>
-                <a href="{{ url_for('login') }}">Login</a>
-                <a href="{{ url_for('register') }}">Register</a>
-            </div>
-            <div class="footer-col">
-                <h4>Company</h4>
-                <a href="#">About</a>
-                <a href="#">Privacy Policy</a>
-                <a href="#">Terms of Use</a>
-                <a href="#">Contact</a>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>© 2026 MewConnect. Made with 💛 for cat lovers everywhere.</p>
-            <p style="color:#475569; font-size:0.78rem;">Powered by AI · Built with Flask · Purrs guaranteed 🐾</p>
-        </div>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <h3>🐱 MeowMood</h3>
+        <p>AI-Powered Cat Emotion Recognition. Built by cat lovers, for cat lovers. Understand your companion better, every day.</p>
+      </div>
+      <div class="footer-col"><h4>Product</h4><a href="#featuresSection">Features</a><a href="#videoSection">How It Works</a><a href="#gallerySection">Gallery</a><a href="{{ url_for('register') }}">Get Started</a></div>
+      <div class="footer-col"><h4>Account</h4><a href="{{ url_for('login') }}">Login</a><a href="{{ url_for('register') }}">Register</a></div>
+      <div class="footer-col"><h4>Company</h4><a href="#">About</a><a href="#">Privacy Policy</a><a href="#">Terms of Use</a><a href="#">Contact</a></div>
     </div>
+    <div class="footer-bottom">
+      <p>© 2026 MeowMood. Made with 💙 for cat lovers everywhere.</p>
+      <p>Powered by AI · Built with Flask · Purrs guaranteed 🐾</p>
+    </div>
+  </div>
 </footer>
-
 {% endblock %}
 
 {% block extra_scripts %}
 <script>
-    // Play/pause button for demo video
-    const video = document.getElementById('mainDemoVideo');
-    const btn = document.getElementById('playPauseBtn');
-    const overlay = document.getElementById('playOverlay');
-    if (video && btn) {
-        btn.addEventListener('click', () => {
-            if (video.paused) { video.play(); btn.textContent = '⏸'; }
-            else { video.pause(); btn.textContent = '▶'; }
-        });
-    }
+  const video = document.getElementById('mainDemoVideo');
+  const btn = document.getElementById('playPauseBtn');
+  if (video && btn) {
+    btn.addEventListener('click', () => {
+      if (video.paused) { video.play(); btn.textContent = '⏸'; }
+      else { video.pause(); btn.textContent = '▶'; }
+    });
+  }
 </script>
 {% endblock %}

@@ -1,117 +1,66 @@
 {% extends "base.html" %}
-
-{% block description %}Login to MewConnect — Access your cat emotion dashboard and track insights.{% endblock %}
-{% block title %}Login | MewConnect{% endblock %}
+{% block title %}Login | MeowMood{% endblock %}
 {% block page_id %}login{% endblock %}
 
 {% block body %}
-<div class="login-page">
-
-    <!-- ============================
-       LEFT: Visual Panel
-  ============================ -->
-    <div class="login-visual">
-        <div class="hero-particles" id="heroParticles" aria-hidden="true"></div>
-        <div class="login-visual-content">
-            <span class="big-cat" aria-hidden="true">😺</span>
-            <h2 style="font-family:var(--f-display);font-size:2.4rem;margin-top:24px;color:#fff;">Welcome Back!</h2>
-            <p>Your cat missed you. Log in to check on their emotional journey.</p>
-
-            <!-- Floating emotion pills -->
-            <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:36px;">
-                <span
-                    style="background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.3);color:#fbbf24;padding:7px 16px;border-radius:999px;font-size:0.8rem;font-weight:600;">😸
-                    Happy</span>
-                <span
-                    style="background:rgba(139,92,246,0.15);border:1px solid rgba(139,92,246,0.3);color:#a78bfa;padding:7px 16px;border-radius:999px;font-size:0.8rem;font-weight:600;">🔍
-                    Curious</span>
-                <span
-                    style="background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3);color:#34d399;padding:7px 16px;border-radius:999px;font-size:0.8rem;font-weight:600;">😺
-                    Relaxed</span>
-                <span
-                    style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#f87171;padding:7px 16px;border-radius:999px;font-size:0.8rem;font-weight:600;">😾
-                    Angry</span>
-            </div>
-
-            <div style="margin-top:48px;opacity:0.2;font-size:2.2rem;letter-spacing:8px;">🐾🐾🐾</div>
-        </div>
+<div class="auth-page">
+  <div class="auth-visual">
+    <div class="auth-visual-grid"></div>
+    <div class="hero-particles" id="heroParticles" aria-hidden="true"></div>
+    <div class="auth-visual-content">
+      <span class="big-emoji">😺</span>
+      <h2>Welcome Back!</h2>
+      <p>Your cat missed you. Log in to check on their emotional journey.</p>
+      <div class="auth-pills">
+        <span class="auth-pill" style="background:rgba(0,229,255,0.1);border:1px solid rgba(0,229,255,0.25);color:#00e5ff;">😸 Happy</span>
+        <span class="auth-pill" style="background:rgba(168,85,247,0.1);border:1px solid rgba(168,85,247,0.25);color:#a855f7;">🔍 Curious</span>
+        <span class="auth-pill" style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);color:#10b981;">😺 Relaxed</span>
+        <span class="auth-pill" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);color:#ef4444;">😾 Angry</span>
+      </div>
     </div>
+  </div>
 
-    <!-- ============================
-       RIGHT: Form Panel
-  ============================ -->
-    <div class="login-form-side">
-        <div class="login-form-wrapper">
-            <a href="{{ url_for('landing') }}"
-                style="display:inline-flex;align-items:center;gap:8px;color:var(--c-text-2);margin-bottom:36px;font-size:0.88rem;transition:var(--t-base);"
-                onmouseover="this.style.color='var(--c-amber)'" onmouseout="this.style.color='var(--c-text-2)'">
-                ← Back to home
-            </a>
-
-            <!-- Logo -->
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:32px;">
-                <div
-                    style="width:38px;height:38px;background:var(--g-brand);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;">
-                    🐱</div>
-                <span
-                    style="font-family:var(--f-display);font-size:1.1rem;font-weight:800;color:#fff;">MewConnect</span>
-            </div>
-
-            <h1 class="anim-up">Log In</h1>
-            <p class="form-subtitle anim-up d1" style="color:var(--c-text-2);margin-bottom:32px;">
-                By logging in, you agree to our <a href="#" style="color:var(--c-amber);font-weight:600;">Terms of
-                    Use</a>.
-            </p>
-
-            <form id="loginForm" method="POST" action="{{ url_for('login') }}" novalidate>
-                <div class="form-group">
-                    <label for="loginEmail">Email Address</label>
-                    <input type="email" id="loginEmail" name="email" class="form-control" placeholder="you@example.com"
-                        required autocomplete="email">
-                </div>
-                <div class="form-group">
-                    <label for="loginPassword">Password</label>
-                    <div style="position:relative;">
-                        <input type="password" id="loginPassword" name="password" class="form-control"
-                            placeholder="Your password" required autocomplete="current-password">
-                        <button type="button" onclick="togglePassword('loginPassword')"
-                            style="position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:1.1rem;background:none;border:none;cursor:pointer;color:var(--c-text-2);"
-                            aria-label="Toggle password visibility">👁️</button>
-                    </div>
-                </div>
-                <div
-                    style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:8px;">
-                    <label
-                        style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.88rem;color:var(--c-text-2);">
-                        <input type="checkbox" id="rememberMe"
-                            style="accent-color:var(--c-amber);width:16px;height:16px;">
-                        Remember me
-                    </label>
-                    <a href="#" style="color:var(--c-amber);font-weight:600;font-size:0.88rem;">Forgot password?</a>
-                </div>
-                <button type="submit" class="btn btn-primary" style="width:100%;margin-bottom:20px;" id="submitLogin">
-                    🐾 Connect
-                </button>
-            </form>
-
-            <div class="form-divider">Or continue with</div>
-            <div class="social-login">
-                <button class="social-btn" id="googleLogin" type="button">
-                    <span style="font-size:1.1rem;font-weight:800;">G</span> Google
-                </button>
-                <button class="social-btn" id="facebookLogin" type="button">
-                    <span style="font-size:1.1rem;font-weight:800;">f</span> Facebook
-                </button>
-            </div>
-
-            <div class="form-footer" style="margin-top:24px;">
-                Don't have an account? <a href="{{ url_for('register') }}">Sign up free</a>
-            </div>
-            <p style="text-align:center;font-size:0.76rem;color:var(--c-text-2);margin-top:20px;">
-                For more information, see our <a href="#" style="color:var(--c-amber);">Privacy Policy</a>.
-            </p>
+  <div class="auth-form-side">
+    <div class="auth-form-wrap">
+      <a href="{{ url_for('landing') }}" class="auth-back">← Back to home</a>
+      <div class="auth-logo">
+        <div class="logo-mark">🐱</div>
+        <div>
+          <div class="logo-name">Meow<span class="mood">Mood</span></div>
+          <div style="font-size:0.6rem;color:rgba(255,255,255,0.3);letter-spacing:0.04em;">AI-Powered Cat Emotion Recognition</div>
         </div>
-    </div>
+      </div>
+      <h1 class="anim-up">Log In</h1>
+      <p class="auth-subtitle anim-up d1">By logging in, you agree to our <a href="#" style="color:#00e5ff;font-weight:600;">Terms of Use</a>.</p>
 
+      <form id="loginForm" method="POST" action="{{ url_for('login') }}" novalidate>
+        <div class="form-group">
+          <label for="loginEmail">Email Address</label>
+          <input type="email" id="loginEmail" name="email" class="form-control" placeholder="you@example.com" required autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label for="loginPassword">Password</label>
+          <div style="position:relative;">
+            <input type="password" id="loginPassword" name="password" class="form-control" placeholder="Your password" required autocomplete="current-password">
+            <button type="button" onclick="togglePassword('loginPassword')" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:1rem;background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.4);" aria-label="Toggle password">👁️</button>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:8px;">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.85rem;color:rgba(255,255,255,0.4);">
+            <input type="checkbox" id="rememberMe" style="accent-color:#00e5ff;width:15px;height:15px;"> Remember me
+          </label>
+          <a href="#" style="color:#00e5ff;font-weight:600;font-size:0.85rem;">Forgot password?</a>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;margin-bottom:20px;" id="submitLogin">🐾 Connect</button>
+      </form>
+
+      <div class="form-divider">Or continue with</div>
+      <div class="social-login">
+        <button class="social-btn" type="button"><span style="font-weight:800;">G</span> Google</button>
+        <button class="social-btn" type="button"><span style="font-weight:800;">f</span> Facebook</button>
+      </div>
+      <div class="form-footer">Don't have an account? <a href="{{ url_for('register') }}">Sign up free</a></div>
+    </div>
+  </div>
 </div>
 {% endblock %}

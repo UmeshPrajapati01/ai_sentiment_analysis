@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block description %}MewConnect History — View all your past cat emotion prediction results.{% endblock %}
-{% block title %}History | MewConnect{% endblock %}
+{% block title %}History | MeowMood{% endblock %}
 {% block page_id %}history{% endblock %}
 
 {% block extra_head %}
@@ -127,8 +127,11 @@
                 <h1>Prediction History 🕐</h1>
                 <p style="color:#94a3b8;margin-top:4px;font-size:0.9rem;">All your past cat emotion analyses</p>
             </div>
-            <div class="header-actions">
-                <a href="{{ url_for('dashboard') }}" class="btn btn-dash-primary btn-sm">📸 New Analysis</a>
+            <div class="header-actions" style="display:flex;gap:10px;">
+                {% if predictions %}
+                <button onclick="document.getElementById('clearModal').classList.add('show')" class="btn btn-sm" style="background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.25);border-radius:999px;font-weight:700;">🗑️ Clear History</button>
+                {% endif %}
+                <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-sm">📸 New Analysis</a>
             </div>
         </div>
 
@@ -214,14 +217,31 @@
                 <h3 style="font-size:1.3rem;font-weight:800;color:#1e293b;margin-bottom:8px;">No Predictions Yet</h3>
                 <p style="color:#94a3b8;max-width:380px;margin:0 auto;">Upload a cat photo or audio file on the
                     dashboard to get started with emotion analysis!</p>
-                <a href="{{ url_for('dashboard') }}" class="btn btn-dash-primary" style="margin-top:24px;">📸 Start
-                    Analyzing</a>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-primary" style="margin-top:24px;">📸 Start Analyzing</a>
             </div>
             {% endif %}
         </div>
 
     </main>
 </div>
+
+<!-- Clear History Confirmation Modal -->
+<div class="credit-popup-overlay" id="clearModal">
+  <div class="credit-popup">
+    <button class="credit-popup-close" onclick="document.getElementById('clearModal').classList.remove('show')">✕</button>
+    <span class="popup-icon">🗑️</span>
+    <h3>Clear All History?</h3>
+    <div class="popup-badge warning">This cannot be undone</div>
+    <p>All {{ predictions|length }} prediction record{{ 's' if predictions|length != 1 else '' }} will be permanently deleted.</p>
+    <div class="popup-actions">
+      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('clearModal').classList.remove('show')">Cancel</button>
+      <form method="POST" action="{{ url_for('clear_history') }}" style="display:inline;">
+        <button type="submit" class="btn btn-sm" style="background:#ef4444;color:#fff;border-radius:999px;font-weight:700;padding:9px 22px;">🗑️ Yes, Clear All</button>
+      </form>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
 
 {% block extra_scripts %}
@@ -230,6 +250,10 @@
         const toggle = document.getElementById('sidebarToggle');
         const show = () => { if (toggle) toggle.style.display = window.innerWidth <= 768 ? 'flex' : 'none'; };
         window.addEventListener('resize', show); show();
+
+        // Close modal on overlay click
+        const modal = document.getElementById('clearModal');
+        if (modal) modal.addEventListener('click', e => { if (e.target === modal) modal.classList.remove('show'); });
     })();
 </script>
 {% endblock %}

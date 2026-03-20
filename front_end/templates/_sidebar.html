@@ -1,57 +1,41 @@
-<!-- _sidebar.html — Shared Sidebar Component -->
 <aside class="sidebar" id="mainSidebar" role="navigation" aria-label="Dashboard navigation">
-    <div class="sidebar-logo">
-        <div class="logo-icon" style="font-size:1.5rem;">🐱</div>
-        <span>MewConnect</span>
+  <div class="sidebar-logo">
+    <div class="logo-mark">🐱</div>
+    <div class="logo-text">
+      <div class="logo-name">Meow<span class="mood">Mood</span></div>
+      <div class="logo-sub">AI Cat Emotion Recognition</div>
     </div>
+  </div>
 
-    <!-- Sidebar Overlay (mobile) -->
-    <div id="sidebarOverlay"
-        style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:499;backdrop-filter:blur(2px);">
-    </div>
+  <div id="sidebarOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:499;backdrop-filter:blur(2px);"></div>
 
-    <div class="sidebar-section">
-        <div class="sidebar-section-title">Main</div>
-        <a href="{{ url_for('dashboard') }}" class="sidebar-link {{ 'active' if active_page == 'dashboard' }}"
-            id="navDashboard">
-            <span class="link-icon">📊</span> Dashboard
-        </a>
-        <a href="{{ url_for('profile') }}" class="sidebar-link {{ 'active' if active_page == 'profile' }}"
-            id="navProfile">
-            <span class="link-icon">👤</span> Profile
-        </a>
-        <a href="{{ url_for('metrics') }}" class="sidebar-link {{ 'active' if active_page == 'metrics' }}"
-            id="navMetrics">
-            <span class="link-icon">📈</span> Metrics
-        </a>
-    </div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">Main</div>
+    <a href="{{ url_for('dashboard') }}" class="sidebar-link {{ 'active' if active_page == 'dashboard' }}"><span class="link-icon">📊</span> Dashboard</a>
+    <a href="{{ url_for('profile') }}" class="sidebar-link {{ 'active' if active_page == 'profile' }}"><span class="link-icon">👤</span> Profile</a>
+    <a href="{{ url_for('metrics') }}" class="sidebar-link {{ 'active' if active_page == 'metrics' }}"><span class="link-icon">📈</span> Metrics</a>
+  </div>
 
-    <div class="sidebar-section">
-        <div class="sidebar-section-title">Analysis</div>
-        <a href="{{ url_for('dashboard') }}#uploadSection" class="sidebar-link" id="navUpload">
-            <span class="link-icon">📸</span> Upload Photo
-        </a>
-        <a href="{{ url_for('history') }}" class="sidebar-link {{ 'active' if active_page == 'history' }}"
-            id="navHistory">
-            <span class="link-icon">🕐</span> History
-        </a>
-    </div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">Analysis</div>
+    <a href="{{ url_for('dashboard') }}#uploadSection" class="sidebar-link"><span class="link-icon">📸</span> Image Analysis</a>
+    <a href="{{ url_for('dashboard') }}#audioSection" class="sidebar-link"><span class="link-icon">🎵</span> Audio Analysis</a>
+    <a href="{{ url_for('dashboard') }}#fusionSection" class="sidebar-link"><span class="link-icon">🔀</span> Fusion Mode</a>
+    <a href="{{ url_for('history') }}" class="sidebar-link {{ 'active' if active_page == 'history' }}"><span class="link-icon">🕐</span> History</a>
+  </div>
 
     <div class="sidebar-section">
-        <div class="sidebar-section-title">System</div>
-        <a href="#" class="sidebar-link" id="navSettings">
-            <span class="link-icon">⚙️</span> Settings
-        </a>
-        <a href="{{ url_for('logout') }}" class="sidebar-link logout-btn" id="navLogout">
-            <span class="link-icon">🚪</span> Logout
-        </a>
-    </div>
+    <div class="sidebar-section-title">System</div>
+    <a href="{{ url_for('plans') }}" class="sidebar-link {{ 'active' if active_page == 'plans' }}"><span class="link-icon">💎</span> Plans & Credits</a>
+    <a href="#" class="sidebar-link"><span class="link-icon">⚙️</span> Settings</a>
+    <a href="{{ url_for('logout') }}" class="sidebar-link" style="color:rgba(239,68,68,0.7);"><span class="link-icon">🚪</span> Logout</a>
+  </div>
 
-    <div class="sidebar-user">
-        <div class="sidebar-user-avatar">🐱</div>
-        <div class="sidebar-user-info">
-            <div class="name" id="sidebarUserName">{{ current_user.display_name }}</div>
-            <div class="role">Premium Member</div>
-        </div>
+  <div class="sidebar-user">
+    <div class="sidebar-user-avatar">🐱</div>
+    <div class="sidebar-user-info">
+      <div class="name">{{ current_user.display_name }}</div>
+      <div class="role">Premium Member</div>
     </div>
+  </div>
 </aside>
