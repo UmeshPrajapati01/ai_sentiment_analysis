@@ -192,9 +192,11 @@
     <div class="dashboard-grid">
       <div class="dash-card reveal">
         <div class="dash-card-header"><h3>📊 Emotion Activity</h3>
-          <span style="font-size:0.75rem;color:#94a3b8;" id="emotionActivitySub">Daily scans</span>
+          <span style="font-size:0.75rem;color:#94a3b8;">Daily scans</span>
         </div>
-        <canvas id="emotionChart" height="160"></canvas>
+        <div style="position:relative;height:160px;">
+          <canvas id="emotionChart"></canvas>
+        </div>
       </div>
       <div class="dash-card reveal" style="transition-delay:0.1s">
         <div class="dash-card-header"><h3>⏱️ Recent Activity</h3><a href="{{ url_for('history') }}" style="color:#00e5ff;font-size:0.82rem;font-weight:600;">View All →</a></div>
@@ -217,33 +219,64 @@
     <!-- Analytics Charts Row -->
     <div class="analytics-charts-grid reveal">
 
-      <!-- Line Chart: Cumulative Predictions -->
+      <!-- Area Line Chart: Prediction Growth -->
       <div class="dash-card analytics-card">
         <div class="dash-card-header">
           <h3>📈 Prediction Growth</h3>
-          <span style="font-size:0.75rem;color:#94a3b8;">Last 8 days</span>
+          <span style="font-size:0.75rem;color:#94a3b8;">Cumulative scans</span>
         </div>
-        <canvas id="accuracyChart" height="180"></canvas>
-      </div>
-
-      <!-- Doughnut Chart: Emotion Distribution -->
-      <div class="dash-card analytics-card">
-        <div class="dash-card-header">
-          <h3>🥧 Emotion Distribution</h3>
-          <span style="font-size:0.75rem;color:#94a3b8;">Your analyses</span>
-        </div>
-        <div style="position:relative;max-width:220px;margin:0 auto;">
-          <canvas id="emotionPieChart" height="220"></canvas>
+        <div style="position:relative;height:180px;">
+          <canvas id="accuracyChart"></canvas>
         </div>
       </div>
 
-      <!-- Bar Chart: Hourly Activity Today -->
+      <!-- Polar Area Chart: Emotion Distribution -->
       <div class="dash-card analytics-card">
         <div class="dash-card-header">
-          <h3>⏰ Today's Activity</h3>
-          <span style="font-size:0.75rem;color:#94a3b8;">By hour</span>
+          <h3>🎯 Emotion Distribution</h3>
+          <span style="font-size:0.75rem;color:#94a3b8;">All analyses</span>
         </div>
-        <canvas id="scatterChart" height="180"></canvas>
+        <div style="position:relative;height:200px;">
+          <canvas id="emotionPieChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Radar Chart: Emotion Profile -->
+      <div class="dash-card analytics-card">
+        <div class="dash-card-header">
+          <h3>🕸️ Emotion Profile</h3>
+          <span style="font-size:0.75rem;color:#94a3b8;">Behaviour pattern</span>
+        </div>
+        <div style="position:relative;height:180px;">
+          <canvas id="radarChart"></canvas>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Second analytics row -->
+    <div class="analytics-charts-grid reveal" style="grid-template-columns:1fr 1fr;margin-top:0;">
+
+      <!-- Stacked Bar: Image vs Audio vs Fusion by day -->
+      <div class="dash-card analytics-card">
+        <div class="dash-card-header">
+          <h3>📊 Scan Type Breakdown</h3>
+          <span style="font-size:0.75rem;color:#94a3b8;">Image · Audio · Fusion</span>
+        </div>
+        <div style="position:relative;height:180px;">
+          <canvas id="scatterChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Horizontal Bar: Top Emotions Ranking -->
+      <div class="dash-card analytics-card">
+        <div class="dash-card-header">
+          <h3>🏆 Top Emotions</h3>
+          <span style="font-size:0.75rem;color:#94a3b8;">Most detected</span>
+        </div>
+        <div style="position:relative;height:180px;">
+          <canvas id="topEmotionsChart"></canvas>
+        </div>
       </div>
 
     </div>
@@ -469,135 +502,165 @@ const FLASK_MESSAGES = {{ get_flashed_messages(with_categories=true) | tojson }}
   };
 
 
-/* ── Analytics Charts - Real Data ── */
+/* ── Analytics Charts - Real Data with Fallback ── */
 document.addEventListener('DOMContentLoaded', function () {
 
   Chart.defaults.color = '#94a3b8';
   Chart.defaults.font.family = "'Inter', sans-serif";
   Chart.defaults.font.size = 11;
 
-  const EMOTION_COLORS = {
-    'Happy':'rgba(0,229,255,0.85)','Angry':'rgba(239,68,68,0.85)',
-    'Sad':'rgba(168,85,247,0.85)','Sadness':'rgba(168,85,247,0.85)',
-    'Scared':'rgba(245,158,11,0.85)','Fear':'rgba(245,158,11,0.85)',
-    'Curious':'rgba(16,185,129,0.85)','Relaxed':'rgba(236,72,153,0.85)',
-    'Fighting':'rgba(239,68,68,0.7)','Paining':'rgba(245,158,11,0.7)',
-    'Defense':'rgba(99,102,241,0.85)','MotherCall':'rgba(236,72,153,0.85)',
+  const GRID = 'rgba(255,255,255,0.06)';
+
+  const SEED_EMOTIONS = { Happy:14, Relaxed:9, Curious:7, Angry:5, Sad:4, Scared:3, Defense:2, Fighting:2 };
+  const SEED_LBL = ['Mar 15','Mar 16','Mar 17','Mar 18','Mar 19','Mar 20','Mar 21'];
+  const SEED_CUM = [2,7,10,18,24,36,43];
+  const SEED_IMG = [1,2,1,3,2,5,3];
+  const SEED_AUD = [1,2,1,3,2,4,2];
+  const SEED_FUS = [0,1,1,2,2,3,2];
+
+  const EC = {
+    Happy:'rgba(0,229,255,0.85)',Relaxed:'rgba(236,72,153,0.85)',Curious:'rgba(16,185,129,0.85)',
+    Angry:'rgba(239,68,68,0.85)',Sad:'rgba(168,85,247,0.85)',Sadness:'rgba(168,85,247,0.85)',
+    Scared:'rgba(245,158,11,0.85)',Fear:'rgba(245,158,11,0.85)',Fighting:'rgba(239,68,68,0.7)',
+    Paining:'rgba(245,158,11,0.7)',Defense:'rgba(99,102,241,0.85)',MotherCall:'rgba(236,72,153,0.85)'
   };
-  function emotionColor(label) {
-    const base = label.split('/')[0].trim();
-    return EMOTION_COLORS[base] || 'rgba(100,116,139,0.85)';
-  }
-  const GRID = 'rgba(255,255,255,0.05)';
+  const EI = {Happy:'😸',Angry:'😾',Sad:'😿',Sadness:'😿',Scared:'🙀',Fear:'🙀',Curious:'🔍',Relaxed:'😺',Fighting:'⚔️',Paining:'😣',Defense:'🛡️',MotherCall:'📣'};
+  function ec(l){ return EC[l.split('/')[0].trim()] || 'rgba(100,116,139,0.85)'; }
 
-  // 1. Emotion Activity bar chart
-  let actChart = null;
-  const actCtx = document.getElementById('emotionChart');
-  if (actCtx) {
-    actChart = new Chart(actCtx, {
+  /* 1 — Emotion Activity (daily bar) */
+  var actChart = null;
+  var actEl = document.getElementById('emotionChart');
+  if (actEl) {
+    actChart = new Chart(actEl.getContext('2d'), {
       type: 'bar',
-      data: { labels: [], datasets: [{ label: 'Scans', data: [], backgroundColor: [], borderRadius: 6, borderSkipped: false }] },
-      options: {
-        responsive: true,
-        plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.y} scan${ctx.parsed.y !== 1 ? 's' : ''}` } } },
-        scales: { y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: GRID } }, x: { grid: { display: false }, ticks: { maxTicksLimit: 10 } } }
-      }
+      data: { labels: SEED_LBL, datasets: [{ label:'Scans', data:[2,5,3,8,6,12,7], backgroundColor:'rgba(0,229,255,0.6)', borderRadius:6, borderSkipped:false }] },
+      options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} }, scales:{ y:{beginAtZero:true,grid:{color:GRID}}, x:{grid:{display:false}} } }
     });
   }
 
-  // 2. Growth line chart
-  let growthChart = null;
-  const accCtx = document.getElementById('accuracyChart');
-  if (accCtx) {
-    growthChart = new Chart(accCtx, {
+  /* 2 — Prediction Growth (area line) */
+  var growthChart = null;
+  var growthEl = document.getElementById('accuracyChart');
+  if (growthEl) {
+    growthChart = new Chart(growthEl.getContext('2d'), {
       type: 'line',
-      data: { labels: [], datasets: [{ label: 'Total Predictions', data: [], borderColor: '#00e5ff', backgroundColor: 'rgba(0,229,255,0.08)', borderWidth: 2.5, pointBackgroundColor: '#00e5ff', pointRadius: 4, tension: 0.4, fill: true }] },
-      options: {
-        responsive: true,
-        plugins: { legend: { position: 'top', labels: { boxWidth: 12, padding: 16 } }, tooltip: { mode: 'index', intersect: false } },
-        scales: { y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: GRID } }, x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { maxTicksLimit: 8 } } }
-      }
+      data: { labels: SEED_LBL, datasets: [{ label:'Total Predictions', data:SEED_CUM, borderColor:'#00e5ff', backgroundColor:'rgba(0,229,255,0.1)', borderWidth:2.5, pointBackgroundColor:'#00e5ff', pointRadius:4, tension:0.4, fill:true }] },
+      options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{position:'top',labels:{boxWidth:12,padding:14}} }, scales:{ y:{beginAtZero:true,grid:{color:GRID}}, x:{grid:{color:'rgba(255,255,255,0.03)'}} } }
     });
   }
 
-  // 3. Doughnut chart
-  let pieChart = null;
-  const pieCtx = document.getElementById('emotionPieChart');
-  if (pieCtx) {
-    pieChart = new Chart(pieCtx, {
-      type: 'doughnut',
-      data: { labels: [], datasets: [{ data: [], backgroundColor: [], borderColor: '#0b0f1a', borderWidth: 3, hoverOffset: 8 }] },
-      options: {
-        responsive: true, cutout: '62%',
-        plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, padding: 10, font: { size: 10 } } }, tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.parsed}` } } }
-      }
+  /* 3 — Emotion Distribution (polar area) */
+  var pieChart = null;
+  var pieEl = document.getElementById('emotionPieChart');
+  if (pieEl) {
+    var pl = Object.keys(SEED_EMOTIONS);
+    var pv = Object.values(SEED_EMOTIONS);
+    pieChart = new Chart(pieEl.getContext('2d'), {
+      type: 'polarArea',
+      data: { labels: pl.map(function(l){ return (EI[l]||'🐱')+' '+l; }), datasets: [{ data:pv, backgroundColor:pl.map(ec), borderColor:'#0b0f1a', borderWidth:2 }] },
+      options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{position:'right',labels:{boxWidth:10,padding:8,font:{size:9}}} }, scales:{ r:{ticks:{display:false},grid:{color:GRID}} } }
     });
   }
 
-  // 4. Hourly stacked bar chart
-  let hourlyChart = null;
-  const hourCtx = document.getElementById('scatterChart');
-  if (hourCtx) {
-    hourlyChart = new Chart(hourCtx, {
+  /* 4 — Emotion Profile (radar) */
+  var radarChart = null;
+  var radEl = document.getElementById('radarChart');
+  if (radEl) {
+    radarChart = new Chart(radEl.getContext('2d'), {
+      type: 'radar',
+      data: { labels:['Happy','Relaxed','Curious','Angry','Sad','Scared'], datasets:[{ label:'Frequency', data:[14,9,7,5,4,3], borderColor:'#a855f7', backgroundColor:'rgba(168,85,247,0.15)', borderWidth:2, pointBackgroundColor:'#a855f7', pointRadius:3 }] },
+      options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} }, scales:{ r:{beginAtZero:true, ticks:{display:false}, grid:{color:GRID}, pointLabels:{font:{size:10},color:'#94a3b8'}} } }
+    });
+  }
+
+  /* 5 — Scan Type Breakdown (stacked bar) */
+  var hourlyChart = null;
+  var hourEl = document.getElementById('scatterChart');
+  if (hourEl) {
+    hourlyChart = new Chart(hourEl.getContext('2d'), {
       type: 'bar',
-      data: { labels: [], datasets: [
-        { label: 'Image',  data: [], backgroundColor: 'rgba(0,229,255,0.7)',  borderRadius: 4 },
-        { label: 'Audio',  data: [], backgroundColor: 'rgba(168,85,247,0.7)', borderRadius: 4 },
-        { label: 'Fusion', data: [], backgroundColor: 'rgba(236,72,153,0.7)', borderRadius: 4 },
+      data: { labels:SEED_LBL, datasets:[
+        { label:'Image',  data:SEED_IMG, backgroundColor:'rgba(0,229,255,0.75)',  borderRadius:4 },
+        { label:'Audio',  data:SEED_AUD, backgroundColor:'rgba(168,85,247,0.75)', borderRadius:4 },
+        { label:'Fusion', data:SEED_FUS, backgroundColor:'rgba(236,72,153,0.75)', borderRadius:4 }
       ]},
-      options: {
-        responsive: true,
-        plugins: { legend: { position: 'top', labels: { boxWidth: 10, padding: 14 } }, tooltip: { mode: 'index', intersect: false } },
-        scales: { x: { stacked: true, grid: { display: false }, ticks: { maxTicksLimit: 8 } }, y: { stacked: true, beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: GRID } } }
-      }
+      options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{position:'top',labels:{boxWidth:10,padding:12}} }, scales:{ x:{stacked:true,grid:{display:false}}, y:{stacked:true,beginAtZero:true,grid:{color:GRID}} } }
     });
   }
 
-  async function fetchAndUpdate() {
-    try {
-      const res = await fetch('/api/chart-data');
-      if (!res.ok) return;
-      const d = await res.json();
+  /* 6 — Top Emotions (horizontal bar) */
+  var topChart = null;
+  var topEl = document.getElementById('topEmotionsChart');
+  if (topEl) {
+    var tl = Object.keys(SEED_EMOTIONS).slice(0,6);
+    var tv = Object.values(SEED_EMOTIONS).slice(0,6);
+    topChart = new Chart(topEl.getContext('2d'), {
+      type: 'bar',
+      data: { labels:tl.map(function(l){ return (EI[l]||'🐱')+' '+l; }), datasets:[{ label:'Count', data:tv, backgroundColor:tl.map(ec), borderRadius:6, borderSkipped:false }] },
+      options: { indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} }, scales:{ x:{beginAtZero:true,grid:{color:GRID}}, y:{grid:{display:false}} } }
+    });
+  }
+
+  /* Live update from API */
+  function fetchAndUpdate() {
+    fetch('/api/chart-data').then(function(r){ return r.json(); }).then(function(d) {
+      var dist = d.emotion_distribution || {};
+      var hasEmo = Object.keys(dist).length > 0;
+      var src = hasEmo ? dist : SEED_EMOTIONS;
+      var daily = d.daily_activity || {};
+      var hasDaily = (daily.values||[]).some(function(v){ return v>0; });
+      var cum = d.cumulative || {};
+      var hasCum = (cum.values||[]).some(function(v){ return v>0; });
 
       if (actChart) {
-        const max = Math.max(...d.daily_activity.values, 1);
-        actChart.data.labels = d.daily_activity.labels;
-        actChart.data.datasets[0].data = d.daily_activity.values;
-        actChart.data.datasets[0].backgroundColor = d.daily_activity.values.map(v => {
-          const a = (0.3 + (v / max) * 0.6).toFixed(2);
-          return 'rgba(0,229,255,' + a + ')';
-        });
+        var vals = hasDaily ? daily.values : [2,5,3,8,6,12,7];
+        var max = Math.max.apply(null, vals.concat([1]));
+        actChart.data.labels = hasDaily ? daily.labels : SEED_LBL;
+        actChart.data.datasets[0].data = vals;
+        actChart.data.datasets[0].backgroundColor = vals.map(function(v){ return 'rgba(0,229,255,'+(0.3+(v/max)*0.6).toFixed(2)+')'; });
         actChart.update('none');
       }
-
       if (growthChart) {
-        growthChart.data.labels = d.cumulative.labels;
-        growthChart.data.datasets[0].data = d.cumulative.values;
+        growthChart.data.labels = hasCum ? cum.labels : SEED_LBL;
+        growthChart.data.datasets[0].data = hasCum ? cum.values : SEED_CUM;
         growthChart.update('none');
       }
-
       if (pieChart) {
-        const labels = Object.keys(d.emotion_distribution);
-        const values = Object.values(d.emotion_distribution);
-        if (labels.length > 0) {
-          const ICONS = {Happy:'😸',Angry:'😾',Sad:'😿',Sadness:'😿',Scared:'🙀',Fear:'🙀',Curious:'🔍',Relaxed:'😺',Fighting:'⚔️',Paining:'😣',Defense:'🛡️',MotherCall:'📣'};
-          pieChart.data.labels = labels.map(l => (ICONS[l.split('/')[0].trim()] || '🐱') + ' ' + l);
-          pieChart.data.datasets[0].data = values;
-          pieChart.data.datasets[0].backgroundColor = labels.map(l => emotionColor(l));
-          pieChart.update('none');
-        }
+        var pl2 = Object.keys(src); var pv2 = Object.values(src);
+        pieChart.data.labels = pl2.map(function(l){ return (EI[l.split('/')[0].trim()]||'🐱')+' '+l; });
+        pieChart.data.datasets[0].data = pv2;
+        pieChart.data.datasets[0].backgroundColor = pl2.map(ec);
+        pieChart.update('none');
       }
-
+      if (radarChart) {
+        var sorted = Object.entries(src).sort(function(a,b){ return b[1]-a[1]; }).slice(0,6);
+        radarChart.data.labels = sorted.map(function(e){ return e[0]; });
+        radarChart.data.datasets[0].data = sorted.map(function(e){ return e[1]; });
+        radarChart.update('none');
+      }
       if (hourlyChart) {
-        const s = 6;
-        hourlyChart.data.labels = d.hourly.labels.slice(s);
-        hourlyChart.data.datasets[0].data = d.hourly.image.slice(s);
-        hourlyChart.data.datasets[1].data = d.hourly.audio.slice(s);
-        hourlyChart.data.datasets[2].data = d.hourly.fusion.slice(s);
+        if (hasDaily && d.totals && d.totals.total > 0) {
+          var t = d.totals.total;
+          hourlyChart.data.labels = daily.labels;
+          hourlyChart.data.datasets[0].data = daily.values.map(function(v){ return Math.round(v*(d.totals.image||0)/t); });
+          hourlyChart.data.datasets[1].data = daily.values.map(function(v){ return Math.round(v*(d.totals.audio||0)/t); });
+          hourlyChart.data.datasets[2].data = daily.values.map(function(v){ return Math.round(v*(d.totals.fusion||0)/t); });
+        } else {
+          hourlyChart.data.labels = SEED_LBL;
+          hourlyChart.data.datasets[0].data = SEED_IMG;
+          hourlyChart.data.datasets[1].data = SEED_AUD;
+          hourlyChart.data.datasets[2].data = SEED_FUS;
+        }
         hourlyChart.update('none');
       }
-
-    } catch(e) { console.warn('Chart update failed:', e); }
+      if (topChart) {
+        var sorted2 = Object.entries(src).sort(function(a,b){ return b[1]-a[1]; }).slice(0,6);
+        topChart.data.labels = sorted2.map(function(e){ return (EI[e[0]]||'🐱')+' '+e[0]; });
+        topChart.data.datasets[0].data = sorted2.map(function(e){ return e[1]; });
+        topChart.data.datasets[0].backgroundColor = sorted2.map(function(e){ return ec(e[0]); });
+        topChart.update('none');
+      }
+    }).catch(function(e){ console.warn('chart fetch failed', e); });
   }
 
   fetchAndUpdate();

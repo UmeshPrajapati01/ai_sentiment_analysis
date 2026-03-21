@@ -1,7 +1,8 @@
 import os
 from pathlib import Path
 from collections import Counter
-from flask import Flask, render_template, request, redirect, url_for, flash, send_from_directory, jsonify
+from datetime import datetime, timedelta
+from flask import Flask, render_template, request, redirect, url_for, flash, send_from_directory, jsonify, Response
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from flask_bcrypt import Bcrypt
 from werkzeug.utils import secure_filename
@@ -301,6 +302,23 @@ def delete_prediction(pred_id):
         return jsonify({'ok': True})
     return jsonify({'ok': False}), 404
 
+@app.route('/history/download')
+@login_required
+def download_history():
+    preds = Prediction.query.filter_by(user_id=current_user.id).order_by(Prediction.timestamp.desc()).all()
+    lines = ['#,Type,Filename,Emotion Detected,Credits Used,Date & Time']
+    for i, p in enumerate(preds, 1):
+        ts = p.timestamp.strftime('%Y-%m-%d %H:%M:%S')
+        filename_safe = p.filename.replace(',', ';')
+        result_safe   = p.prediction_result.replace(',', ';')
+        lines.append(f'{i},{p.file_type},{filename_safe},{result_safe},{p.credits_used},{ts}')
+    csv_data = '\n'.join(lines)
+    return Response(
+        csv_data,
+        mimetype='text/csv',
+        headers={'Content-Disposition': 'attachment; filename=meowmood_history.csv'}
+    )
+
 @app.route('/settings', methods=['GET'])
 @login_required
 def settings():
@@ -341,31 +359,40 @@ def settings_save():
 
     return redirect(url_for('settings'))
 
+@app.route('/api/chart-data')
+@login_required
 def chart_data():
-    from datetime import timedelta
-
     all_preds = Prediction.query.filter_by(user_id=current_user.id).all()
-
     today = datetime.utcnow().date()
 
-    # ── 1. Emotion distribution — normalize casing ──
+    # Emotion distribution — only single-emotion results (no fusion "X / Y")
     emotion_map = {}
     for p in all_preds:
         raw = p.prediction_result.strip()
-        # keep multi-word results (e.g. "Sad / Paining") as-is, capitalize first letter
-        key = raw[0].upper() + raw[1:] if raw else raw
-        emotion_map[key] = emotion_map.get(key, 0) + 1
+        if '/' in raw:
+            # split fusion results into individual emotions
+            for part in raw.split('/'):
+                key = part.strip().capitalize()
+                if key:
+                    emotion_map[key] = emotion_map.get(key, 0) + 1
+        else:
+            key = (raw[0].upper() + raw[1:]) if raw else raw
+            emotion_map[key] = emotion_map.get(key, 0) + 1
 
-    # ── 2. Date range: first prediction → today (max 30 days) ──
+    # Date range: first prediction to today, max 30 days
     if all_preds:
         first_date = min(p.timestamp.date() for p in all_preds)
         start_date = max(first_date, today - timedelta(days=29))
     else:
         start_date = today
 
+    # Always show at least 7 days so the chart has width
+    if (today - start_date).days < 6:
+        start_date = today - timedelta(days=6)
+
     num_days = (today - start_date).days + 1
     daily_labels, daily_values, cum_labels, cumulative = [], [], [], []
-    running = 0
+    running = sum(1 for p in all_preds if p.timestamp.date() < start_date)  # carry-over
     for i in range(num_days):
         d = start_date + timedelta(days=i)
         count = sum(1 for p in all_preds if p.timestamp.date() == d)
@@ -376,7 +403,7 @@ def chart_data():
         cum_labels.append(label)
         cumulative.append(running)
 
-    # ── 3. Hourly breakdown today ──
+    # Hourly breakdown today
     hourly = {h: {'image': 0, 'audio': 0, 'fusion': 0} for h in range(24)}
     for p in all_preds:
         if p.timestamp.date() == today:
@@ -388,7 +415,7 @@ def chart_data():
         'emotion_distribution': emotion_map,
         'daily_activity': {'labels': daily_labels, 'values': daily_values},
         'hourly': {
-            'labels': [f'{h}:00' for h in range(24)],
+            'labels': [str(h)+':00' for h in range(24)],
             'image':  [hourly[h]['image']  for h in range(24)],
             'audio':  [hourly[h]['audio']  for h in range(24)],
             'fusion': [hourly[h]['fusion'] for h in range(24)],

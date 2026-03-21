@@ -11,6 +11,27 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐱</text></svg>">
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/main.css') }}">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <!-- Restore theme immediately to avoid flash -->
+  <script>
+  (function(){
+    var THEMES = {
+      'dark-neon':       { bg:'#060810', bg2:'#0b0f1a', card:'#0d1117', border:'rgba(255,255,255,0.08)',    cyan:'#00e5ff', purple:'#a855f7', text:'#e2e8f0', text2:'#94a3b8' },
+      'midnight-purple': { bg:'#0d0618', bg2:'#130820', card:'#1a0a2e', border:'rgba(168,85,247,0.15)',     cyan:'#c084fc', purple:'#a855f7', text:'#e2e8f0', text2:'#94a3b8' },
+      'ocean-cyan':      { bg:'#020d14', bg2:'#041c2c', card:'#062030', border:'rgba(6,182,212,0.15)',      cyan:'#06b6d4', purple:'#0ea5e9', text:'#e2e8f0', text2:'#94a3b8' },
+      'soft-dark':       { bg:'#1a1a2e', bg2:'#16213e', card:'#1f2b47', border:'rgba(236,72,153,0.15)',     cyan:'#ec4899', purple:'#8b5cf6', text:'#e2e8f0', text2:'#94a3b8' },
+      'light-white':     { bg:'#ffffff', bg2:'#f1f5f9', card:'#ffffff', border:'rgba(99,102,241,0.2)',      cyan:'#6366f1', purple:'#8b5cf6', text:'#1e293b', text2:'#64748b' },
+      'eye-protection':  { bg:'#fefce8', bg2:'#fef9c3', card:'#fffde7', border:'rgba(202,138,4,0.25)',      cyan:'#ca8a04', purple:'#d97706', text:'#1c1917', text2:'#78716c' }
+    };
+    var t = THEMES[localStorage.getItem('meowmood_theme')] || THEMES['dark-neon'];
+    var r = document.documentElement;
+    r.style.setProperty('--bg',t.bg); r.style.setProperty('--bg2',t.bg2); r.style.setProperty('--bg3',t.bg2);
+    r.style.setProperty('--dash-bg',t.bg); r.style.setProperty('--dash-card',t.card); r.style.setProperty('--dash-border',t.border);
+    r.style.setProperty('--cyan',t.cyan); r.style.setProperty('--cyan2',t.cyan); r.style.setProperty('--purple',t.purple);
+    if(t.text){ r.style.setProperty('--dash-text',t.text); r.style.setProperty('--dash-text2',t.text2); }
+    var acc = localStorage.getItem('meowmood_accent');
+    if(acc){ r.style.setProperty('--cyan',acc); r.style.setProperty('--cyan2',acc); }
+  })();
+  </script>
   {% block extra_head %}{% endblock %}
 </head>
 <body data-page="{% block page_id %}{% endblock %}">
