@@ -138,6 +138,7 @@ def dashboard():
     prediction_text = None
     credits_used    = 0
     file_type_used  = None
+    face_detected   = True   # default True — warning only shown when False
 
     if request.method == 'POST':
         file      = request.files.get('file')
@@ -158,7 +159,7 @@ def dashboard():
             file.save(filepath)
             try:
                 if file_type == 'image':
-                    result, confidence = predict_image(filepath)
+                    result, confidence, face_detected = predict_image(filepath)
                 elif file_type == 'audio':
                     result, confidence = predict_audio(filepath)
                 else:
@@ -189,6 +190,7 @@ def dashboard():
     stats = get_user_stats(current_user.id)
     return render_template('dashboard.html', prediction=prediction_text,
                            credits_used=credits_used, file_type_used=file_type_used,
+                           face_detected=face_detected,
                            plans=PLANS, credit_costs=CREDIT_COSTS, **stats)
 
 # ── FUSION (AJAX) ─────────────────────────────────────────────────────────────
@@ -214,7 +216,7 @@ def fusion():
         aud_path = os.path.join(app.config['UPLOAD_FOLDER'], aud_filename)
         audio_file.save(aud_path)
 
-        img_result, img_conf = predict_image(img_path)
+        img_result, img_conf, _ = predict_image(img_path)
         aud_result, aud_conf = predict_audio(aud_path)
         fusion_result = img_result if img_result.lower() == aud_result.lower() else f"{img_result} / {aud_result}"
         fusion_conf = round((img_conf + aud_conf) / 2, 2)
@@ -272,7 +274,13 @@ def profile():
 @app.route('/update_profile', methods=['POST'])
 @login_required
 def update_profile():
-    flash('Profile updated successfully! 🎉', 'success')
+    display_name = request.form.get('display_name', '').strip()
+    if display_name:
+        current_user.name = display_name
+        db.session.commit()
+        flash('Profile updated successfully! 🎉', 'success')
+    else:
+        flash('Display name cannot be empty.', 'danger')
     return redirect(url_for('profile'))
 
 @app.route('/metrics')
@@ -453,16 +461,21 @@ def chart_data():
 
     num_days = (today - start_date).days + 1
     daily_labels, daily_values, cum_labels, cumulative = [], [], [], []
+    daily_image, daily_audio, daily_fusion = [], [], []
     running = sum(1 for p in all_preds if p.timestamp.date() < start_date)  # carry-over
     for i in range(num_days):
         d = start_date + timedelta(days=i)
-        count = sum(1 for p in all_preds if p.timestamp.date() == d)
+        day_preds = [p for p in all_preds if p.timestamp.date() == d]
+        count = len(day_preds)
         running += count
         label = d.strftime('%b %d')
         daily_labels.append(label)
         daily_values.append(count)
         cum_labels.append(label)
         cumulative.append(running)
+        daily_image.append(sum(1 for p in day_preds if p.file_type == 'image'))
+        daily_audio.append(sum(1 for p in day_preds if p.file_type == 'audio'))
+        daily_fusion.append(sum(1 for p in day_preds if p.file_type == 'fusion'))
 
     # Hourly breakdown today
     hourly = {h: {'image': 0, 'audio': 0, 'fusion': 0} for h in range(24)}
@@ -474,7 +487,7 @@ def chart_data():
 
     return jsonify({
         'emotion_distribution': emotion_map,
-        'daily_activity': {'labels': daily_labels, 'values': daily_values},
+        'daily_activity': {'labels': daily_labels, 'values': daily_values, 'image': daily_image, 'audio': daily_audio, 'fusion': daily_fusion},
         'hourly': {
             'labels': [str(h)+':00' for h in range(24)],
             'image':  [hourly[h]['image']  for h in range(24)],

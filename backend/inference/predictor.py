@@ -4,7 +4,7 @@ import librosa
 from PIL import Image
 from torchvision import transforms
 from backend.inference.model_loader import loader
-from backend.utils import extract_mel_spectrogram_sota # Use the 99% accuracy extractor
+from backend.utils import extract_mel_spectrogram_sota, detect_cat_face
 
 # Image Transforms (Must match training validation transforms)
 image_transforms = transforms.Compose([
@@ -15,28 +15,35 @@ image_transforms = transforms.Compose([
 ])
 
 def predict_image(image_path):
+    """
+    Returns (emotion, confidence, face_detected).
+    face_detected is a soft hint only — prediction always runs regardless.
+    """
     if not loader.image_model:
-        return "Model not loaded", 0.0
-    
+        return "Model not loaded", 0.0, True
+
+    # Soft cat face check — never blocks prediction
+    face_detected = detect_cat_face(image_path)
+
     try:
         image = Image.open(image_path).convert('RGB')
         image_tensor = image_transforms(image).unsqueeze(0).to(loader.device)
-        
+
         with torch.no_grad():
             outputs = loader.image_model(image_tensor)
             probs = torch.softmax(outputs, dim=1)
             confidence, preds = torch.max(probs, 1)
-            
+
         class_idx = preds.item()
-        conf_score = round(confidence.item() * 100, 2)  # e.g. 87.43
+        conf_score = round(confidence.item() * 100, 2)
 
         if loader.image_classes and class_idx < len(loader.image_classes):
-            return loader.image_classes[class_idx], conf_score
-        return f"Class {class_idx}", conf_score
-        
+            return loader.image_classes[class_idx], conf_score, face_detected
+        return f"Class {class_idx}", conf_score, face_detected
+
     except Exception as e:
         print(f"Image prediction error: {e}")
-        return "Error", 0.0
+        return "Error", 0.0, face_detected
 
 def predict_audio(audio_path):
     """

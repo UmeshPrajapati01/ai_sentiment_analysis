@@ -58,7 +58,7 @@
         <!-- Chart + Emotion Breakdown Row -->
         <div class="dashboard-grid">
             <!-- Weekly Chart -->
-            <div class="dash-card reveal">
+            <div class="dash-card reveal" style="display:flex;flex-direction:column;">
                 <div class="dash-card-header">
                     <h3>📈 Weekly Emotion Trend</h3>
                     <select
@@ -90,13 +90,121 @@
                         style="background:linear-gradient(to top,#10b981,#34d399);height:0;"><span
                             class="chart-bar-label">Sun</span></div>
                 </div>
+
+                <!-- Divider -->
+                <div style="border-top:1px solid var(--dash-border);margin:18px 0 14px;"></div>
+
+                <!-- Weekly quick stats -->
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px;">
+                    <div style="background:rgba(0,229,255,0.06);border:1px solid rgba(0,229,255,0.15);border-radius:10px;padding:12px 8px;text-align:center;">
+                        <div style="font-size:1.3rem;font-weight:800;color:#00e5ff;">{{ total_predictions }}</div>
+                        <div style="font-size:0.7rem;color:var(--dash-text2);margin-top:3px;">Total Scans</div>
+                    </div>
+                    <div style="background:rgba(168,85,247,0.06);border:1px solid rgba(168,85,247,0.15);border-radius:10px;padding:12px 8px;text-align:center;">
+                        <div style="font-size:1.3rem;font-weight:800;color:#a855f7;">{{ image_count }}</div>
+                        <div style="font-size:0.7rem;color:var(--dash-text2);margin-top:3px;">📸 Images</div>
+                    </div>
+                    <div style="background:rgba(236,72,153,0.06);border:1px solid rgba(236,72,153,0.15);border-radius:10px;padding:12px 8px;text-align:center;">
+                        <div style="font-size:1.3rem;font-weight:800;color:#ec4899;">{{ audio_count }}</div>
+                        <div style="font-size:0.7rem;color:var(--dash-text2);margin-top:3px;">🎵 Audio</div>
+                    </div>
+                </div>
+
+                <!-- Top 3 emotions this week -->
+                <div style="font-size:0.78rem;font-weight:700;color:var(--dash-text2);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;">🏆 Top Emotions</div>
+                {% set top_emotions = [
+                    ('😸', 'Happy',   '#f59e0b'),
+                    ('😺', 'Relaxed', '#10b981'),
+                    ('🔍', 'Curious', '#3b82f6')
+                ] %}
+                {% if emotion_distribution %}
+                    {% set top_list = emotion_distribution.items()|list %}
+                    {% for i in range([top_list|length, 3]|min) %}
+                    {% set em = top_list[i][0] %}
+                    {% set cnt = top_list[i][1] %}
+                    {% set pct = (cnt / total_predictions * 100)|int if total_predictions > 0 else 0 %}
+                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+                        <span style="font-size:1.1rem;">
+                            {% if em|lower == 'happy' %}😸
+                            {% elif em|lower == 'angry' %}😾
+                            {% elif em|lower in ['sad','sadness'] %}😿
+                            {% elif em|lower in ['scared','fear'] %}🙀
+                            {% elif em|lower == 'curious' %}🔍
+                            {% elif em|lower == 'relaxed' %}😺
+                            {% else %}🐱{% endif %}
+                        </span>
+                        <div style="flex:1;">
+                            <div style="display:flex;justify-content:space-between;font-size:0.8rem;color:var(--dash-text);margin-bottom:3px;">
+                                <span>{{ em }}</span><span style="color:var(--dash-text2);">{{ pct }}%</span>
+                            </div>
+                            <div style="height:4px;border-radius:4px;background:rgba(255,255,255,0.06);">
+                                <div style="height:4px;border-radius:4px;width:{{ pct }}%;background:linear-gradient(90deg,
+                                    {% if loop.index0 == 0 %}#f59e0b,#fbbf24
+                                    {% elif loop.index0 == 1 %}#10b981,#34d399
+                                    {% else %}#3b82f6,#60a5fa{% endif %});transition:width 1s ease;"></div>
+                            </div>
+                        </div>
+                        <span style="font-size:0.75rem;font-weight:700;color:var(--dash-text2);">{{ cnt }}×</span>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    {% for item in top_emotions %}
+                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+                        <span style="font-size:1.1rem;">{{ item[0] }}</span>
+                        <div style="flex:1;">
+                            <div style="display:flex;justify-content:space-between;font-size:0.8rem;color:var(--dash-text);margin-bottom:3px;">
+                                <span>{{ item[1] }}</span><span style="color:var(--dash-text2);">—</span>
+                            </div>
+                            <div style="height:4px;border-radius:4px;background:rgba(255,255,255,0.06);"></div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <div style="font-size:0.75rem;color:var(--dash-text2);text-align:center;margin-top:4px;">Demo — upload files to see real data</div>
+                {% endif %}
+
+                <!-- Divider -->
+                <div style="border-top:1px solid var(--dash-border);margin:18px 0 14px;"></div>
+
+                <!-- 3 Insight mini-cards — flex:1 fills remaining card height -->
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;flex:1;">
+                    <!-- Most Detected -->
+                    <div style="background:rgba(0,229,255,0.05);border:1px solid rgba(0,229,255,0.15);border-radius:12px;padding:20px 10px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+                        <div style="font-size:2rem;margin-bottom:8px;" id="topEmotionEmoji">🐱</div>
+                        <div style="font-size:1rem;font-weight:800;background:linear-gradient(135deg,#00e5ff,#a855f7);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;" id="topEmotionName">
+                            {% if emotion_distribution %}{{ emotion_distribution.keys()|list|first }}{% else %}Happy{% endif %}
+                        </div>
+                        <div style="font-size:0.7rem;color:var(--dash-text2);margin-top:5px;">Top Emotion</div>
+                        <div style="margin-top:10px;padding:5px 12px;border-radius:999px;background:rgba(0,229,255,0.08);border:1px solid rgba(0,229,255,0.2);font-size:0.75rem;color:#00e5ff;font-weight:600;">
+                            {% if emotion_distribution and total_predictions > 0 %}{{ (emotion_distribution.values()|list|first / total_predictions * 100)|int }}% of scans{% else %}—{% endif %}
+                        </div>
+                    </div>
+                    <!-- Time Saved -->
+                    <div style="background:rgba(168,85,247,0.05);border:1px solid rgba(168,85,247,0.15);border-radius:12px;padding:20px 10px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+                        <div style="font-size:2rem;margin-bottom:8px;">⚡</div>
+                        <div style="font-size:1rem;font-weight:800;color:var(--dash-text);">~{{ (total_predictions * 4) }}s</div>
+                        <div style="font-size:0.7rem;color:var(--dash-text2);margin-top:5px;">Time Saved</div>
+                        <div style="margin-top:10px;padding:5px 12px;border-radius:999px;background:rgba(168,85,247,0.08);border:1px solid rgba(168,85,247,0.2);font-size:0.75rem;color:#a855f7;font-weight:600;">vs manual</div>
+                    </div>
+                    <!-- Fusion -->
+                    <div style="background:rgba(236,72,153,0.05);border:1px solid rgba(236,72,153,0.15);border-radius:12px;padding:20px 10px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+                        <div style="font-size:2rem;margin-bottom:8px;">🔀</div>
+                        <div style="font-size:1rem;font-weight:800;color:var(--dash-text);">
+                            {% if total_predictions > 0 %}{% set fusion_count = recent_predictions | selectattr('file_type','equalto','fusion') | list | length %}{{ fusion_count }}{% else %}0{% endif %}
+                        </div>
+                        <div style="font-size:0.7rem;color:var(--dash-text2);margin-top:5px;">Fusion Scans</div>
+                        <div style="margin-top:10px;padding:5px 12px;border-radius:999px;background:rgba(236,72,153,0.08);border:1px solid rgba(236,72,153,0.2);font-size:0.75rem;color:#ec4899;font-weight:600;">Multimodal</div>
+                    </div>
+                </div>
             </div>
 
-            <!-- Emotion Distribution Bars -->
-            <div class="dash-card reveal" style="transition-delay:0.1s">
+            <!-- Emotion Distribution -->
+            <div class="dash-card reveal" style="transition-delay:0.1s;display:flex;flex-direction:column;">
                 <div class="dash-card-header">
                     <h3>🎯 Emotion Distribution</h3>
+                    <span style="font-size:0.75rem;color:var(--dash-text2);">All analyses</span>
                 </div>
+                <!-- Progress bars — flex-grow fills remaining card height -->
+                <div style="flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.1) transparent;padding-right:4px;">
                 {% if emotion_distribution and total_predictions > 0 %}
                 {% for emotion, count in emotion_distribution.items() %}
                 <div class="progress-bar-wrap slide-in-row" style="animation-delay:{{ loop.index0 * 0.08 }}s">
@@ -116,12 +224,9 @@
                 </div>
                 {% endfor %}
                 {% else %}
-                <div style="text-align:center;padding:40px 20px;color:#94a3b8;">
-                    <div style="font-size:3rem;margin-bottom:12px;">📊</div>
-                    <p>No data yet — upload files to see your emotion distribution.</p>
-                    <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-sm" style="margin-top:16px;">Go to Dashboard</a>
-                </div>
+                <div style="text-align:center;padding:12px 0;color:#94a3b8;font-size:0.82rem;">Demo data shown — upload files to see real distribution</div>
                 {% endif %}
+                </div>
             </div>
         </div>
 
@@ -192,7 +297,7 @@
             </div>
 
             <!-- Emotion Heatmap / emoji counts -->
-            <div class="metric-card">
+            <div class="metric-card" style="max-height:420px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.1) transparent;" id="emotionFreqCard">
                 <h3>😸 Emotion Frequency</h3>
                 {% if emotion_distribution %}
                 {% for emotion, count in emotion_distribution.items() %}
@@ -273,18 +378,50 @@
     (function () {
         var rows = document.querySelectorAll('.slide-in-row');
         if (!rows.length) return;
-        var obs = new IntersectionObserver(function (entries) {
+
+        // Observer for main page scroll (Emotion Distribution rows)
+        var pageObs = new IntersectionObserver(function (entries) {
             entries.forEach(function (e) {
                 if (e.isIntersecting) {
                     e.target.style.animationPlayState = 'running';
-                    obs.unobserve(e.target);
+                    pageObs.unobserve(e.target);
                 }
             });
-        }, { threshold: 0.15 });
+        }, { threshold: 0.1 });
+
+        // Observer for card scroll (Emotion Frequency rows inside scrollable card)
+        var freqCard = document.getElementById('emotionFreqCard');
+        var cardObs = new IntersectionObserver(function (entries) {
+            entries.forEach(function (e) {
+                if (e.isIntersecting) {
+                    e.target.style.animationPlayState = 'running';
+                    cardObs.unobserve(e.target);
+                }
+            });
+        }, { root: freqCard, threshold: 0.05 });
+
         rows.forEach(function (r) {
             r.style.animationPlayState = 'paused';
-            obs.observe(r);
+            // If row is inside the freq card use card observer, else page observer
+            if (freqCard && freqCard.contains(r)) {
+                cardObs.observe(r);
+            } else {
+                pageObs.observe(r);
+            }
         });
+
+        // Also re-trigger on card scroll for rows that come into view while scrolling
+        if (freqCard) {
+            freqCard.addEventListener('scroll', function () {
+                freqCard.querySelectorAll('.slide-in-row').forEach(function (r) {
+                    var rect = r.getBoundingClientRect();
+                    var cardRect = freqCard.getBoundingClientRect();
+                    if (rect.top < cardRect.bottom && rect.bottom > cardRect.top) {
+                        r.style.animationPlayState = 'running';
+                    }
+                });
+            });
+        }
     })();
 </script>
 {% endblock %}

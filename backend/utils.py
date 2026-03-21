@@ -2,6 +2,7 @@ import os
 import numpy as np
 import librosa
 import joblib
+import cv2
 from pathlib import Path
 
 # ==========================================
@@ -14,6 +15,60 @@ TARGET_AUDIO_SR = 22050
 # Path to persistent classic components
 SCALER_PATH = os.path.join(PROJECT_ROOT, "models", "audio_scaler_classic.pkl")
 audio_scaler = None
+
+# ==========================================
+# CAT FACE DETECTION (soft check only)
+# ==========================================
+# Load Haar cascade once at module level — never crashes if file missing
+_cat_cascade = None
+def _get_cascade():
+    global _cat_cascade
+    if _cat_cascade is None:
+        try:
+            xml_path = cv2.data.haarcascades + 'haarcascade_frontalcatface.xml'
+            _cat_cascade = cv2.CascadeClassifier(xml_path)
+        except Exception:
+            _cat_cascade = None
+    return _cat_cascade
+
+def detect_cat_face(image_path):
+    """
+    Soft check: returns True if a cat face is likely present, False otherwise.
+    NEVER raises an exception — always returns a bool.
+    Prediction always runs regardless of this result.
+    """
+    try:
+        cascade = _get_cascade()
+        if cascade is None or cascade.empty():
+            return True  # cascade unavailable → assume OK, no warning
+
+        img = cv2.imread(str(image_path))
+        if img is None:
+            return True  # can't read image → assume OK
+
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+        # Try with relaxed params first (catches more faces)
+        faces = cascade.detectMultiScale(
+            gray,
+            scaleFactor=1.05,
+            minNeighbors=3,
+            minSize=(30, 30)
+        )
+        if len(faces) > 0:
+            return True
+
+        # Second pass — even more relaxed (catches partial/angled faces)
+        faces2 = cascade.detectMultiScale(
+            gray,
+            scaleFactor=1.1,
+            minNeighbors=1,
+            minSize=(20, 20)
+        )
+        return len(faces2) > 0
+
+    except Exception:
+        return True  # any error → assume OK, never block prediction
 
 def get_scaler():
     global audio_scaler

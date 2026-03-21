@@ -78,19 +78,16 @@ def init_db(app):
 
 
 def _seed_premium_account(app):
-    """Ensure umeshprajapati0506@gmail.com has yearly premium + unlimited credits."""
+    """Ensure umesh.prajapati0506@gmail.com has yearly premium + unlimited credits."""
     from flask_bcrypt import Bcrypt
     bcrypt = Bcrypt(app)
-    email = 'umeshprajapati0506@gmail.com'
+    email = 'umesh.prajapati0506@gmail.com'
     user = User.query.filter_by(email=email).first()
     if user:
-        # Already exists — just upgrade
         user.plan = 'yearly'
         user.credits = 9999
         user.plan_expires_at = datetime(2027, 1, 1)
-        db.session.commit()
     else:
-        # Create the account
         user = User(
             name='Umesh Prajapati',
             email=email,
@@ -100,4 +97,4 @@ def _seed_premium_account(app):
             plan_expires_at=datetime(2027, 1, 1),
         )
         db.session.add(user)
-        db.session.commit()
+    db.session.commit()
