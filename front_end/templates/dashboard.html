@@ -81,6 +81,21 @@
             {% if r == 'happy' %}😸{% elif r == 'angry' %}😾{% elif r in ['sad','sadness'] %}😿{% elif r in ['scared','fear'] %}🙀{% elif r == 'curious' %}🔍{% elif r == 'relaxed' %}😺{% else %}🐱{% endif %}
             {{ prediction }}
           </div>
+          {% if credits_used and file_type_used == 'image' %}
+          <div style="margin-top:10px;">
+            <div style="display:flex;justify-content:space-between;font-size:0.75rem;color:#94a3b8;margin-bottom:4px;">
+              <span>Confidence</span>
+              <span style="font-weight:700;color:#00e5ff;">
+                {% set last_pred = recent_predictions[0] if recent_predictions else None %}
+                {{ last_pred.confidence|round(1) if last_pred and last_pred.confidence else '—' }}%
+              </span>
+            </div>
+            <div style="height:6px;background:rgba(255,255,255,0.08);border-radius:999px;overflow:hidden;">
+              {% set conf_val = recent_predictions[0].confidence if recent_predictions and recent_predictions[0].confidence else 0 %}
+              <div style="height:100%;border-radius:999px;width:{{ conf_val|round(0)|int }}%;background:{% if conf_val >= 80 %}linear-gradient(90deg,#10b981,#34d399){% elif conf_val >= 60 %}linear-gradient(90deg,#f59e0b,#fbbf24){% else %}linear-gradient(90deg,#ef4444,#f87171){% endif %};transition:width 0.8s ease;"></div>
+            </div>
+          </div>
+          {% endif %}
         </div>
         <div class="emotion-hint-bar hint-image">
           <span class="hint-icon">
@@ -127,6 +142,21 @@
             {% if r == 'happy' %}😸{% elif r == 'angry' %}😾{% elif r in ['sad','sadness'] %}😿{% elif r in ['scared','fear'] %}🙀{% elif r == 'curious' %}🔍{% elif r == 'relaxed' %}😺{% else %}🐱{% endif %}
             {{ prediction }}
           </div>
+          {% if credits_used and file_type_used == 'audio' %}
+          <div style="margin-top:10px;">
+            <div style="display:flex;justify-content:space-between;font-size:0.75rem;color:#94a3b8;margin-bottom:4px;">
+              <span>Confidence</span>
+              <span style="font-weight:700;color:#a855f7;">
+                {% set last_pred = recent_predictions[0] if recent_predictions else None %}
+                {{ last_pred.confidence|round(1) if last_pred and last_pred.confidence else '—' }}%
+              </span>
+            </div>
+            <div style="height:6px;background:rgba(255,255,255,0.08);border-radius:999px;overflow:hidden;">
+              {% set conf_val = recent_predictions[0].confidence if recent_predictions and recent_predictions[0].confidence else 0 %}
+              <div style="height:100%;border-radius:999px;width:{{ conf_val|round(0)|int }}%;background:{% if conf_val >= 80 %}linear-gradient(90deg,#10b981,#34d399){% elif conf_val >= 60 %}linear-gradient(90deg,#f59e0b,#fbbf24){% else %}linear-gradient(90deg,#ef4444,#f87171){% endif %};transition:width 0.8s ease;"></div>
+            </div>
+          </div>
+          {% endif %}
         </div>
         <div class="emotion-hint-bar hint-audio">
           <span class="hint-icon">

@@ -8,11 +8,16 @@ function initPageTransition() {
   overlay.id = 'page-overlay';
   overlay.style.cssText = 'position:fixed;inset:0;background:#060810;z-index:99999;pointer-events:none;opacity:0;transition:opacity 0.35s cubic-bezier(0.4,0,0.2,1);';
   document.body.appendChild(overlay);
-  window.addEventListener('load', () => { overlay.style.opacity = '0'; });
-  document.querySelectorAll('a[href]:not([target]):not([href^="#"]):not([href^="mailto"])').forEach(link => {
+  window.addEventListener('load', () => { overlay.style.opacity = '0'; overlay.style.pointerEvents = 'none'; });
+  // Fade in on pageshow (handles back/forward cache)
+  window.addEventListener('pageshow', () => { overlay.style.opacity = '0'; overlay.style.pointerEvents = 'none'; });
+  document.querySelectorAll('a[href]:not([target]):not([href^="#"]):not([href^="mailto"]):not([onclick])').forEach(link => {
     link.addEventListener('click', e => {
       const href = link.getAttribute('href');
       if (!href || href.startsWith('http') || href.startsWith('//')) return;
+      // Skip same-page hash navigation
+      const url = new URL(href, window.location.href);
+      if (url.pathname === window.location.pathname && url.hash) return;
       e.preventDefault();
       overlay.style.opacity = '1'; overlay.style.pointerEvents = 'all';
       setTimeout(() => { window.location.href = href; }, 340);

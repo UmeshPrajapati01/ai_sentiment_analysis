@@ -14,13 +14,14 @@
     <a href="{{ url_for('dashboard') }}" class="sidebar-link {{ 'active' if active_page == 'dashboard' }}"><span class="link-icon">📊</span> Dashboard</a>
     <a href="{{ url_for('profile') }}" class="sidebar-link {{ 'active' if active_page == 'profile' }}"><span class="link-icon">👤</span> Profile</a>
     <a href="{{ url_for('metrics') }}" class="sidebar-link {{ 'active' if active_page == 'metrics' }}"><span class="link-icon">📈</span> Metrics</a>
+    <a href="{{ url_for('model_report') }}" class="sidebar-link {{ 'active' if active_page == 'report' }}"><span class="link-icon">🤖</span> Model Report</a>
   </div>
 
   <div class="sidebar-section">
     <div class="sidebar-section-title">Analysis</div>
-    <a href="{{ url_for('dashboard') }}#uploadSection" class="sidebar-link"><span class="link-icon">📸</span> Image Analysis</a>
-    <a href="{{ url_for('dashboard') }}#audioSection" class="sidebar-link"><span class="link-icon">🎵</span> Audio Analysis</a>
-    <a href="{{ url_for('dashboard') }}#fusionSection" class="sidebar-link"><span class="link-icon">🔀</span> Fusion Mode</a>
+    <a href="{{ url_for('dashboard') }}#uploadSection" class="sidebar-link" onclick="sidebarScrollTo(event,'uploadSection')"><span class="link-icon">📸</span> Image Analysis</a>
+    <a href="{{ url_for('dashboard') }}#audioSection"  class="sidebar-link" onclick="sidebarScrollTo(event,'audioSection')"><span class="link-icon">🎵</span> Audio Analysis</a>
+    <a href="{{ url_for('dashboard') }}#fusionSection" class="sidebar-link" onclick="sidebarScrollTo(event,'fusionSection')"><span class="link-icon">🔀</span> Fusion Mode</a>
     <a href="{{ url_for('history') }}" class="sidebar-link {{ 'active' if active_page == 'history' }}"><span class="link-icon">🕐</span> History</a>
   </div>
 
@@ -39,3 +40,25 @@
     </div>
   </div>
 </aside>
+
+<script>
+function sidebarScrollTo(e, sectionId) {
+  var el = document.getElementById(sectionId);
+  if (el) {
+    e.preventDefault();
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    el.style.transition = 'box-shadow 0.3s';
+    el.style.boxShadow = '0 0 0 2px rgba(0,229,255,0.5)';
+    setTimeout(function(){ el.style.boxShadow = ''; }, 1200);
+  }
+  // else: let href navigate to dashboard#section normally
+}
+
+// On dashboard load, scroll to hash section if present
+window.addEventListener('DOMContentLoaded', function() {
+  if (window.location.hash) {
+    var target = document.getElementById(window.location.hash.slice(1));
+    if (target) setTimeout(function(){ target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 300);
+  }
+});
+</script>

@@ -158,11 +158,11 @@ def dashboard():
             file.save(filepath)
             try:
                 if file_type == 'image':
-                    result = predict_image(filepath)
+                    result, confidence = predict_image(filepath)
                 elif file_type == 'audio':
-                    result = predict_audio(filepath)
+                    result, confidence = predict_audio(filepath)
                 else:
-                    result = 'Unknown'
+                    result, confidence = 'Unknown', 0.0
 
                 # Deduct credits
                 credits_used   = current_user.deduct_credits(file_type)
@@ -175,6 +175,7 @@ def dashboard():
                     file_type=file_type,
                     filename=filename,
                     prediction_result=result,
+                    confidence=confidence,
                     credits_used=credits_used,
                 )
                 db.session.add(pred_entry); db.session.commit()
@@ -213,9 +214,10 @@ def fusion():
         aud_path = os.path.join(app.config['UPLOAD_FOLDER'], aud_filename)
         audio_file.save(aud_path)
 
-        img_result = predict_image(img_path)
-        aud_result = predict_audio(aud_path)
+        img_result, img_conf = predict_image(img_path)
+        aud_result, aud_conf = predict_audio(aud_path)
         fusion_result = img_result if img_result.lower() == aud_result.lower() else f"{img_result} / {aud_result}"
+        fusion_conf = round((img_conf + aud_conf) / 2, 2)
 
         current_user.deduct_credits('fusion')
         db.session.commit()
@@ -225,6 +227,7 @@ def fusion():
             file_type='fusion',
             filename=f"{img_filename} + {aud_filename}",
             prediction_result=fusion_result,
+            confidence=fusion_conf,
             credits_used=cost,
         )
         db.session.add(pred_entry); db.session.commit()
@@ -318,6 +321,64 @@ def download_history():
         mimetype='text/csv',
         headers={'Content-Disposition': 'attachment; filename=meowmood_history.csv'}
     )
+
+@app.route('/report')
+@login_required
+def model_report():
+    import re
+
+    def parse_report(filepath):
+        """Parse a sklearn classification_report text into structured data."""
+        if not os.path.exists(filepath):
+            return None
+        with open(filepath, 'r') as f:
+            text = f.read()
+        rows = []
+        accuracy = None
+        for line in text.splitlines():
+            line = line.strip()
+            if not line:
+                continue
+            # accuracy line
+            acc_match = re.match(r'accuracy\s+([\d.]+)\s+(\d+)', line)
+            if acc_match:
+                accuracy = float(acc_match.group(1))
+                continue
+            # class rows: name  prec  recall  f1  support
+            parts = line.split()
+            if len(parts) >= 5:
+                try:
+                    support = int(parts[-1])
+                    f1      = float(parts[-2])
+                    recall  = float(parts[-3])
+                    prec    = float(parts[-4])
+                    name    = ' '.join(parts[:-4])
+                    if name not in ('macro avg', 'weighted avg', 'accuracy'):
+                        rows.append({'name': name, 'precision': prec, 'recall': recall, 'f1': f1, 'support': support})
+                except (ValueError, IndexError):
+                    pass
+        return {'rows': rows, 'accuracy': accuracy}
+
+    MODEL_DIR = BASE_DIR / 'backend' / 'trained_modelimages'
+    image_report_path = MODEL_DIR / 'image_model' / 'classification_report.txt'
+    audio_report_path = MODEL_DIR / 'audio_model_finetuned' / 'classification_report.txt'
+
+    image_report = parse_report(str(image_report_path))
+    audio_report = parse_report(str(audio_report_path))
+
+    # Image training history for chart
+    img_history_path = MODEL_DIR / 'image_model_finetuned' / 'training_history.csv'
+    img_history = []
+    if img_history_path.exists():
+        import csv
+        with open(img_history_path, 'r') as f:
+            reader = csv.DictReader(f)
+            img_history = list(reader)
+
+    return render_template('report.html',
+                           image_report=image_report,
+                           audio_report=audio_report,
+                           img_history=img_history)
 
 @app.route('/settings', methods=['GET'])
 @login_required

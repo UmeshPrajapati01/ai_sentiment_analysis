@@ -6,7 +6,9 @@ import copy
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
 from pathlib import Path
+from sklearn.metrics import classification_report, confusion_matrix
 
 import torch
 import torch.nn as nn
@@ -241,6 +243,45 @@ def save_plots(history):
     plt.close()
     print("Training plots saved.")
 
+
+def save_evaluation_report(model, dataloader, class_names):
+    """
+    Runs inference on the validation set and saves:
+    - classification_report.txt (accuracy, precision, recall, F1 per class)
+    - confusion_matrix.png
+    """
+    model.eval()
+    all_preds = []
+    all_labels = []
+
+    with torch.no_grad():
+        for inputs, labels in dataloader:
+            inputs = inputs.to(device)
+            outputs = model(inputs)
+            _, preds = torch.max(outputs, 1)
+            all_preds.extend(preds.cpu().numpy())
+            all_labels.extend(labels.numpy())
+
+    # Classification report (accuracy + F1 per class)
+    report = classification_report(all_labels, all_preds, target_names=class_names)
+    print("\nClassification Report:\n", report)
+    with open(OUTPUT_DIR / 'classification_report.txt', 'w') as f:
+        f.write(report)
+    print("Classification report saved.")
+
+    # Confusion matrix
+    cm = confusion_matrix(all_labels, all_preds)
+    plt.figure(figsize=(10, 8))
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues',
+                xticklabels=class_names, yticklabels=class_names)
+    plt.title('Confusion Matrix — Image Model')
+    plt.ylabel('True Label')
+    plt.xlabel('Predicted Label')
+    plt.tight_layout()
+    plt.savefig(OUTPUT_DIR / 'confusion_matrix.png')
+    plt.close()
+    print("Confusion matrix saved.")
+
 # ==========================================
 # MAIN EXECUTION
 # ==========================================
@@ -291,6 +332,9 @@ def main():
     
     # Save Plots
     save_plots(history)
+
+    # Save Evaluation Report (confusion matrix + F1 per class)
+    save_evaluation_report(model_ft, dataloaders['val'], class_names)
     
     # Save Class Names for inference
     with open(OUTPUT_DIR / 'classes.txt', 'w') as f:

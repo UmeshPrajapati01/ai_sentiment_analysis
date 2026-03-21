@@ -62,7 +62,7 @@
                 <div class="dash-card-header">
                     <h3>📈 Weekly Emotion Trend</h3>
                     <select
-                        style="padding:5px 10px;border:1px solid #e2e8f0;border-radius:6px;font-size:0.8rem;color:#64748b;cursor:pointer;">
+                        style="padding:5px 10px;border:1px solid var(--dash-border);border-radius:6px;font-size:0.8rem;color:var(--dash-text2);background:var(--dash-card);cursor:pointer;">
                         <option>This Week</option>
                         <option>This Month</option>
                     </select>
@@ -99,7 +99,7 @@
                 </div>
                 {% if emotion_distribution and total_predictions > 0 %}
                 {% for emotion, count in emotion_distribution.items() %}
-                <div class="progress-bar-wrap">
+                <div class="progress-bar-wrap slide-in-row" style="animation-delay:{{ loop.index0 * 0.08 }}s">
                     <div class="progress-label">
                         <span>{{ emotion }}</span>
                         <span>{{ (count / total_predictions * 100)|int }}%</span>
@@ -170,17 +170,17 @@
             #3b82f6 {{ (image_count / total_predictions * 100)|int }}% 100%
           );display:flex;align-items:center;justify-content:center;position:relative;">
                         <div
-                            style="width:100px;height:100px;border-radius:50%;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;">
-                            <div style="font-size:1.4rem;font-weight:800;color:#1e293b;">{{ total_predictions }}</div>
-                            <div style="font-size:0.7rem;color:#94a3b8;">Total</div>
+                            style="width:100px;height:100px;border-radius:50%;background:var(--dash-card);display:flex;flex-direction:column;align-items:center;justify-content:center;">
+                            <div style="font-size:1.4rem;font-weight:800;color:var(--dash-text);">{{ total_predictions }}</div>
+                            <div style="font-size:0.7rem;color:var(--dash-text2);">Total</div>
                         </div>
                     </div>
                 </div>
                 <div style="display:flex;gap:24px;justify-content:center;margin-top:12px;">
-                    <div style="display:flex;align-items:center;gap:8px;font-size:0.85rem;color:#64748b;"><span
+                    <div style="display:flex;align-items:center;gap:8px;font-size:0.85rem;color:var(--dash-text2);"><span
                             style="width:10px;height:10px;border-radius:50%;background:#f59e0b;display:block;"></span>Images
                         ({{ image_count }})</div>
-                    <div style="display:flex;align-items:center;gap:8px;font-size:0.85rem;color:#64748b;"><span
+                    <div style="display:flex;align-items:center;gap:8px;font-size:0.85rem;color:var(--dash-text2);"><span
                             style="width:10px;height:10px;border-radius:50%;background:#3b82f6;display:block;"></span>Audio
                         ({{ audio_count }})</div>
                 </div>
@@ -196,8 +196,7 @@
                 <h3>😸 Emotion Frequency</h3>
                 {% if emotion_distribution %}
                 {% for emotion, count in emotion_distribution.items() %}
-                <div
-                    style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f1f5f9;">
+                <div class="slide-in-row" style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--dash-border);animation-delay:{{ loop.index0 * 0.08 }}s">
                     <div style="display:flex;align-items:center;gap:10px;">
                         <span style="font-size:1.4rem;">
                             {% if emotion|lower == 'happy' %}😸
@@ -208,11 +207,11 @@
                             {% elif emotion|lower == 'relaxed' %}😺
                             {% else %}🐱{% endif %}
                         </span>
-                        <span style="font-weight:600;color:#1e293b;font-size:0.9rem;">{{ emotion }}</span>
+                        <span style="font-weight:600;color:var(--dash-text);font-size:0.9rem;">{{ emotion }}</span>
                     </div>
                     <div style="display:flex;align-items:center;gap:10px;">
                         <span style="font-weight:700;color:#d97706;font-size:0.9rem;">{{ count }}×</span>
-                        <span style="font-size:0.78rem;color:#94a3b8;">{{ (count/total_predictions*100)|int if
+                        <span style="font-size:0.78rem;color:var(--dash-text2);">{{ (count/total_predictions*100)|int if
                             total_predictions>0 else 0 }}%</span>
                     </div>
                 </div>
@@ -268,6 +267,24 @@
         const toggle = document.getElementById('sidebarToggle');
         const show = () => { if (toggle) toggle.style.display = window.innerWidth <= 768 ? 'flex' : 'none'; };
         window.addEventListener('resize', show); show();
+    })();
+
+    // Slide-in rows — trigger when scrolled into view
+    (function () {
+        var rows = document.querySelectorAll('.slide-in-row');
+        if (!rows.length) return;
+        var obs = new IntersectionObserver(function (entries) {
+            entries.forEach(function (e) {
+                if (e.isIntersecting) {
+                    e.target.style.animationPlayState = 'running';
+                    obs.unobserve(e.target);
+                }
+            });
+        }, { threshold: 0.15 });
+        rows.forEach(function (r) {
+            r.style.animationPlayState = 'paused';
+            obs.observe(r);
+        });
     })();
 </script>
 {% endblock %}
