@@ -1,0 +1,2 @@
+# Development-of-an-AI-Based-Cat-Emotion-Recognition-System-Using-Facial-and-Vocal-Analysis
+The objective of this project is to develop an intelligent system capable of detecting cat emotions using both facial expressions and vocal sounds. The system is designed to help users understand pet behavior through AI-based analysis. The project aims to: • Build deep learning models for emotion detection • 
