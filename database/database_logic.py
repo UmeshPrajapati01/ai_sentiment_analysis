@@ -57,6 +57,7 @@ class User(db.Model, UserMixin):
 
 
 class Prediction(db.Model):
+    """User-facing prediction history — can be deleted/downloaded by user."""
     id                = db.Column(db.Integer, primary_key=True)
     user_id           = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     file_type         = db.Column(db.String(10), nullable=False)
@@ -68,6 +69,19 @@ class Prediction(db.Model):
 
     def __repr__(self):
         return f"Prediction('{self.filename}', '{self.prediction_result}')"
+
+
+class ModelLog(db.Model):
+    """Permanent model-level log — never deleted, powers all dashboard charts/graphs."""
+    id                = db.Column(db.Integer, primary_key=True)
+    user_id           = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    file_type         = db.Column(db.String(10), nullable=False)   # image / audio / fusion
+    prediction_result = db.Column(db.String(100), nullable=False)
+    confidence        = db.Column(db.Float, nullable=True)
+    timestamp         = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f"ModelLog(user={self.user_id}, '{self.prediction_result}', {self.timestamp})"
 
 
 def init_db(app):

@@ -7,7 +7,7 @@ from flask_login import LoginManager, login_user, login_required, logout_user, c
 from flask_bcrypt import Bcrypt
 from werkzeug.utils import secure_filename
 
-from database.database_logic import db, init_db, User, Prediction, PLANS, CREDIT_COSTS
+from database.database_logic import db, init_db, User, Prediction, ModelLog, PLANS, CREDIT_COSTS
 from backend.inference.predictor import predict_image, predict_audio
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -42,11 +42,13 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def get_user_stats(user_id):
-    all_preds = Prediction.query.filter_by(user_id=user_id).all()
+    # Stats use ModelLog (permanent) so counts never reset when user clears history
+    all_preds = ModelLog.query.filter_by(user_id=user_id).all()
     total = len(all_preds)
     image_count = sum(1 for p in all_preds if p.file_type == 'image')
     audio_count = sum(1 for p in all_preds if p.file_type == 'audio')
     emotion_counts = Counter(p.prediction_result for p in all_preds)
+    # Recent activity still comes from user-facing Prediction table
     recent = Prediction.query.filter_by(user_id=user_id).order_by(Prediction.timestamp.desc()).limit(10).all()
     return {
         'total_predictions': total,
@@ -179,7 +181,15 @@ def dashboard():
                     confidence=confidence,
                     credits_used=credits_used,
                 )
-                db.session.add(pred_entry); db.session.commit()
+                db.session.add(pred_entry)
+                # ModelLog — permanent, never deleted, powers charts
+                db.session.add(ModelLog(
+                    user_id=current_user.id,
+                    file_type=file_type,
+                    prediction_result=result,
+                    confidence=confidence,
+                ))
+                db.session.commit()
                 flash(f'credit_used:{credits_used}:{file_type}', 'info')
 
             except Exception as e:
@@ -232,7 +242,15 @@ def fusion():
             confidence=fusion_conf,
             credits_used=cost,
         )
-        db.session.add(pred_entry); db.session.commit()
+        db.session.add(pred_entry)
+        # ModelLog — permanent, never deleted, powers charts
+        db.session.add(ModelLog(
+            user_id=current_user.id,
+            file_type='fusion',
+            prediction_result=fusion_result,
+            confidence=fusion_conf,
+        ))
+        db.session.commit()
 
         return jsonify({
             'image': img_result,
@@ -328,6 +346,28 @@ def download_history():
         csv_data,
         mimetype='text/csv',
         headers={'Content-Disposition': 'attachment; filename=meowmood_history.csv'}
+    )
+
+@app.route('/model-history')
+@login_required
+def model_history():
+    logs = ModelLog.query.filter_by(user_id=current_user.id).order_by(ModelLog.timestamp.desc()).all()
+    return render_template('model_history.html', logs=logs)
+
+@app.route('/model-history/download')
+@login_required
+def download_model_history():
+    logs = ModelLog.query.filter_by(user_id=current_user.id).order_by(ModelLog.timestamp.desc()).all()
+    lines = ['#,Type,Emotion Detected,Confidence,Date & Time']
+    for i, l in enumerate(logs, 1):
+        ts   = l.timestamp.strftime('%Y-%m-%d %H:%M:%S')
+        conf = f'{l.confidence:.2f}' if l.confidence else 'N/A'
+        lines.append(f'{i},{l.file_type},{l.prediction_result},{conf},{ts}')
+    csv_data = '\n'.join(lines)
+    return Response(
+        csv_data,
+        mimetype='text/csv',
+        headers={'Content-Disposition': 'attachment; filename=meowmood_model_history.csv'}
     )
 
 @app.route('/report')
@@ -431,7 +471,8 @@ def settings_save():
 @app.route('/api/chart-data')
 @login_required
 def chart_data():
-    all_preds = Prediction.query.filter_by(user_id=current_user.id).all()
+    # Charts always use ModelLog — permanent, unaffected by user history deletion
+    all_preds = ModelLog.query.filter_by(user_id=current_user.id).all()
     today = datetime.utcnow().date()
 
     # Emotion distribution — only single-emotion results (no fusion "X / Y")

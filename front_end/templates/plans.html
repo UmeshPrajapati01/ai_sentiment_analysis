@@ -40,20 +40,20 @@
     <div class="dash-card reveal" style="margin-bottom:28px;">
       <div class="dash-card-header"><h3>💡 Credit Costs</h3></div>
       <div style="display:flex;gap:16px;flex-wrap:wrap;">
-        <div style="flex:1;min-width:140px;text-align:center;padding:16px;border-radius:12px;background:#f8fafc;border:1px solid #e2e8f0;">
+        <div style="flex:1;min-width:140px;text-align:center;padding:16px;border-radius:12px;background:var(--dash-card);border:1px solid var(--dash-border);">
           <div style="font-size:1.8rem;margin-bottom:6px;">📸</div>
-          <div style="font-weight:800;font-size:1.2rem;color:#0f172a;">{{ credit_costs.image }} Credit</div>
-          <div style="font-size:0.78rem;color:#64748b;margin-top:4px;">Image Analysis</div>
+          <div style="font-weight:800;font-size:1.2rem;color:var(--dash-text);">{{ credit_costs.image }} Credit</div>
+          <div style="font-size:0.78rem;color:var(--dash-text2);margin-top:4px;">Image Analysis</div>
         </div>
-        <div style="flex:1;min-width:140px;text-align:center;padding:16px;border-radius:12px;background:#f8fafc;border:1px solid #e2e8f0;">
+        <div style="flex:1;min-width:140px;text-align:center;padding:16px;border-radius:12px;background:var(--dash-card);border:1px solid var(--dash-border);">
           <div style="font-size:1.8rem;margin-bottom:6px;">🎵</div>
-          <div style="font-weight:800;font-size:1.2rem;color:#0f172a;">{{ credit_costs.audio }} Credits</div>
-          <div style="font-size:0.78rem;color:#64748b;margin-top:4px;">Audio Analysis</div>
+          <div style="font-weight:800;font-size:1.2rem;color:var(--dash-text);">{{ credit_costs.audio }} Credits</div>
+          <div style="font-size:0.78rem;color:var(--dash-text2);margin-top:4px;">Audio Analysis</div>
         </div>
-        <div style="flex:1;min-width:140px;text-align:center;padding:16px;border-radius:12px;background:linear-gradient(135deg,rgba(0,229,255,0.06),rgba(168,85,247,0.06));border:1px solid rgba(168,85,247,0.15);">
+        <div style="flex:1;min-width:140px;text-align:center;padding:16px;border-radius:12px;background:linear-gradient(135deg,rgba(var(--cyan-rgb,0,229,255),0.06),rgba(168,85,247,0.06));border:1px solid var(--dash-border);">
           <div style="font-size:1.8rem;margin-bottom:6px;">🔀</div>
-          <div style="font-weight:800;font-size:1.2rem;color:#0f172a;">{{ credit_costs.fusion }} Credits</div>
-          <div style="font-size:0.78rem;color:#64748b;margin-top:4px;">Fusion Analysis</div>
+          <div style="font-weight:800;font-size:1.2rem;color:var(--dash-text);">{{ credit_costs.fusion }} Credits</div>
+          <div style="font-size:0.78rem;color:var(--dash-text2);margin-top:4px;">Fusion Analysis</div>
         </div>
       </div>
     </div>
@@ -125,7 +125,7 @@
       </div>
 
       <!-- YEARLY -->
-      <div class="plan-card" style="border-color:rgba(0,229,255,0.3);background:linear-gradient(135deg,#f0fdff,#faf5ff);">
+      <div class="plan-card" style="border-color:var(--cyan);">
         <div class="plan-name">👑 Yearly</div>
         <div class="plan-price">$49.99<span>/year</span></div>
         <div class="plan-credits">Unlimited credits</div>
@@ -140,7 +140,7 @@
         <span class="plan-current-badge">✅ Current Plan</span>
         {% else %}
         <form method="POST" action="{{ url_for('subscribe', plan_key='yearly') }}">
-          <button type="submit" class="btn btn-primary btn-sm" style="width:100%;background:linear-gradient(135deg,#00e5ff,#a855f7);">Get Yearly</button>
+          <button type="submit" class="btn btn-primary btn-sm" style="width:100%;">Get Yearly</button>
         </form>
         {% endif %}
       </div>

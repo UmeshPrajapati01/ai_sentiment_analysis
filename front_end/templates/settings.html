@@ -101,11 +101,11 @@
             <div style="font-size:0.78rem;color:var(--dash-text2);margin-bottom:14px;">Choose your colour palette</div>
             <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;" id="themePicker">
 
-              <button class="theme-btn" data-theme="dark-neon" onclick="applyTheme('dark-neon',this)" title="Dark Neon">
-                <div class="theme-preview" style="background:linear-gradient(135deg,#060810,#0d1117);border:2px solid rgba(0,229,255,0.4);">
-                  <span style="color:#00e5ff;font-size:1.1rem;">⚡</span>
+              <button class="theme-btn" data-theme="solar-amber" onclick="applyTheme('solar-amber',this)" title="Solar Amber">
+                <div class="theme-preview" style="background:linear-gradient(135deg,#0f0a00,#241a00);border:2px solid rgba(255,194,0,0.4);">
+                  <span style="color:#ffc200;font-size:1.1rem;">☀️</span>
                 </div>
-                <div class="theme-name">Dark Neon</div>
+                <div class="theme-name">Solar Amber</div>
               </button>
 
               <button class="theme-btn" data-theme="midnight-purple" onclick="applyTheme('midnight-purple',this)" title="Midnight Purple">
@@ -218,6 +218,25 @@
         </div>
       </div>
 
+      <!-- Model History -->
+      <div class="dash-card reveal">
+        <div class="dash-card-header">
+          <h3>Model History</h3>
+          <a href="{{ url_for('model_history') }}" style="color:var(--cyan);font-size:0.82rem;font-weight:600;">View All →</a>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+          <div style="flex:1;">
+            <div style="font-size:0.88rem;color:var(--dash-text2);line-height:1.7;">
+              Permanent prediction log that powers your dashboard charts and graphs. This history is never deleted — even if you clear your user history, your charts stay accurate.
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;flex-shrink:0;">
+            <a href="{{ url_for('model_history') }}" class="btn btn-primary btn-sm">View Log</a>
+            <a href="{{ url_for('download_model_history') }}" class="btn btn-sm" style="background:rgba(16,185,129,0.1);color:#10b981;border:1px solid rgba(16,185,129,0.25);border-radius:999px;font-weight:700;">Download CSV</a>
+          </div>
+        </div>
+      </div>
+
       <!-- Danger Zone -->
       <div class="dash-card reveal" style="border:1px solid rgba(239,68,68,0.2);background:rgba(239,68,68,0.02);">
         <div class="dash-card-header"><h3 style="color:#ef4444;">⚠️ Danger Zone</h3></div>
@@ -269,7 +288,7 @@
 
   // ── Theme definitions ──
   var THEMES = {
-    'dark-neon':        { bg:'#060810', bg2:'#0b0f1a', card:'#0d1117', border:'rgba(255,255,255,0.08)', cyan:'#00e5ff', purple:'#a855f7', text:'#e2e8f0', text2:'#94a3b8' },
+    'solar-amber':      { bg:'#0f0a00', bg2:'#1a1200', card:'#241a00', border:'rgba(255,200,0,0.1)', cyan:'#ffc200', purple:'#ff6b00', text:'#e2e8f0', text2:'#94a3b8' },
     'midnight-purple':  { bg:'#0d0618', bg2:'#130820', card:'#1a0a2e', border:'rgba(168,85,247,0.15)', cyan:'#c084fc', purple:'#a855f7', text:'#e2e8f0', text2:'#94a3b8' },
     'ocean-cyan':       { bg:'#020d14', bg2:'#041c2c', card:'#062030', border:'rgba(6,182,212,0.15)',   cyan:'#06b6d4', purple:'#0ea5e9', text:'#e2e8f0', text2:'#94a3b8' },
     'soft-dark':        { bg:'#1a1a2e', bg2:'#16213e', card:'#1f2b47', border:'rgba(236,72,153,0.15)',  cyan:'#ec4899', purple:'#8b5cf6', text:'#e2e8f0', text2:'#94a3b8' },
@@ -316,7 +335,7 @@
   };
 
   // ── Restore saved preferences on load ──
-  var savedTheme  = localStorage.getItem('meowmood_theme')  || 'dark-neon';
+  var savedTheme  = localStorage.getItem('meowmood_theme')  || 'solar-amber';
   var savedAccent = localStorage.getItem('meowmood_accent');
   var savedCompact = localStorage.getItem('meowmood_compact');
 
