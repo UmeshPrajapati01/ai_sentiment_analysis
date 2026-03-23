@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% block title %}Subscription Plans | MeowMood{% endblock %}
+{% block page_id %}plans{% endblock %}
+
+{% block body %}
+<div class="dashboard-layout">
+  {% set active_page = 'plans' %}
+  {% include '_sidebar.html' %}
+
+  <main class="main-content" id="mainContent">
+    <button id="sidebarToggle" style="display:none;position:fixed;top:16px;left:16px;z-index:600;width:44px;height:44px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;font-size:1.2rem;cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,0.1);align-items:center;justify-content:center;" aria-label="Toggle sidebar">☰</button>
+
+    <div class="page-header">
+      <div>
+        <h1>Subscription Plans 💎</h1>
+        <p>Choose the plan that fits your cat analysis needs</p>
+      </div>
+      <a href="{{ url_for('dashboard') }}" class="btn-dash btn btn-sm">← Back to Dashboard</a>
+    </div>
+
+    <!-- Current status -->
+    <div class="credits-widget reveal">
+      <div class="credits-icon">⚡</div>
+      <div class="credits-info">
+        <div class="credits-label">Current Credits</div>
+        <div class="credits-value {% if current_user.credits <= 5 %}low{% elif current_user.credits <= 20 %}medium{% endif %}">
+          {{ current_user.credits }}
+          {% if current_user.plan == 'yearly' %}<span style="font-size:0.9rem;color:#94a3b8;"> / ∞</span>{% endif %}
+        </div>
+        <div class="credits-bar-wrap">
+          {% set max_cr = plans[current_user.plan]['credits'] %}
+          {% set pct = [((current_user.credits / max_cr) * 100)|int, 100]|min if max_cr > 0 else 100 %}
+          <div class="credits-bar"><div class="credits-bar-fill" style="width:{{ pct }}%;"></div></div>
+        </div>
+      </div>
+      <span class="credits-plan-badge plan-{{ current_user.plan }}">{{ current_user.plan_label }} Plan</span>
+    </div>
+
+    <!-- Credit costs info -->
+    <div class="dash-card reveal" style="margin-bottom:28px;">
+      <div class="dash-card-header"><h3>💡 Credit Costs</h3></div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:140px;text-align:center;padding:16px;border-radius:12px;background:var(--dash-card);border:1px solid var(--dash-border);">
+          <div style="font-size:1.8rem;margin-bottom:6px;">📸</div>
+          <div style="font-weight:800;font-size:1.2rem;color:var(--dash-text);">{{ credit_costs.image }} Credit</div>
+          <div style="font-size:0.78rem;color:var(--dash-text2);margin-top:4px;">Image Analysis</div>
+        </div>
+        <div style="flex:1;min-width:140px;text-align:center;padding:16px;border-radius:12px;background:var(--dash-card);border:1px solid var(--dash-border);">
+          <div style="font-size:1.8rem;margin-bottom:6px;">🎵</div>
+          <div style="font-weight:800;font-size:1.2rem;color:var(--dash-text);">{{ credit_costs.audio }} Credits</div>
+          <div style="font-size:0.78rem;color:var(--dash-text2);margin-top:4px;">Audio Analysis</div>
+        </div>
+        <div style="flex:1;min-width:140px;text-align:center;padding:16px;border-radius:12px;background:linear-gradient(135deg,rgba(var(--cyan-rgb,0,229,255),0.06),rgba(168,85,247,0.06));border:1px solid var(--dash-border);">
+          <div style="font-size:1.8rem;margin-bottom:6px;">🔀</div>
+          <div style="font-weight:800;font-size:1.2rem;color:var(--dash-text);">{{ credit_costs.fusion }} Credits</div>
+          <div style="font-size:0.78rem;color:var(--dash-text2);margin-top:4px;">Fusion Analysis</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Plans grid -->
+    <div class="plans-grid reveal">
+
+      <!-- FREE -->
+      <div class="plan-card">
+        <div class="plan-name">🐾 Free</div>
+        <div class="plan-price">$0<span>/forever</span></div>
+        <div class="plan-credits">20 credits on signup</div>
+        <div class="plan-features">
+          <div class="plan-feature"><span class="check">✓</span> 20 one-time credits</div>
+          <div class="plan-feature"><span class="check">✓</span> Image & Audio analysis</div>
+          <div class="plan-feature"><span class="check">✓</span> Basic history</div>
+          <div class="plan-feature" style="color:#cbd5e1;"><span>✗</span> Fusion mode</div>
+          <div class="plan-feature" style="color:#cbd5e1;"><span>✗</span> Priority support</div>
+        </div>
+        {% if current_user.plan == 'free' %}
+        <span class="plan-current-badge">✅ Current Plan</span>
+        {% else %}
+        <form method="POST" action="{{ url_for('subscribe', plan_key='free') }}">
+          <button type="submit" class="btn btn-ghost btn-sm" style="width:100%;">Downgrade</button>
+        </form>
+        {% endif %}
+      </div>
+
+      <!-- WEEKLY -->
+      <div class="plan-card">
+        <div class="plan-name">⚡ Weekly</div>
+        <div class="plan-price">$2.99<span>/week</span></div>
+        <div class="plan-credits">100 credits / week</div>
+        <div class="plan-features">
+          <div class="plan-feature"><span class="check">✓</span> 100 credits per week</div>
+          <div class="plan-feature"><span class="check">✓</span> Image & Audio analysis</div>
+          <div class="plan-feature"><span class="check">✓</span> Fusion mode</div>
+          <div class="plan-feature"><span class="check">✓</span> Full history</div>
+          <div class="plan-feature" style="color:#cbd5e1;"><span>✗</span> Priority support</div>
+        </div>
+        {% if current_user.plan == 'weekly' %}
+        <span class="plan-current-badge">✅ Current Plan</span>
+        {% else %}
+        <form method="POST" action="{{ url_for('subscribe', plan_key='weekly') }}">
+          <button type="submit" class="btn btn-primary btn-sm" style="width:100%;">Subscribe</button>
+        </form>
+        {% endif %}
+      </div>
+
+      <!-- MONTHLY -->
+      <div class="plan-card popular">
+        <div class="plan-name">🚀 Monthly</div>
+        <div class="plan-price">$7.99<span>/month</span></div>
+        <div class="plan-credits">500 credits / month</div>
+        <div class="plan-features">
+          <div class="plan-feature"><span class="check">✓</span> 500 credits per month</div>
+          <div class="plan-feature"><span class="check">✓</span> Image & Audio analysis</div>
+          <div class="plan-feature"><span class="check">✓</span> Fusion mode</div>
+          <div class="plan-feature"><span class="check">✓</span> Full history & metrics</div>
+          <div class="plan-feature"><span class="check">✓</span> Priority support</div>
+        </div>
+        {% if current_user.plan == 'monthly' %}
+        <span class="plan-current-badge">✅ Current Plan</span>
+        {% else %}
+        <form method="POST" action="{{ url_for('subscribe', plan_key='monthly') }}">
+          <button type="submit" class="btn btn-purple btn-sm" style="width:100%;">Subscribe</button>
+        </form>
+        {% endif %}
+      </div>
+
+      <!-- YEARLY -->
+      <div class="plan-card" style="border-color:var(--cyan);">
+        <div class="plan-name">👑 Yearly</div>
+        <div class="plan-price">$49.99<span>/year</span></div>
+        <div class="plan-credits">Unlimited credits</div>
+        <div class="plan-features">
+          <div class="plan-feature"><span class="check">✓</span> Unlimited credits</div>
+          <div class="plan-feature"><span class="check">✓</span> All analysis types</div>
+          <div class="plan-feature"><span class="check">✓</span> Fusion mode</div>
+          <div class="plan-feature"><span class="check">✓</span> Full history & metrics</div>
+          <div class="plan-feature"><span class="check">✓</span> Priority support</div>
+        </div>
+        {% if current_user.plan == 'yearly' %}
+        <span class="plan-current-badge">✅ Current Plan</span>
+        {% else %}
+        <form method="POST" action="{{ url_for('subscribe', plan_key='yearly') }}">
+          <button type="submit" class="btn btn-primary btn-sm" style="width:100%;">Get Yearly</button>
+        </form>
+        {% endif %}
+      </div>
+
+    </div>
+
+    <p style="text-align:center;color:#94a3b8;font-size:0.8rem;margin-top:20px;">
+      * This is a demo/local environment. No real payments are processed.
+    </p>
+
+  </main>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function(){
+  const toggle = document.getElementById('sidebarToggle');
+  const show = () => { if(toggle) toggle.style.display = window.innerWidth <= 768 ? 'flex' : 'none'; };
+  window.addEventListener('resize', show); show();
+})();
+</script>
+{% endblock %}

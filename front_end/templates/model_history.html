@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block title %}Model History | MeowMood{% endblock %}
+{% block page_id %}model_history{% endblock %}
+
+{% block body %}
+<div class="dashboard-layout">
+  {% set active_page = 'settings' %}
+  {% include '_sidebar.html' %}
+
+  <main class="main-content" id="mainContent">
+
+    <div class="page-header">
+      <div>
+        <h1>Model History</h1>
+        <p>Permanent prediction log — powers your dashboard charts. Cannot be deleted.</p>
+      </div>
+      <a href="{{ url_for('download_model_history') }}" class="btn btn-primary btn-sm">Download CSV</a>
+    </div>
+
+    <!-- Quick stats -->
+    <div class="stats-grid" style="margin-bottom:24px;">
+      <div class="stat-card">
+        <div class="stat-card-icon">📊</div>
+        <div class="stat-card-value">{{ logs|length }}</div>
+        <div class="stat-card-label">Total Predictions</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon">📸</div>
+        <div class="stat-card-value">{{ logs|selectattr('file_type','eq','image')|list|length }}</div>
+        <div class="stat-card-label">Image Analyses</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon">🎵</div>
+        <div class="stat-card-value">{{ logs|selectattr('file_type','eq','audio')|list|length }}</div>
+        <div class="stat-card-label">Audio Analyses</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon">🔀</div>
+        <div class="stat-card-value">{{ logs|selectattr('file_type','eq','fusion')|list|length }}</div>
+        <div class="stat-card-label">Fusion Analyses</div>
+      </div>
+    </div>
+
+    <!-- Info banner -->
+    <div style="display:flex;align-items:center;gap:12px;padding:14px 18px;background:rgba(255,194,0,0.06);border:1px solid rgba(255,194,0,0.2);border-radius:14px;margin-bottom:20px;">
+      <span style="font-size:1.3rem;">🔒</span>
+      <div>
+        <div style="font-weight:700;color:var(--dash-text);font-size:0.88rem;">This log is permanent</div>
+        <div style="font-size:0.78rem;color:var(--dash-text2);margin-top:2px;">Model history is never deleted — it ensures your dashboard charts and graphs always reflect accurate data, even if you clear your user history.</div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="dash-card">
+      <div class="dash-card-header">
+        <h3>All Prediction Logs</h3>
+        <span style="font-size:0.8rem;color:var(--dash-text2);">{{ logs|length }} records</span>
+      </div>
+
+      {% if logs %}
+      <div style="overflow-x:auto;">
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Type</th>
+              <th>Emotion Detected</th>
+              <th>Confidence</th>
+              <th>Date & Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for log in logs %}
+            <tr class="slide-in-row" style="animation-delay:{{ loop.index0 * 0.03 }}s;">
+              <td data-label="#">{{ loop.index }}</td>
+              <td data-label="Type">
+                <span class="type-badge {{ log.file_type }}">
+                  {% if log.file_type == 'image' %}📸{% elif log.file_type == 'audio' %}🎵{% else %}🔀{% endif %}
+                  {{ log.file_type|capitalize }}
+                </span>
+              </td>
+              <td data-label="Emotion">
+                <span class="emotion-badge">{{ log.prediction_result }}</span>
+              </td>
+              <td data-label="Confidence">
+                {% if log.confidence %}
+                  <span style="font-weight:700;color:var(--cyan);">{{ (log.confidence * 100)|round(1) }}%</span>
+                {% else %}
+                  <span style="color:var(--dash-text2);">—</span>
+                {% endif %}
+              </td>
+              <td data-label="Date & Time" style="color:var(--dash-text2);font-size:0.82rem;">
+                {{ log.timestamp.strftime('%b %d, %Y · %H:%M') }}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div style="text-align:center;padding:60px 20px;">
+        <div style="font-size:3rem;margin-bottom:16px;">📭</div>
+        <div style="font-weight:700;color:var(--dash-text);margin-bottom:8px;">No predictions yet</div>
+        <div style="color:var(--dash-text2);font-size:0.88rem;">Run your first analysis on the dashboard to see logs here.</div>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-sm" style="margin-top:20px;">Go to Dashboard</a>
+      </div>
+      {% endif %}
+    </div>
+
+  </main>
+</div>
+{% endblock %}

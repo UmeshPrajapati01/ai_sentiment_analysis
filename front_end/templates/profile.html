@@ -1,0 +1,262 @@
+{% extends "base.html" %}
+{% block description %}MeowMood Profile — Manage your account and view your cat analysis history.{% endblock %}
+{% block title %}Profile | MeowMood{% endblock %}
+{% block page_id %}profile{% endblock %}
+
+{% block body %}
+<div class="dashboard-layout">
+  {% set active_page = 'profile' %}
+  {% include '_sidebar.html' %}
+
+  <main class="main-content" id="mainContent">
+    <button id="sidebarToggle" style="display:none;position:fixed;top:16px;left:16px;z-index:600;width:44px;height:44px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;font-size:1.2rem;cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,0.1);align-items:center;justify-content:center;" aria-label="Toggle sidebar">☰</button>
+
+    <!-- Header -->
+    <div class="page-header">
+      <div>
+        <h1>My Profile 👤</h1>
+        <p>Manage your account and view your stats</p>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="document.getElementById('editModal').style.display='flex'">✏️ Edit Profile</button>
+    </div>
+
+    <!-- Profile Banner -->
+    <div class="profile-banner" style="margin-bottom:24px;">
+      <video autoplay muted loop playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.15;">
+        <source src="{{ url_for('serve_media', filename='abstract-slow-moving-particle-field-in-deep-dark-b.mp4') }}" type="video/mp4">
+      </video>
+      <div class="profile-avatar-wrap" style="z-index:2;">
+        <div class="profile-avatar">{{ current_user.display_name[0].upper() if current_user.display_name else '🐱' }}</div>
+        <div class="profile-name-section">
+          <h2 style="color:#fff;">{{ current_user.display_name }}</h2>
+          <p style="color:rgba(255,255,255,0.65);">{{ current_user.email }}</p>
+          <span class="credits-plan-badge plan-{{ current_user.plan }}" style="margin-top:6px;display:inline-block;">{{ current_user.plan_label }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid reveal">
+      <div class="stat-card"><div class="stat-card-icon">🐾</div><div class="stat-card-value">{{ total_predictions }}</div><div class="stat-card-label">Total Predictions</div><div class="stat-card-change">↑ All Time</div></div>
+      <div class="stat-card"><div class="stat-card-icon">📸</div><div class="stat-card-value">{{ image_count }}</div><div class="stat-card-label">Images Analyzed</div><div class="stat-card-change">📸 Photos</div></div>
+      <div class="stat-card"><div class="stat-card-icon">🎵</div><div class="stat-card-value">{{ audio_count }}</div><div class="stat-card-label">Audio Analyzed</div><div class="stat-card-change">🎵 Audio</div></div>
+      <div class="stat-card"><div class="stat-card-icon">🎯</div><div class="stat-card-value">{{ unique_emotions }}</div><div class="stat-card-label">Unique Emotions</div><div class="stat-card-change">✅ Detected</div></div>
+    </div>
+
+    <!-- Info + Emotion Breakdown -->
+    <div class="profile-grid reveal" style="margin-bottom:24px;">
+      <div class="profile-card">
+        <h3>👤 Personal Information</h3>
+        <div class="profile-field"><span class="profile-field-label">Full Name</span><span class="profile-field-value">{{ current_user.display_name }}</span></div>
+        <div class="profile-field"><span class="profile-field-label">Email</span><span class="profile-field-value">{{ current_user.email }}</span></div>
+        <div class="profile-field"><span class="profile-field-label">Plan</span><span class="profile-field-value"><span class="credits-plan-badge plan-{{ current_user.plan }}">{{ current_user.plan_label }}</span></span></div>
+        <div class="profile-field"><span class="profile-field-label">Credits</span><span class="profile-field-value" style="color:#00e5ff;font-weight:800;">⚡ {{ current_user.credits }}</span></div>
+        <div class="profile-field"><span class="profile-field-label">Total Predictions</span><span class="profile-field-value">{{ total_predictions }}</span></div>
+        <div class="profile-field" style="border:none;"><span class="profile-field-label">Member Since</span><span class="profile-field-value">2026</span></div>
+      </div>
+
+      <div class="profile-card">
+        <h3>🎯 Emotion Breakdown</h3>
+        {% if emotion_distribution and total_predictions > 0 %}
+          {% for emotion, count in emotion_distribution.items() %}
+          <div class="progress-bar-wrap">
+            <div class="progress-label">
+              <span>{% if emotion|lower=='happy' %}😸{% elif emotion|lower=='angry' %}😾{% elif emotion|lower in ['sad','sadness'] %}😿{% elif emotion|lower in ['scared','fear'] %}🙀{% elif emotion|lower=='curious' %}🔍{% elif emotion|lower=='relaxed' %}😺{% else %}🐱{% endif %} {{ emotion }}</span>
+              <span>{{ count }} · {{ (count/total_predictions*100)|int }}%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" data-width="{{ (count/total_predictions*100)|int }}%" style="width:0;background:linear-gradient(90deg,{% if loop.index0%4==0 %}#00e5ff,#00b8d9{% elif loop.index0%4==1 %}#a855f7,#c084fc{% elif loop.index0%4==2 %}#10b981,#34d399{% else %}#ec4899,#f472b6{% endif %});"></div>
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div style="text-align:center;padding:40px 0;color:#94a3b8;">
+            <div style="font-size:3rem;margin-bottom:12px;">📊</div>
+            <p style="font-size:0.88rem;">No analyses yet — start from the dashboard!</p>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-sm" style="margin-top:16px;">Go Analyze</a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Video Showcase — Auto-cycling carousel -->
+    <div class="dash-card reveal" style="margin-bottom:24px;">
+      <div class="dash-card-header">
+        <h3>🎬 MeowMood in Action</h3>
+        <span style="color:#94a3b8;font-size:0.82rem;">AI-powered cat emotion clips</span>
+      </div>
+
+      <div id="videoCarousel" style="position:relative;border-radius:16px;overflow:hidden;background:#000;aspect-ratio:16/7;">
+        <!-- Videos stacked, only active one visible -->
+        <video id="vcVid" autoplay muted playsinline style="width:100%;height:100%;object-fit:cover;display:block;transition:opacity 0.6s ease;" preload="auto"></video>
+
+        <!-- Overlay gradient -->
+        <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(6,8,16,0.92) 0%,rgba(6,8,16,0.1) 50%,transparent 100%);pointer-events:none;"></div>
+
+        <!-- Scan line -->
+        <div id="vcScan" style="position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#00e5ff,transparent);box-shadow:0 0 18px #00e5ff;animation:vcScanAnim 3.5s linear infinite;pointer-events:none;z-index:3;"></div>
+        <style>@keyframes vcScanAnim{0%{top:-2px;opacity:0}5%{opacity:1}95%{opacity:0.8}100%{top:100%;opacity:0}}</style>
+
+        <!-- Label overlay -->
+        <div style="position:absolute;bottom:0;left:0;right:0;padding:22px 26px;z-index:4;">
+          <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+            <div>
+              <div id="vcEmoji" style="font-size:2rem;margin-bottom:6px;transition:all 0.4s ease;">😸</div>
+              <div id="vcLabel" style="font-family:'Space Grotesk',sans-serif;font-size:1.5rem;font-weight:800;color:#fff;transition:all 0.4s ease;">Happy</div>
+              <div id="vcSub" style="color:rgba(255,255,255,0.5);font-size:0.82rem;margin-top:3px;transition:all 0.4s ease;">AI scan · real-time analysis</div>
+            </div>
+            <!-- Dot indicators -->
+            <div id="vcDots" style="display:flex;gap:7px;align-items:center;padding-bottom:4px;"></div>
+          </div>
+          <!-- Confidence bar -->
+          <div style="margin-top:14px;height:3px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden;">
+            <div id="vcProgress" style="height:100%;border-radius:2px;transition:width 0.4s ease;"></div>
+          </div>
+        </div>
+
+        <!-- Prev / Next arrows -->
+        <button onclick="vcStep(-1)" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);z-index:5;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.15);color:#fff;font-size:1rem;cursor:pointer;backdrop-filter:blur(8px);transition:all 0.2s;" aria-label="Previous">‹</button>
+        <button onclick="vcStep(1)"  style="position:absolute;right:14px;top:50%;transform:translateY(-50%);z-index:5;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.15);color:#fff;font-size:1rem;cursor:pointer;backdrop-filter:blur(8px);transition:all 0.2s;" aria-label="Next">›</button>
+      </div>
+    </div>
+
+    <!-- Recent Predictions -->
+    <div class="dash-card reveal" style="margin-bottom:24px;">
+      <div class="dash-card-header">
+        <h3>📋 Recent Predictions</h3>
+        <a href="{{ url_for('history') }}" style="color:#00e5ff;font-size:0.82rem;font-weight:600;">View All →</a>
+      </div>
+      <div class="activity-list">
+        {% if recent_predictions %}
+          {% for pred in recent_predictions %}
+          <div class="activity-item">
+            <div class="activity-icon" style="background:{{ 'rgba(0,229,255,0.1)' if pred.file_type=='image' else ('rgba(168,85,247,0.1)' if pred.file_type=='audio' else 'rgba(16,185,129,0.1)') }};">{{ '📸' if pred.file_type=='image' else ('🎵' if pred.file_type=='audio' else '🔀') }}</div>
+            <div class="activity-info">
+              <div class="activity-text">{{ pred.prediction_result }} — {{ pred.filename }}</div>
+              <div class="activity-time">{{ pred.timestamp.strftime('%b %d, %Y at %I:%M %p') }}</div>
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="activity-item">
+            <div class="activity-icon" style="background:rgba(0,229,255,0.1);">🐾</div>
+            <div class="activity-info"><div class="activity-text">No predictions yet — start analyzing!</div><div class="activity-time">Just now</div></div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Edit Modal -->
+<div id="editModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:20px;padding:40px;width:90%;max-width:460px;box-shadow:0 32px 80px rgba(0,0,0,0.3);">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;">
+      <h2 style="font-size:1.4rem;font-weight:800;color:#1e293b;">Edit Profile</h2>
+      <button onclick="document.getElementById('editModal').style.display='none'" style="font-size:1.5rem;cursor:pointer;background:none;border:none;color:#94a3b8;" aria-label="Close">✕</button>
+    </div>
+    <form method="POST" action="{{ url_for('update_profile') }}">
+      <div class="form-group">
+        <label style="color:#64748b;">Display Name</label>
+        <input type="text" class="form-control" style="background:#f8fafc;border-color:#e2e8f0;color:#1e293b;" value="{{ current_user.display_name }}" name="display_name">
+      </div>
+      <div class="form-group">
+        <label style="color:#64748b;">Bio</label>
+        <textarea class="form-control" rows="3" name="bio" style="background:#f8fafc;border-color:#e2e8f0;color:#1e293b;resize:vertical;">Cat lover & MeowMood user 🐱</textarea>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;">💾 Save Changes</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function(){
+  const toggle = document.getElementById('sidebarToggle');
+  const show = () => { if(toggle) toggle.style.display = window.innerWidth<=768?'flex':'none'; };
+  window.addEventListener('resize',show); show();
+  document.getElementById('editModal').addEventListener('click',function(e){ if(e.target===this) this.style.display='none'; });
+})();
+
+// ── Video Carousel ──────────────────────────────────────────────
+const VC_CLIPS = [
+  { src: "{{ url_for('serve_media', filename='a-happy-playful-kitten-with-ears-perked-up-bright-.mp4') }}",       emoji:'😸', label:'Happy',            sub:'Playful energy detected',          color:'#10b981', conf:94 },
+  { src: "{{ url_for('serve_media', filename='a-cat-lying-on-a-cozy-surface-eyes-half-closed-doi (1).mp4') }}",   emoji:'😺', label:'Relaxed',           sub:'Calm & content state',             color:'#a855f7', conf:88 },
+  { src: "{{ url_for('serve_media', filename='a-cat-walking-slowly-toward-the-camera-in-a-dark-r.mp4') }}",       emoji:'🔍', label:'Curiosity Detected', sub:'AI scan · real-time analysis',     color:'#00e5ff', conf:91 },
+  { src: "{{ url_for('serve_media', filename='a-cat-with-wide-alert-eyes-and-forward-pointing-wh.mp4') }}",       emoji:'😲', label:'Surprised',          sub:'Heightened alertness detected',    color:'#f59e0b', conf:82 },
+  { src: "{{ url_for('serve_media', filename='a-cat-yawning-and-stretching-on-a-dark-surface-sof.mp4') }}",       emoji:'😴', label:'Sleepy',             sub:'Low energy · resting mode',        color:'#6366f1', conf:79 },
+  { src: "{{ url_for('serve_media', filename='close-up-of-a-fluffy-cat-sitting-on-a-dark-surface.mp4') }}",       emoji:'🐱', label:'Neutral',            sub:'Baseline emotional state',         color:'#94a3b8', conf:85 },
+  { src: "{{ url_for('serve_media', filename='a-cat-meowing-softly-sound-wave-visualization-appe (1).mp4') }}",   emoji:'🎵', label:'Vocal / Expressive',  sub:'Audio emotion pattern detected',   color:'#ec4899', conf:87 },
+  { src: "{{ url_for('serve_media', filename='a-cat-and-its-owner-sharing-a-calm-moment-cat-slow.mp4') }}",       emoji:'🥰', label:'Affectionate',        sub:'Bonding behaviour detected',       color:'#f472b6', conf:90 },
+  { src: "{{ url_for('serve_media', filename='split-screen-style-left-side-shows-a-cats-face-wit.mp4') }}",       emoji:'🔀', label:'Fusion Analysis',     sub:'Multi-modal emotion detection',    color:'#00e5ff', conf:96 },
+  { src: "{{ url_for('serve_media', filename='AI_Analyzes_Cat_s_Curiosity.mp4') }}",                              emoji:'🤖', label:'AI Analysis Mode',    sub:'Neural network processing',        color:'#a855f7', conf:99 },
+  { src: "{{ url_for('serve_media', filename='extreme-close-up-of-a-cats-face-camera-slowly-zoom.mp4') }}",       emoji:'🔬', label:'Deep Scan',           sub:'Micro-expression analysis active', color:'#00e5ff', conf:93 },
+  { src: "{{ url_for('serve_media', filename='a-cats-paw-gently-tapping-a-glowing-holographic-sc.mp4') }}",       emoji:'✨', label:'Interactive',         sub:'Engagement behaviour detected',    color:'#10b981', conf:86 },
+];
+
+let vcIdx = 0;
+let vcTimer = null;
+const vid    = document.getElementById('vcVid');
+const lbl    = document.getElementById('vcLabel');
+const emoji  = document.getElementById('vcEmoji');
+const sub    = document.getElementById('vcSub');
+const prog   = document.getElementById('vcProgress');
+const dotsEl = document.getElementById('vcDots');
+
+// Build dots
+VC_CLIPS.forEach((_,i) => {
+  const d = document.createElement('div');
+  d.style.cssText = 'width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.25);cursor:pointer;transition:all 0.3s;';
+  d.addEventListener('click', () => vcGo(i));
+  dotsEl.appendChild(d);
+});
+
+function updateDots(){
+  [...dotsEl.children].forEach((d,i) => {
+    d.style.background = i===vcIdx ? VC_CLIPS[vcIdx].color : 'rgba(255,255,255,0.25)';
+    d.style.transform  = i===vcIdx ? 'scale(1.4)' : 'scale(1)';
+  });
+}
+
+function vcGo(idx){
+  vcIdx = (idx + VC_CLIPS.length) % VC_CLIPS.length;
+  const clip = VC_CLIPS[vcIdx];
+
+  // Fade out
+  vid.style.opacity = '0';
+  setTimeout(() => {
+    vid.src = clip.src;
+    vid.load();
+    vid.play().catch(()=>{});
+    vid.style.opacity = '1';
+  }, 300);
+
+  // Update labels
+  emoji.style.opacity = '0'; lbl.style.opacity = '0'; sub.style.opacity = '0';
+  setTimeout(() => {
+    emoji.textContent = clip.emoji;
+    lbl.textContent   = clip.label;
+    lbl.style.color   = clip.color;
+    sub.textContent   = clip.sub;
+    prog.style.width  = clip.conf + '%';
+    prog.style.background = `linear-gradient(90deg, ${clip.color}, ${clip.color}88)`;
+    emoji.style.opacity = '1'; lbl.style.opacity = '1'; sub.style.opacity = '1';
+  }, 350);
+
+  updateDots();
+  resetTimer();
+}
+
+function vcStep(dir){ vcGo(vcIdx + dir); }
+
+function resetTimer(){
+  clearInterval(vcTimer);
+  vcTimer = setInterval(() => vcGo(vcIdx + 1), 7000);
+}
+
+// Init
+vcGo(0);
+</script>
+{% endblock %}

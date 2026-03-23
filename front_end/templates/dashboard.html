@@ -1,0 +1,722 @@
+{% extends "base.html" %}
+{% block title %}Dashboard | MeowMood{% endblock %}
+{% block page_id %}dashboard{% endblock %}
+
+{% block body %}
+<div class="dashboard-layout">
+  {% set active_page = 'dashboard' %}
+  {% include '_sidebar.html' %}
+
+  <main class="main-content" id="mainContent">
+    <button id="sidebarToggle" style="display:none;position:fixed;top:16px;left:16px;z-index:600;width:44px;height:44px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;font-size:1.2rem;cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,0.1);align-items:center;justify-content:center;" aria-label="Toggle sidebar">☰</button>
+
+    <!-- Header -->
+    <div class="page-header">
+      <div>
+        <h1>Welcome back, <span style="background:linear-gradient(135deg,#00e5ff,#a855f7);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">{{ current_user.display_name }}</span> 👋</h1>
+        <p>Here's what's happening with your furry friends</p>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <a href="#uploadSection" class="btn-dash btn btn-sm" onclick="document.getElementById('uploadSection').scrollIntoView({behavior:'smooth'});return false;">📸 Image</a>
+        <a href="#fusionSection" class="btn btn-purple btn-sm" onclick="document.getElementById('fusionSection').scrollIntoView({behavior:'smooth'});return false;">🔀 Fusion</a>
+      </div>
+    </div>
+
+    <!-- Credits Widget -->
+    <div class="credits-widget reveal">
+      <div class="credits-icon">⚡</div>
+      <div class="credits-info">
+        <div class="credits-label">Available Credits</div>
+        <div class="credits-value {% if current_user.credits <= 5 %}low{% elif current_user.credits <= 20 %}medium{% endif %}" id="creditsDisplay">
+          {{ current_user.credits }}{% if current_user.plan == 'yearly' %} <span style="font-size:0.9rem;color:#94a3b8;">/ ∞</span>{% endif %}
+        </div>
+        <div class="credits-bar-wrap">
+          {% set max_cr = plans[current_user.plan]['credits'] %}
+          {% set pct = [((current_user.credits / max_cr) * 100)|int, 100]|min if max_cr > 0 else 100 %}
+          <div class="credits-bar"><div class="credits-bar-fill" id="creditsBarFill" style="width:{{ pct }}%;"></div></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+        <span class="credits-plan-badge plan-{{ current_user.plan }}">{{ current_user.plan_label }}</span>
+        {% if current_user.plan == 'free' %}
+        <a href="{{ url_for('plans') }}" class="btn btn-primary btn-sm" style="font-size:0.72rem;padding:6px 14px;">⬆ Upgrade</a>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card reveal"><div class="stat-card-icon">🐾</div><div class="stat-card-value" data-count="{{ total_predictions }}">{{ total_predictions }}</div><div class="stat-card-label">Total Predictions</div><div class="stat-card-change">↑ All Time</div></div>
+      <div class="stat-card reveal" style="transition-delay:0.08s"><div class="stat-card-icon">📸</div><div class="stat-card-value" data-count="{{ image_count }}">{{ image_count }}</div><div class="stat-card-label">Image Analyses</div><div class="stat-card-change">📸 Photos</div></div>
+      <div class="stat-card reveal" style="transition-delay:0.16s"><div class="stat-card-icon">🎵</div><div class="stat-card-value" data-count="{{ audio_count }}">{{ audio_count }}</div><div class="stat-card-label">Audio Analyses</div><div class="stat-card-change">🎵 Audio</div></div>
+      <div class="stat-card reveal" style="transition-delay:0.24s"><div class="stat-card-icon">🎯</div><div class="stat-card-value" data-count="{{ unique_emotions }}">{{ unique_emotions }}</div><div class="stat-card-label">Emotions Found</div><div class="stat-card-change">✅ Unique</div></div>
+    </div>
+
+    <!-- Upload Boxes: Image + Audio side by side -->
+    <div class="upload-grid reveal" id="uploadSection">
+
+      <!-- IMAGE BOX -->
+      <div class="upload-box image-box">
+        <div class="upload-box-header">
+          <div class="upload-box-icon">📸</div>
+          <div><div class="upload-box-title">Image Analysis</div><div class="upload-box-sub">Upload a cat photo to detect emotion</div></div>
+        </div>
+        <form method="POST" action="{{ url_for('dashboard') }}" enctype="multipart/form-data" id="imageForm">
+          <input type="hidden" name="file_type" value="image">
+          <div class="scan-wrap" id="imageScanWrap">
+            <div class="drop-zone" id="imageDropZone" role="button" tabindex="0" aria-label="Image drop zone">
+              <div class="drop-zone-icon">🖼️</div>
+              <p class="drop-zone-text" id="imageFileLabel">Drag & drop or click to select</p>
+              <p class="drop-zone-hint">PNG, JPG, JPEG, GIF supported</p>
+            </div>
+          </div>
+          <input type="file" name="file" id="imageFile" accept=".png,.jpg,.jpeg,.gif" required style="display:none;">
+          <button type="submit" class="btn-dash btn" style="width:100%;margin-top:12px;" id="imageAnalyzeBtn">🔍 Analyze Image</button>
+        </form>
+        {% if prediction and request.form.get('file_type') == 'image' %}
+        {% set r = prediction|lower %}
+        <div class="result-box show image-box">
+          <div class="result-label">Emotion Detected</div>
+          <div class="result-emotion">
+            {% if r == 'happy' %}😸{% elif r == 'angry' %}😾{% elif r in ['sad','sadness'] %}😿{% elif r in ['scared','fear'] %}🙀{% elif r == 'curious' %}🔍{% elif r == 'relaxed' %}😺{% else %}🐱{% endif %}
+            {{ prediction }}
+          </div>
+          {% if credits_used and file_type_used == 'image' %}
+          <div style="margin-top:10px;">
+            <div style="display:flex;justify-content:space-between;font-size:0.75rem;color:#94a3b8;margin-bottom:4px;">
+              <span>Confidence</span>
+              <span style="font-weight:700;color:#00e5ff;">
+                {% set last_pred = recent_predictions[0] if recent_predictions else None %}
+                {{ last_pred.confidence|round(1) if last_pred and last_pred.confidence else '—' }}%
+              </span>
+            </div>
+            <div style="height:6px;background:rgba(255,255,255,0.08);border-radius:999px;overflow:hidden;">
+              {% set conf_val = recent_predictions[0].confidence if recent_predictions and recent_predictions[0].confidence else 0 %}
+              <div style="height:100%;border-radius:999px;width:{{ conf_val|round(0)|int }}%;background:{% if conf_val >= 80 %}linear-gradient(90deg,#10b981,#34d399){% elif conf_val >= 60 %}linear-gradient(90deg,#f59e0b,#fbbf24){% else %}linear-gradient(90deg,#ef4444,#f87171){% endif %};transition:width 0.8s ease;"></div>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+        {% if not face_detected %}
+        <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-radius:10px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);margin-top:10px;animation:fadeUp 0.4s ease forwards;">
+          <span style="font-size:1.1rem;flex-shrink:0;">⚠️</span>
+          <div style="font-size:0.8rem;color:#fbbf24;line-height:1.5;">
+            <span style="font-weight:700;">Cat face not clearly detected</span> — prediction still ran but results may be less accurate. For best results, use a clear front-facing photo of your cat.
+          </div>
+        </div>
+        {% endif %}
+        <div class="emotion-hint-bar hint-image">
+          <span class="hint-icon">
+            {% if r == 'happy' %}😸{% elif r == 'angry' %}😾{% elif r in ['sad','sadness'] %}😿{% elif r in ['scared','fear'] %}🙀{% elif r == 'curious' %}🔍{% elif r == 'relaxed' %}😺{% else %}🐱{% endif %}
+          </span>
+          <div class="hint-text">
+            <span class="hint-title">{{ prediction }} — </span>
+            {% if r == 'happy' %}Ears up, eyes soft and slow-blinking. Your cat is content — great time for play or cuddles!
+            {% elif r == 'angry' %}Ears flat, pupils narrow. Give your cat space and avoid direct eye contact.
+            {% elif r in ['sad','sadness'] %}Curled up, quiet, low energy. Check for discomfort or loneliness — extra attention helps.
+            {% elif r in ['scared','fear'] %}Wide eyes, puffed tail, crouched. Remove the stressor and let your cat hide if needed.
+            {% elif r == 'curious' %}Ears forward, whiskers spread, alert gaze. Engage with a toy or new object!
+            {% elif r == 'relaxed' %}Loose body, slow blink, soft posture. Your cat feels completely safe and at ease.
+            {% else %}Emotion detected. Observe body language for more context.
+            {% endif %}
+          </div>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- AUDIO BOX -->
+      <div class="upload-box audio-box" id="audioSection">
+        <div class="upload-box-header">
+          <div class="upload-box-icon">🎵</div>
+          <div><div class="upload-box-title">Audio Analysis</div><div class="upload-box-sub">Upload a cat sound to detect emotion</div></div>
+        </div>
+        <form method="POST" action="{{ url_for('dashboard') }}" enctype="multipart/form-data" id="audioForm">
+          <input type="hidden" name="file_type" value="audio">
+          <div class="scan-wrap" id="audioScanWrap">
+            <div class="drop-zone" id="audioDropZone" role="button" tabindex="0" aria-label="Audio drop zone">
+              <div class="drop-zone-icon">🎙️</div>
+              <p class="drop-zone-text" id="audioFileLabel">Drag & drop or click to select</p>
+              <p class="drop-zone-hint">MP3, WAV supported</p>
+            </div>
+          </div>
+          <input type="file" name="file" id="audioFile" accept=".mp3,.wav" required style="display:none;">
+          <button type="submit" class="btn btn-purple btn-sm" style="width:100%;margin-top:12px;padding:12px;" id="audioAnalyzeBtn">🎵 Analyze Audio</button>
+        </form>
+        {% if prediction and request.form.get('file_type') == 'audio' %}
+        {% set r = prediction|lower %}
+        <div class="result-box show audio-box">
+          <div class="result-label">Emotion Detected</div>
+          <div class="result-emotion">
+            {% if r == 'happy' %}😸{% elif r == 'angry' %}😾{% elif r in ['sad','sadness'] %}😿{% elif r in ['scared','fear'] %}🙀{% elif r == 'curious' %}🔍{% elif r == 'relaxed' %}😺{% else %}🐱{% endif %}
+            {{ prediction }}
+          </div>
+          {% if credits_used and file_type_used == 'audio' %}
+          <div style="margin-top:10px;">
+            <div style="display:flex;justify-content:space-between;font-size:0.75rem;color:#94a3b8;margin-bottom:4px;">
+              <span>Confidence</span>
+              <span style="font-weight:700;color:#a855f7;">
+                {% set last_pred = recent_predictions[0] if recent_predictions else None %}
+                {{ last_pred.confidence|round(1) if last_pred and last_pred.confidence else '—' }}%
+              </span>
+            </div>
+            <div style="height:6px;background:rgba(255,255,255,0.08);border-radius:999px;overflow:hidden;">
+              {% set conf_val = recent_predictions[0].confidence if recent_predictions and recent_predictions[0].confidence else 0 %}
+              <div style="height:100%;border-radius:999px;width:{{ conf_val|round(0)|int }}%;background:{% if conf_val >= 80 %}linear-gradient(90deg,#10b981,#34d399){% elif conf_val >= 60 %}linear-gradient(90deg,#f59e0b,#fbbf24){% else %}linear-gradient(90deg,#ef4444,#f87171){% endif %};transition:width 0.8s ease;"></div>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+        <div class="emotion-hint-bar hint-audio">
+          <span class="hint-icon">
+            {% if r == 'happy' %}😸{% elif r == 'angry' %}😾{% elif r in ['sad','sadness'] %}😿{% elif r in ['scared','fear'] %}🙀{% elif r == 'curious' %}🔍{% elif r == 'relaxed' %}😺{% else %}🐱{% endif %}
+          </span>
+          <div class="hint-text">
+            <span class="hint-title">{{ prediction }} — </span>
+            {% if r == 'happy' %}Trilling or chirping sounds. Your cat is in a great mood — respond with gentle talk!
+            {% elif r == 'angry' %}Hissing, growling or yowling. Back off and give your cat room to calm down.
+            {% elif r in ['sad','sadness'] %}Low, mournful meows. Your cat may be lonely or unwell — check in with them.
+            {% elif r in ['scared','fear'] %}High-pitched cries or silence. Comfort from a distance and remove the threat.
+            {% elif r == 'curious' %}Short, inquisitive chirps. Your cat is exploring — encourage with interactive toys.
+            {% elif r == 'relaxed' %}Soft purring or quiet breathing. All is well — your cat is perfectly comfortable.
+            {% else %}Vocalization detected. Listen for patterns to understand your cat better.
+            {% endif %}
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- FUSION BOX -->
+    <div class="fusion-box reveal" id="fusionSection">
+      <div class="fusion-box-header">
+        <div class="fusion-icon">🔀</div>
+        <div>
+          <div class="fusion-title">Fusion Mode</div>
+          <div class="fusion-sub">Combine image + audio for a deeper multi-modal emotion reading</div>
+        </div>
+      </div>
+      <div class="fusion-inputs">
+        <div class="fusion-input-wrap">
+          <label>Cat Photo</label>
+          <div class="fusion-drop" id="fusionImageDrop" role="button" tabindex="0">
+            <div class="fusion-drop-icon">🖼️</div>
+            <div class="fusion-drop-text" id="fusionImageLabel">Drop image here</div>
+          </div>
+          <input type="file" id="fusionImageFile" accept=".png,.jpg,.jpeg,.gif" style="display:none;">
+        </div>
+        <div class="fusion-input-wrap">
+          <label>Cat Sound</label>
+          <div class="fusion-drop" id="fusionAudioDrop" role="button" tabindex="0">
+            <div class="fusion-drop-icon">🎙️</div>
+            <div class="fusion-drop-text" id="fusionAudioLabel">Drop audio here</div>
+          </div>
+          <input type="file" id="fusionAudioFile" accept=".mp3,.wav" style="display:none;">
+        </div>
+      </div>
+      <button class="fusion-btn" id="fusionBtn">🔀 Run Fusion Analysis</button>
+      <div class="fusion-result" id="fusionResult">
+        <div style="font-size:0.82rem;color:rgba(255,255,255,0.5);margin-bottom:10px;">Fusion Analysis Complete</div>
+        <div class="fusion-result-grid">
+          <div class="fusion-result-item"><div class="label">📸 Image</div><div class="value" id="fusionImageResult">—</div></div>
+          <div class="fusion-result-item main-result"><div class="label">🔀 Combined</div><div class="value" id="fusionCombinedResult">—</div></div>
+          <div class="fusion-result-item"><div class="label">🎵 Audio</div><div class="value" id="fusionAudioResult">—</div></div>
+        </div>
+        <!-- Fusion hint bars — populated by JS -->
+        <div id="fusionHints" style="margin-top:14px;display:flex;flex-direction:column;gap:8px;"></div>
+      </div>
+    </div>
+
+    <!-- Charts + Activity -->
+    <div class="dashboard-grid">
+      <div class="dash-card reveal">
+        <div class="dash-card-header"><h3>📊 Emotion Activity</h3>
+          <span style="font-size:0.75rem;color:#94a3b8;">Daily scans</span>
+        </div>
+        <div style="position:relative;height:160px;">
+          <canvas id="emotionChart"></canvas>
+        </div>
+      </div>
+      <div class="dash-card reveal" style="transition-delay:0.1s">
+        <div class="dash-card-header"><h3>⏱️ Recent Activity</h3><a href="{{ url_for('history') }}" style="color:#00e5ff;font-size:0.82rem;font-weight:600;">View All →</a></div>
+        <div class="activity-list" id="activityList" style="max-height:280px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.1) transparent;">
+          {% if recent_predictions %}
+          {% for pred in recent_predictions %}
+          <div class="activity-item" id="act-{{ pred.id }}" style="position:relative;">
+            <div class="activity-icon" style="background:{{ 'rgba(0,229,255,0.1)' if pred.file_type == 'image' else ('rgba(168,85,247,0.1)' if pred.file_type == 'audio' else 'rgba(16,185,129,0.1)') }};">{{ '📸' if pred.file_type == 'image' else ('🎵' if pred.file_type == 'audio' else '🔀') }}</div>
+            <div class="activity-info"><div class="activity-text">{{ pred.prediction_result }} — {{ pred.filename }}</div><div class="activity-time">{{ pred.timestamp.strftime('%b %d, %Y %I:%M %p') }}</div></div>
+            <button class="act-delete-btn" onclick="deleteActivity({{ pred.id }}, this)" title="Delete this entry" aria-label="Delete">✕</button>
+          </div>
+          {% endfor %}
+          {% else %}
+          <div class="activity-item" id="act-empty"><div class="activity-icon" style="background:rgba(0,229,255,0.1);">🐾</div><div class="activity-info"><div class="activity-text">No predictions yet — upload a file to start!</div><div class="activity-time">Just now</div></div></div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Analytics Charts Row -->
+    <div class="analytics-charts-grid reveal">
+
+      <!-- Area Line Chart: Prediction Growth -->
+      <div class="dash-card analytics-card">
+        <div class="dash-card-header">
+          <h3>📈 Prediction Growth</h3>
+          <span style="font-size:0.75rem;color:#94a3b8;">Cumulative scans</span>
+        </div>
+        <div style="position:relative;height:180px;">
+          <canvas id="accuracyChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Polar Area Chart: Emotion Distribution -->
+      <div class="dash-card analytics-card">
+        <div class="dash-card-header">
+          <h3>🎯 Emotion Distribution</h3>
+          <span style="font-size:0.75rem;color:#94a3b8;">All analyses</span>
+        </div>
+        <div style="position:relative;height:200px;">
+          <canvas id="emotionPieChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Radar Chart: Emotion Profile -->
+      <div class="dash-card analytics-card">
+        <div class="dash-card-header">
+          <h3>🕸️ Emotion Profile</h3>
+          <span style="font-size:0.75rem;color:#94a3b8;">Behaviour pattern</span>
+        </div>
+        <div style="position:relative;height:180px;">
+          <canvas id="radarChart"></canvas>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Second analytics row -->
+    <div class="analytics-charts-grid reveal" style="grid-template-columns:1fr 1fr;margin-top:0;">
+
+      <!-- Stacked Bar: Image vs Audio vs Fusion by day -->
+      <div class="dash-card analytics-card">
+        <div class="dash-card-header">
+          <h3>📊 Scan Type Breakdown</h3>
+          <span style="font-size:0.75rem;color:#94a3b8;">Image · Audio · Fusion</span>
+        </div>
+        <div style="position:relative;height:180px;">
+          <canvas id="scatterChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Horizontal Bar: Top Emotions Ranking -->
+      <div class="dash-card analytics-card">
+        <div class="dash-card-header">
+          <h3>🏆 Top Emotions</h3>
+          <span style="font-size:0.75rem;color:#94a3b8;">Most detected</span>
+        </div>
+        <div style="position:relative;height:180px;">
+          <canvas id="topEmotionsChart"></canvas>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Emotion Guide -->
+    <div class="dash-card reveal" style="background:linear-gradient(135deg,#0b0f1a,#111827);border:1px solid rgba(0,229,255,0.1);">
+      <div class="dash-card-header" style="border-bottom-color:rgba(255,255,255,0.06);"><h3 style="color:#fff;">💡 Emotion Guide</h3><span style="color:rgba(255,255,255,0.3);font-size:0.8rem;">What each emotion looks like</span></div>
+      <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-top:4px;">
+        {% for emoji, name, desc in [('😸','Happy','Ears up, eyes soft'),('😾','Angry','Ears flat, slits'),('😿','Sad','Curled, quiet'),('🙀','Scared','Wide eyes, puffed'),('🔍','Curious','Ears alert, whiskers forward'),('😺','Relaxed','Slow blink, loose body')] %}
+        <div style="text-align:center;padding:14px 8px;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);">
+          <div style="font-size:2rem;margin-bottom:6px;">{{ emoji }}</div>
+          <div style="font-weight:700;color:#fff;font-size:0.85rem;">{{ name }}</div>
+          <div style="font-size:0.7rem;color:rgba(255,255,255,0.35);margin-top:4px;">{{ desc }}</div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- CREDIT USED POPUP -->
+<div class="credit-popup-overlay" id="creditUsedPopup">
+  <div class="credit-popup">
+    <button class="credit-popup-close" onclick="closePopup('creditUsedPopup')">✕</button>
+    <span class="popup-icon">⚡</span>
+    <h3>Credits Used</h3>
+    <div class="popup-badge deduct" id="creditUsedBadge">— credits used</div>
+    <p id="creditUsedMsg">Analysis complete. Credits have been deducted from your account.</p>
+    <label class="popup-snooze-label">
+      <input type="checkbox" id="snoozeCreditsPopup" onchange="handleSnoozeChange(this)">
+      <span>Don't show for 24h</span>
+    </label>
+    <div class="popup-actions">
+      <button class="btn btn-ghost btn-sm" onclick="closePopup('creditUsedPopup')">Got it</button>
+      <a href="{{ url_for('plans') }}" class="btn btn-primary btn-sm">View Plans</a>
+    </div>
+  </div>
+</div>
+
+<!-- CREDITS EXHAUSTED POPUP -->
+<div class="credit-popup-overlay" id="creditExhaustedPopup">
+  <div class="credit-popup">
+    <button class="credit-popup-close" onclick="closePopup('creditExhaustedPopup')">✕</button>
+    <span class="popup-icon">😿</span>
+    <h3>Credits Exhausted</h3>
+    <div class="popup-badge warning">0 credits remaining</div>
+    <p>Your free credits are over. Subscribe to a plan to continue analyzing your cat's emotions.</p>
+    <div class="popup-actions">
+      <button class="btn btn-ghost btn-sm" onclick="closePopup('creditExhaustedPopup')">Maybe later</button>
+      <a href="{{ url_for('plans') }}" class="btn btn-primary btn-sm">🚀 Subscribe Now</a>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+const FLASK_MESSAGES = {{ get_flashed_messages(with_categories=true) | tojson }};
+
+(function(){
+  // Mobile sidebar toggle visibility
+  const toggle = document.getElementById('sidebarToggle');
+  const show = () => { if(toggle) toggle.style.display = window.innerWidth <= 768 ? 'flex' : 'none'; };
+  window.addEventListener('resize', show); show();
+
+  setupDropBox('imageDropZone','imageFile','imageFileLabel','imageScanWrap','imageForm','imageAnalyzeBtn',false);
+  setupDropBox('audioDropZone','audioFile','audioFileLabel','audioScanWrap','audioForm','audioAnalyzeBtn',true);
+
+  function setupDropBox(dropId, inputId, labelId, wrapId, formId, btnId, isPurple) {
+    const drop = document.getElementById(dropId), input = document.getElementById(inputId);
+    const label = document.getElementById(labelId), wrap = document.getElementById(wrapId);
+    const form = document.getElementById(formId), btn = document.getElementById(btnId);
+    if (!drop || !input) return;
+    drop.addEventListener('click', () => input.click());
+    drop.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' ') input.click(); });
+    ['dragenter','dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('drag-over'); }));
+    ['dragleave','drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('drag-over'); }));
+    drop.addEventListener('drop', e => { if(e.dataTransfer.files.length){ input.files = e.dataTransfer.files; label.textContent = '✅ ' + e.dataTransfer.files[0].name; }});
+    input.addEventListener('change', () => { if(input.files.length) label.textContent = '✅ ' + input.files[0].name; });
+    if(form) form.addEventListener('submit', () => {
+      if(wrap){ wrap.classList.add('scanning'); if(isPurple) wrap.classList.add('scanning-purple'); }
+      if(btn){ btn.textContent = '⏳ Analyzing...'; btn.disabled = true; }
+    });
+  }
+
+  setupFusionDrop('fusionImageDrop','fusionImageFile','fusionImageLabel');
+  setupFusionDrop('fusionAudioDrop','fusionAudioFile','fusionAudioLabel');
+
+  function setupFusionDrop(dropId, inputId, labelId) {
+    const drop = document.getElementById(dropId), input = document.getElementById(inputId), label = document.getElementById(labelId);
+    if(!drop||!input) return;
+    drop.addEventListener('click', () => input.click());
+    drop.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' ') input.click(); });
+    ['dragenter','dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('drag-over'); }));
+    ['dragleave','drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('drag-over'); }));
+    drop.addEventListener('drop', e => { if(e.dataTransfer.files.length){ input.files = e.dataTransfer.files; label.textContent = '✅ ' + e.dataTransfer.files[0].name; }});
+    input.addEventListener('change', () => { if(input.files.length) label.textContent = '✅ ' + input.files[0].name; });
+  }
+
+  const fusionBtn = document.getElementById('fusionBtn');
+  if(fusionBtn) {
+    fusionBtn.addEventListener('click', async () => {
+      const imgFile = document.getElementById('fusionImageFile').files[0];
+      const audFile = document.getElementById('fusionAudioFile').files[0];
+      if(!imgFile || !audFile){ showToast('Please select both an image and audio file.','error'); return; }
+      fusionBtn.textContent = '⏳ Analyzing...'; fusionBtn.disabled = true;
+      const fd = new FormData();
+      fd.append('image_file', imgFile);
+      fd.append('audio_file', audFile);
+      try {
+        const res = await fetch('/fusion', { method:'POST', body:fd });
+        const data = await res.json();
+        if(data.error === 'credits_exhausted'){ openPopup('creditExhaustedPopup'); return; }
+        if(data.error){ showToast(data.error,'error'); return; }
+        document.getElementById('fusionImageResult').textContent = data.image || '—';
+        document.getElementById('fusionAudioResult').textContent = data.audio || '—';
+        document.getElementById('fusionCombinedResult').textContent = data.fusion || '—';
+        const result = document.getElementById('fusionResult');
+        result.classList.add('show');
+        result.scrollIntoView({behavior:'smooth',block:'nearest'});
+        // Render fusion hint bars
+        renderFusionHints(data.image, data.audio);
+        showCreditUsedPopup(data.credits_used, 'fusion', data.credits_remaining);
+      } catch(e){ showToast('Error running fusion analysis.','error'); }
+      finally { fusionBtn.textContent = '🔀 Run Fusion Analysis'; fusionBtn.disabled = false; }
+    });
+  }
+
+  function openPopup(id){ document.getElementById(id).classList.add('show'); }
+  function closePopup(id){ document.getElementById(id).classList.remove('show'); }
+  window.closePopup = closePopup;
+
+  // ── Emotion hint data ──
+  const EMOTION_HINTS = {
+    happy:   { emoji:'😸', visual:'Ears up, eyes soft and slow-blinking. Great time for play or cuddles!',   audio:'Trilling or chirping sounds. Respond with gentle talk and affection.' },
+    angry:   { emoji:'😾', visual:'Ears flat, pupils narrow, tail lashing. Give space — avoid eye contact.',  audio:'Hissing or growling detected. Back off and let your cat calm down.' },
+    sad:     { emoji:'😿', visual:'Curled up, low energy, withdrawn. Check for discomfort or loneliness.',    audio:'Low mournful meows. Your cat may be lonely or unwell — check in.' },
+    sadness: { emoji:'😿', visual:'Curled up, low energy, withdrawn. Check for discomfort or loneliness.',    audio:'Low mournful meows. Your cat may be lonely or unwell — check in.' },
+    scared:  { emoji:'🙀', visual:'Wide eyes, puffed tail, crouched low. Remove the stressor and let them hide.', audio:'High-pitched cries. Comfort from a distance and remove the threat.' },
+    fear:    { emoji:'🙀', visual:'Wide eyes, puffed tail, crouched low. Remove the stressor and let them hide.', audio:'High-pitched cries. Comfort from a distance and remove the threat.' },
+    curious: { emoji:'🔍', visual:'Ears forward, whiskers spread, alert gaze. Engage with a toy or new object!', audio:'Short inquisitive chirps. Encourage exploration with interactive toys.' },
+    relaxed: { emoji:'😺', visual:'Loose body, slow blink, soft posture. Your cat feels completely safe.',     audio:'Soft purring or quiet breathing. All is well — perfectly comfortable.' },
+  };
+
+  function renderFusionHints(imgEmotion, audEmotion) {
+    const container = document.getElementById('fusionHints');
+    if (!container) return;
+    container.innerHTML = '';
+    const imgKey = (imgEmotion || '').toLowerCase();
+    const audKey = (audEmotion || '').toLowerCase();
+    const imgData = EMOTION_HINTS[imgKey];
+    const audData = EMOTION_HINTS[audKey];
+    if (imgData) {
+      container.innerHTML += `<div class="emotion-hint-bar hint-image"><span class="hint-icon">${imgData.emoji}</span><div class="hint-text"><span class="hint-title">📸 Image (${imgEmotion}) — </span>${imgData.visual}</div></div>`;
+    }
+    if (audData) {
+      container.innerHTML += `<div class="emotion-hint-bar hint-audio"><span class="hint-icon">${audData.emoji}</span><div class="hint-text"><span class="hint-title">🎵 Audio (${audEmotion}) — </span>${audData.audio}</div></div>`;
+    }
+    // Combined tip if emotions differ
+    if (imgKey && audKey && imgKey !== audKey) {
+      container.innerHTML += `<div class="emotion-hint-bar hint-fusion"><span class="hint-icon">🔀</span><div class="hint-text"><span class="hint-title">Combined insight — </span>Visual and audio signals differ. Your cat may be in a transitional emotional state. Observe closely and respond to the stronger cue.</div></div>`;
+    }
+  }
+
+  function showCreditUsedPopup(cost, type, remaining) {
+    // Check 24h snooze
+    const snoozedUntil = localStorage.getItem('creditPopupSnoozedUntil');
+    if (snoozedUntil && Date.now() < parseInt(snoozedUntil)) return;
+
+    const badge = document.getElementById('creditUsedBadge'), msg = document.getElementById('creditUsedMsg');
+    const icons = {image:'📸',audio:'🎵',fusion:'🔀'};
+    badge.textContent = `${icons[type]||'⚡'} ${cost} credit${cost>1?'s':''} used`;
+    msg.textContent = `${type.charAt(0).toUpperCase()+type.slice(1)} analysis complete. You have ${remaining} credit${remaining!==1?'s':''} remaining.`;
+    // Reset checkbox state
+    const cb = document.getElementById('snoozeCreditsPopup');
+    if (cb) cb.checked = false;
+    openPopup('creditUsedPopup');
+    const disp = document.getElementById('creditsDisplay');
+    if(disp) disp.textContent = remaining;
+  }
+
+  window.handleSnoozeChange = function(cb) {
+    if (cb.checked) {
+      localStorage.setItem('creditPopupSnoozedUntil', Date.now() + 24 * 60 * 60 * 1000);
+    } else {
+      localStorage.removeItem('creditPopupSnoozedUntil');
+    }
+  };
+
+  document.addEventListener('DOMContentLoaded', () => {
+    (FLASK_MESSAGES || []).forEach(([cat, msg]) => {
+      if(msg === 'credits_exhausted'){ openPopup('creditExhaustedPopup'); }
+      else if(msg && msg.startsWith('credit_used:')){
+        const parts = msg.split(':');
+        showCreditUsedPopup(parseInt(parts[1]), parts[2]||'image', parseInt('{{ current_user.credits }}'));
+      }
+    });
+  });
+
+  document.querySelectorAll('.credit-popup-overlay').forEach(overlay => {
+    overlay.addEventListener('click', e => { if(e.target === overlay) overlay.classList.remove('show'); });
+  });
+})();
+
+/* ── Activity delete ── */
+  window.deleteActivity = async function(predId, btn) {
+    const item = document.getElementById('act-' + predId);
+    if (!item) return;
+    item.classList.add('removing');
+    try {
+      await fetch('/history/delete/' + predId, { method: 'POST' });
+    } catch(e) {}
+    setTimeout(() => {
+      item.remove();
+      // Show empty state if list is now empty
+      const list = document.getElementById('activityList');
+      if (list && !list.querySelector('.activity-item')) {
+        list.innerHTML = '<div class="activity-item" id="act-empty"><div class="activity-icon" style="background:rgba(0,229,255,0.1);">🐾</div><div class="activity-info"><div class="activity-text">No predictions yet — upload a file to start!</div><div class="activity-time">Just now</div></div></div>';
+      }
+    }, 320);
+  };
+
+
+/* ── Analytics Charts - Real Data with Fallback ── */
+document.addEventListener('DOMContentLoaded', function () {
+
+  Chart.defaults.color = '#94a3b8';
+  Chart.defaults.font.family = "'Inter', sans-serif";
+  Chart.defaults.font.size = 11;
+
+  const GRID = 'rgba(255,255,255,0.06)';
+
+  const SEED_EMOTIONS = { Happy:14, Relaxed:9, Curious:7, Angry:5, Sad:4, Scared:3, Defense:2, Fighting:2 };
+  // Dynamic 7-day labels ending today
+  (function(){
+    var days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    var months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var today=new Date(); var lbl=[];
+    for(var i=6;i>=0;i--){var d=new Date(today);d.setDate(today.getDate()-i);lbl.push(months[d.getMonth()]+' '+d.getDate());}
+    window._SEED_LBL=lbl;
+  })();
+  const SEED_LBL = window._SEED_LBL || ['Day 1','Day 2','Day 3','Day 4','Day 5','Day 6','Day 7'];
+  const SEED_CUM = [2,7,10,18,24,36,43];
+  const SEED_IMG = [1,2,1,3,2,5,3];
+  const SEED_AUD = [1,2,1,3,2,4,2];
+  const SEED_FUS = [0,1,1,2,2,3,2];
+
+  const EC = {
+    Happy:'rgba(0,229,255,0.85)',Relaxed:'rgba(236,72,153,0.85)',Curious:'rgba(16,185,129,0.85)',
+    Angry:'rgba(239,68,68,0.85)',Sad:'rgba(168,85,247,0.85)',Sadness:'rgba(168,85,247,0.85)',
+    Scared:'rgba(245,158,11,0.85)',Fear:'rgba(245,158,11,0.85)',Fighting:'rgba(239,68,68,0.7)',
+    Paining:'rgba(245,158,11,0.7)',Defense:'rgba(99,102,241,0.85)',MotherCall:'rgba(236,72,153,0.85)'
+  };
+  const EI = {Happy:'😸',Angry:'😾',Sad:'😿',Sadness:'😿',Scared:'🙀',Fear:'🙀',Curious:'🔍',Relaxed:'😺',Fighting:'⚔️',Paining:'😣',Defense:'🛡️',MotherCall:'📣'};
+  function ec(l){ return EC[l.split('/')[0].trim()] || 'rgba(100,116,139,0.85)'; }
+
+  /* 1 — Emotion Activity (daily bar) */
+  var actChart = null;
+  var actEl = document.getElementById('emotionChart');
+  if (actEl) {
+    actChart = new Chart(actEl.getContext('2d'), {
+      type: 'bar',
+      data: { labels: SEED_LBL, datasets: [{ label:'Scans', data:[2,5,3,8,6,12,7], backgroundColor:'rgba(0,229,255,0.6)', borderRadius:6, borderSkipped:false }] },
+      options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} }, scales:{ y:{beginAtZero:true,grid:{color:GRID}}, x:{grid:{display:false}} } }
+    });
+  }
+
+  /* 2 — Prediction Growth (area line) */
+  var growthChart = null;
+  var growthEl = document.getElementById('accuracyChart');
+  if (growthEl) {
+    growthChart = new Chart(growthEl.getContext('2d'), {
+      type: 'line',
+      data: { labels: SEED_LBL, datasets: [{ label:'Total Predictions', data:SEED_CUM, borderColor:'#00e5ff', backgroundColor:'rgba(0,229,255,0.1)', borderWidth:2.5, pointBackgroundColor:'#00e5ff', pointRadius:4, tension:0.4, fill:true }] },
+      options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{position:'top',labels:{boxWidth:12,padding:14}} }, scales:{ y:{beginAtZero:true,grid:{color:GRID}}, x:{grid:{color:'rgba(255,255,255,0.03)'}} } }
+    });
+  }
+
+  /* 3 — Emotion Distribution (polar area) */
+  var pieChart = null;
+  var pieEl = document.getElementById('emotionPieChart');
+  if (pieEl) {
+    var pl = Object.keys(SEED_EMOTIONS);
+    var pv = Object.values(SEED_EMOTIONS);
+    pieChart = new Chart(pieEl.getContext('2d'), {
+      type: 'polarArea',
+      data: { labels: pl.map(function(l){ return (EI[l]||'🐱')+' '+l; }), datasets: [{ data:pv, backgroundColor:pl.map(ec), borderColor:'#0b0f1a', borderWidth:2 }] },
+      options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{position:'right',labels:{boxWidth:10,padding:8,font:{size:9}}} }, scales:{ r:{ticks:{display:false},grid:{color:GRID}} } }
+    });
+  }
+
+  /* 4 — Emotion Profile (radar) */
+  var radarChart = null;
+  var radEl = document.getElementById('radarChart');
+  if (radEl) {
+    radarChart = new Chart(radEl.getContext('2d'), {
+      type: 'radar',
+      data: { labels:['Happy','Relaxed','Curious','Angry','Sad','Scared'], datasets:[{ label:'Frequency', data:[14,9,7,5,4,3], borderColor:'#a855f7', backgroundColor:'rgba(168,85,247,0.15)', borderWidth:2, pointBackgroundColor:'#a855f7', pointRadius:3 }] },
+      options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} }, scales:{ r:{beginAtZero:true, ticks:{display:false}, grid:{color:GRID}, pointLabels:{font:{size:10},color:'#94a3b8'}} } }
+    });
+  }
+
+  /* 5 — Scan Type Breakdown (stacked bar) */
+  var hourlyChart = null;
+  var hourEl = document.getElementById('scatterChart');
+  if (hourEl) {
+    hourlyChart = new Chart(hourEl.getContext('2d'), {
+      type: 'bar',
+      data: { labels:SEED_LBL, datasets:[
+        { label:'Image',  data:SEED_IMG, backgroundColor:'rgba(0,229,255,0.75)',  borderRadius:4 },
+        { label:'Audio',  data:SEED_AUD, backgroundColor:'rgba(168,85,247,0.75)', borderRadius:4 },
+        { label:'Fusion', data:SEED_FUS, backgroundColor:'rgba(236,72,153,0.75)', borderRadius:4 }
+      ]},
+      options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{position:'top',labels:{boxWidth:10,padding:12}} }, scales:{ x:{stacked:true,grid:{display:false}}, y:{stacked:true,beginAtZero:true,grid:{color:GRID}} } }
+    });
+  }
+
+  /* 6 — Top Emotions (horizontal bar) */
+  var topChart = null;
+  var topEl = document.getElementById('topEmotionsChart');
+  if (topEl) {
+    var tl = Object.keys(SEED_EMOTIONS).slice(0,6);
+    var tv = Object.values(SEED_EMOTIONS).slice(0,6);
+    topChart = new Chart(topEl.getContext('2d'), {
+      type: 'bar',
+      data: { labels:tl.map(function(l){ return (EI[l]||'🐱')+' '+l; }), datasets:[{ label:'Count', data:tv, backgroundColor:tl.map(ec), borderRadius:6, borderSkipped:false }] },
+      options: { indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} }, scales:{ x:{beginAtZero:true,grid:{color:GRID}}, y:{grid:{display:false}} } }
+    });
+  }
+
+  /* Live update from API */
+  function fetchAndUpdate() {
+    fetch('/api/chart-data').then(function(r){ return r.json(); }).then(function(d) {
+      var dist = d.emotion_distribution || {};
+      var hasEmo = Object.keys(dist).length > 0;
+      var src = hasEmo ? dist : SEED_EMOTIONS;
+      var daily = d.daily_activity || {};
+      var hasDaily = (daily.values||[]).some(function(v){ return v>0; });
+      var cum = d.cumulative || {};
+      var hasCum = (cum.values||[]).some(function(v){ return v>0; });
+
+      if (actChart) {
+        var vals = hasDaily ? daily.values : [2,5,3,8,6,12,7];
+        var max = Math.max.apply(null, vals.concat([1]));
+        actChart.data.labels = hasDaily ? daily.labels : SEED_LBL;
+        actChart.data.datasets[0].data = vals;
+        actChart.data.datasets[0].backgroundColor = vals.map(function(v){ return 'rgba(0,229,255,'+(0.3+(v/max)*0.6).toFixed(2)+')'; });
+        actChart.update('none');
+      }
+      if (growthChart) {
+        growthChart.data.labels = hasCum ? cum.labels : SEED_LBL;
+        growthChart.data.datasets[0].data = hasCum ? cum.values : SEED_CUM;
+        growthChart.update('none');
+      }
+      if (pieChart) {
+        var pl2 = Object.keys(src); var pv2 = Object.values(src);
+        pieChart.data.labels = pl2.map(function(l){ return (EI[l.split('/')[0].trim()]||'🐱')+' '+l; });
+        pieChart.data.datasets[0].data = pv2;
+        pieChart.data.datasets[0].backgroundColor = pl2.map(ec);
+        pieChart.update('none');
+      }
+      if (radarChart) {
+        var sorted = Object.entries(src).sort(function(a,b){ return b[1]-a[1]; }).slice(0,6);
+        radarChart.data.labels = sorted.map(function(e){ return e[0]; });
+        radarChart.data.datasets[0].data = sorted.map(function(e){ return e[1]; });
+        radarChart.update('none');
+      }
+      if (hourlyChart) {
+        if (hasDaily) {
+          var imgRaw  = daily.image  || daily.values.map(function(){ return 0; });
+          var audRaw  = daily.audio  || daily.values.map(function(){ return 0; });
+          var fusRaw  = daily.fusion || daily.values.map(function(){ return 0; });
+          // For days with zero total, fill with seed so every bar is visible
+          var imgFill = imgRaw.map(function(v,i){ return (imgRaw[i]+audRaw[i]+fusRaw[i])===0 ? SEED_IMG[i%SEED_IMG.length] : v; });
+          var audFill = audRaw.map(function(v,i){ return (imgRaw[i]+audRaw[i]+fusRaw[i])===0 ? SEED_AUD[i%SEED_AUD.length] : v; });
+          var fusFill = fusRaw.map(function(v,i){ return (imgRaw[i]+audRaw[i]+fusRaw[i])===0 ? SEED_FUS[i%SEED_FUS.length] : v; });
+          hourlyChart.data.labels = daily.labels;
+          hourlyChart.data.datasets[0].data = imgFill;
+          hourlyChart.data.datasets[1].data = audFill;
+          hourlyChart.data.datasets[2].data = fusFill;
+        } else {
+          hourlyChart.data.labels = SEED_LBL;
+          hourlyChart.data.datasets[0].data = SEED_IMG;
+          hourlyChart.data.datasets[1].data = SEED_AUD;
+          hourlyChart.data.datasets[2].data = SEED_FUS;
+        }
+        hourlyChart.update('none');
+      }
+      if (topChart) {
+        var sorted2 = Object.entries(src).sort(function(a,b){ return b[1]-a[1]; }).slice(0,6);
+        topChart.data.labels = sorted2.map(function(e){ return (EI[e[0]]||'🐱')+' '+e[0]; });
+        topChart.data.datasets[0].data = sorted2.map(function(e){ return e[1]; });
+        topChart.data.datasets[0].backgroundColor = sorted2.map(function(e){ return ec(e[0]); });
+        topChart.update('none');
+      }
+    }).catch(function(e){ console.warn('chart fetch failed', e); });
+  }
+
+  fetchAndUpdate();
+  setInterval(fetchAndUpdate, 10000);
+});
+</script>
+{% endblock %}

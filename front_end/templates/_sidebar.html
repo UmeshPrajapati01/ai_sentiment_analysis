@@ -1,0 +1,64 @@
+<aside class="sidebar" id="mainSidebar" role="navigation" aria-label="Dashboard navigation">
+  <div class="sidebar-logo">
+    <div class="logo-mark">🐱</div>
+    <div class="logo-text">
+      <div class="logo-name">Meow<span class="mood">Mood</span></div>
+      <div class="logo-sub">AI Cat Emotion Recognition</div>
+    </div>
+  </div>
+
+  <div id="sidebarOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:499;backdrop-filter:blur(2px);"></div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">Main</div>
+    <a href="{{ url_for('dashboard') }}" class="sidebar-link {{ 'active' if active_page == 'dashboard' }}"><span class="link-icon">📊</span> Dashboard</a>
+    <a href="{{ url_for('profile') }}" class="sidebar-link {{ 'active' if active_page == 'profile' }}"><span class="link-icon">👤</span> Profile</a>
+    <a href="{{ url_for('metrics') }}" class="sidebar-link {{ 'active' if active_page == 'metrics' }}"><span class="link-icon">📈</span> Metrics</a>
+    <a href="{{ url_for('model_report') }}" class="sidebar-link {{ 'active' if active_page == 'report' }}"><span class="link-icon">🤖</span> Model Report</a>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">Analysis</div>
+    <a href="{{ url_for('dashboard') }}#uploadSection" class="sidebar-link" onclick="sidebarScrollTo(event,'uploadSection')"><span class="link-icon">📸</span> Image Analysis</a>
+    <a href="{{ url_for('dashboard') }}#audioSection"  class="sidebar-link" onclick="sidebarScrollTo(event,'audioSection')"><span class="link-icon">🎵</span> Audio Analysis</a>
+    <a href="{{ url_for('dashboard') }}#fusionSection" class="sidebar-link" onclick="sidebarScrollTo(event,'fusionSection')"><span class="link-icon">🔀</span> Fusion Mode</a>
+    <a href="{{ url_for('history') }}" class="sidebar-link {{ 'active' if active_page == 'history' }}"><span class="link-icon">🕐</span> History</a>
+  </div>
+
+    <div class="sidebar-section">
+    <div class="sidebar-section-title">System</div>
+    <a href="{{ url_for('plans') }}" class="sidebar-link {{ 'active' if active_page == 'plans' }}"><span class="link-icon">💎</span> Plans & Credits</a>
+    <a href="{{ url_for('settings') }}" class="sidebar-link {{ 'active' if active_page == 'settings' }}"><span class="link-icon">⚙️</span> Settings</a>
+    <a href="{{ url_for('logout') }}" class="sidebar-link" style="color:rgba(239,68,68,0.7);"><span class="link-icon">🚪</span> Logout</a>
+  </div>
+
+  <div class="sidebar-user">
+    <div class="sidebar-user-avatar">🐱</div>
+    <div class="sidebar-user-info">
+      <div class="name">{{ current_user.display_name }}</div>
+      <div class="role">Premium Member</div>
+    </div>
+  </div>
+</aside>
+
+<script>
+function sidebarScrollTo(e, sectionId) {
+  var el = document.getElementById(sectionId);
+  if (el) {
+    e.preventDefault();
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    el.style.transition = 'box-shadow 0.3s';
+    el.style.boxShadow = '0 0 0 2px rgba(0,229,255,0.5)';
+    setTimeout(function(){ el.style.boxShadow = ''; }, 1200);
+  }
+  // else: let href navigate to dashboard#section normally
+}
+
+// On dashboard load, scroll to hash section if present
+window.addEventListener('DOMContentLoaded', function() {
+  if (window.location.hash) {
+    var target = document.getElementById(window.location.hash.slice(1));
+    if (target) setTimeout(function(){ target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 300);
+  }
+});
+</script>

@@ -1,0 +1,133 @@
+{
+  "models": [
+    {
+      "version": 1,
+      "file": "audio_student_supervised_v1.pth",
+      "type": "audio_student_supervised",
+      "accuracy": 0.6,
+      "f1_macro": 0.4666666666666666,
+      "timestamp": "2026-02-25T00:22:14.969146"
+    },
+    {
+      "version": 2,
+      "file": "audio_student_distilled_v2.pth",
+      "type": "audio_student_distilled",
+      "accuracy": 0.6,
+      "f1_macro": 0.4833333333333333,
+      "timestamp": "2026-02-25T00:22:56.514595"
+    },
+    {
+      "version": 3,
+      "file": "audio_student_supervised_v3.pth",
+      "type": "audio_student_supervised",
+      "accuracy": 0.6,
+      "f1_macro": 0.5333333333333333,
+      "timestamp": "2026-02-25T00:30:04.088052"
+    },
+    {
+      "version": 4,
+      "file": "audio_student_distilled_v4.pth",
+      "type": "audio_student_distilled",
+      "accuracy": 0.4,
+      "f1_macro": 0.31666666666666665,
+      "timestamp": "2026-02-25T00:30:41.783177"
+    },
+    {
+      "version": 5,
+      "file": "audio_student_supervised_v5.pth",
+      "type": "audio_student_supervised",
+      "accuracy": 0.6,
+      "f1_macro": 0.5333333333333333,
+      "timestamp": "2026-02-25T00:35:31.496932"
+    },
+    {
+      "version": 6,
+      "file": "audio_student_supervised_v6.pth",
+      "type": "audio_student_supervised",
+      "accuracy": 0.6,
+      "f1_macro": 0.5666666666666667,
+      "timestamp": "2026-02-25T00:36:15.661987"
+    },
+    {
+      "version": 7,
+      "file": "audio_student_distilled_v7.pth",
+      "type": "audio_student_distilled",
+      "accuracy": 0.5,
+      "f1_macro": 0.4333333333333333,
+      "timestamp": "2026-02-25T00:42:38.835291"
+    },
+    {
+      "version": 8,
+      "file": "audio_student_distilled_v8.pth",
+      "type": "audio_student_distilled",
+      "accuracy": 0.6,
+      "f1_macro": 0.5333333333333333,
+      "timestamp": "2026-02-25T00:42:48.547863"
+    },
+    {
+      "version": 9,
+      "file": "audio_student_supervised_v9.pth",
+      "type": "audio_student_supervised",
+      "accuracy": 0.6,
+      "f1_macro": 0.5666666666666667,
+      "timestamp": "2026-02-25T00:53:44.704144"
+    },
+    {
+      "version": 10,
+      "file": "audio_student_supervised_v10.pth",
+      "type": "audio_student_supervised",
+      "accuracy": 0.6,
+      "f1_macro": 0.5,
+      "timestamp": "2026-02-25T00:54:59.343396"
+    },
+    {
+      "version": 11,
+      "file": "audio_student_distilled_v11.pth",
+      "type": "audio_student_distilled",
+      "accuracy": 0.5,
+      "f1_macro": 0.4,
+      "timestamp": "2026-02-25T01:01:15.078308"
+    },
+    {
+      "version": 12,
+      "file": "audio_student_distilled_v12.pth",
+      "type": "audio_student_distilled",
+      "accuracy": 0.4,
+      "f1_macro": 0.31666666666666665,
+      "timestamp": "2026-02-25T01:01:44.894003"
+    },
+    {
+      "version": 13,
+      "file": "image_student_supervised_v13.pth",
+      "type": "image_student_supervised",
+      "accuracy": 0.68,
+      "f1_macro": 0.6739231709633007,
+      "timestamp": "2026-02-25T02:29:14.502357"
+    },
+    {
+      "version": 14,
+      "file": "image_student_supervised_v14.pth",
+      "type": "image_student_supervised",
+      "accuracy": 0.67,
+      "f1_macro": 0.6671949110930023,
+      "timestamp": "2026-02-25T02:29:30.920996"
+    },
+    {
+      "version": 15,
+      "file": "image_student_distilled_v15.pth",
+      "type": "image_student_distilled",
+      "accuracy": 0.65,
+      "f1_macro": 0.6521475159830162,
+      "timestamp": "2026-02-25T03:21:50.645022"
+    },
+    {
+      "version": 16,
+      "file": "image_student_distilled_v16.pth",
+      "type": "image_student_distilled",
+      "accuracy": 0.76,
+      "f1_macro": 0.757517725175376,
+      "timestamp": "2026-02-25T03:22:21.421772"
+    }
+  ],
+  "latest_version": 16
+}

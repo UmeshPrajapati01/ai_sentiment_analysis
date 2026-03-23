@@ -1,0 +1,295 @@
+{% extends "base.html" %}
+{% block title %}Login | MeowMood{% endblock %}
+{% block page_id %}login{% endblock %}
+
+{% block extra_head %}
+<style>
+/* ── Login Page v2 ── */
+.login-page{min-height:100vh;display:grid;grid-template-columns:55% 45%;background:#060810;overflow:hidden;}
+
+/* ── LEFT PANEL ── */
+.lp-visual{position:relative;overflow:hidden;}
+.lp-video{width:100%;height:100%;object-fit:cover;display:block;filter:brightness(0.75);}
+.lp-overlay{position:absolute;inset:0;background:linear-gradient(135deg,rgba(6,8,16,0.3) 0%,rgba(0,0,0,0.15) 50%,rgba(6,8,16,0.7) 100%);}
+.lp-overlay-right{position:absolute;inset:0;background:linear-gradient(to right,transparent 60%,#060810 100%);}
+
+/* Scan line */
+.lp-scan{position:absolute;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent 0%,rgba(0,229,255,0.0) 10%,#00e5ff 50%,rgba(0,229,255,0.0) 90%,transparent 100%);box-shadow:0 0 24px 4px rgba(0,229,255,0.4);animation:lpScan 4s linear infinite;pointer-events:none;z-index:5;}
+@keyframes lpScan{0%{top:-3px;opacity:0}5%{opacity:1}95%{opacity:1}100%{top:100%;opacity:0}}
+
+/* Grid overlay */
+.lp-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(0,229,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,0.04) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:1;}
+
+/* Detection box */
+.lp-detect{position:absolute;z-index:6;border:1.5px solid rgba(0,229,255,0.6);border-radius:6px;animation:lpDetect 3s ease-in-out infinite;}
+@keyframes lpDetect{0%,100%{border-color:rgba(0,229,255,0.35);box-shadow:0 0 16px rgba(0,229,255,0.15)}50%{border-color:rgba(0,229,255,0.9);box-shadow:0 0 36px rgba(0,229,255,0.45),inset 0 0 36px rgba(0,229,255,0.04)}}
+.lp-detect::before,.lp-detect::after,.lp-detect-br::before,.lp-detect-br::after{content:'';position:absolute;width:12px;height:12px;border-color:#00e5ff;border-style:solid;}
+.lp-detect::before{top:-2px;left:-2px;border-width:2px 0 0 2px;}
+.lp-detect::after{top:-2px;right:-2px;border-width:2px 2px 0 0;}
+.lp-detect-br::before{bottom:-2px;left:-2px;border-width:0 0 2px 2px;}
+.lp-detect-br::after{bottom:-2px;right:-2px;border-width:0 2px 2px 0;}
+.lp-detect-label{position:absolute;top:-26px;left:0;background:rgba(0,229,255,0.9);color:#060810;font-size:0.6rem;font-weight:800;padding:3px 9px;border-radius:4px 4px 0 0;letter-spacing:0.1em;white-space:nowrap;}
+.lp-detect-conf{position:absolute;bottom:-26px;right:0;background:rgba(0,0,0,0.7);border:1px solid rgba(0,229,255,0.3);color:#00e5ff;font-size:0.6rem;font-weight:700;padding:3px 9px;border-radius:0 0 4px 4px;letter-spacing:0.06em;}
+
+/* Emotion tags */
+.lp-tag{position:absolute;z-index:7;display:flex;align-items:center;gap:8px;padding:9px 16px;border-radius:999px;font-size:0.78rem;font-weight:700;backdrop-filter:blur(16px);border:1px solid;animation:lpFloat 4s ease-in-out infinite;}
+@keyframes lpFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-10px) scale(1.02)}}
+.lp-tag-bar{width:40px;height:4px;border-radius:2px;overflow:hidden;background:rgba(255,255,255,0.1);}
+.lp-tag-fill{height:100%;border-radius:2px;transition:width 0.3s;}
+
+/* Bottom info */
+.lp-info{position:absolute;bottom:0;left:0;right:0;padding:32px 36px;background:linear-gradient(transparent,rgba(6,8,16,0.97));z-index:8;}
+.lp-live{display:inline-flex;align-items:center;gap:7px;background:rgba(0,229,255,0.08);border:1px solid rgba(0,229,255,0.25);color:#00e5ff;padding:5px 14px;border-radius:999px;font-size:0.7rem;font-weight:800;letter-spacing:0.08em;margin-bottom:14px;}
+.lp-live-dot{width:7px;height:7px;border-radius:50%;background:#00e5ff;animation:lpPulse 1.4s ease-in-out infinite;}
+@keyframes lpPulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.5);opacity:0.6}}
+.lp-info h2{font-family:'Space Grotesk',sans-serif;font-size:1.75rem;font-weight:800;color:#fff;line-height:1.2;margin-bottom:8px;}
+.lp-info p{color:rgba(255,255,255,0.45);font-size:0.85rem;margin-bottom:20px;}
+.lp-stats{display:flex;gap:0;}
+.lp-stat{flex:1;text-align:center;padding:12px 0;border-right:1px solid rgba(255,255,255,0.07);}
+.lp-stat:last-child{border-right:none;}
+.lp-stat-n{font-family:'Space Grotesk',sans-serif;font-size:1.3rem;font-weight:800;background:linear-gradient(135deg,#00e5ff,#a855f7);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+.lp-stat-l{font-size:0.65rem;color:rgba(255,255,255,0.3);margin-top:2px;letter-spacing:0.04em;}
+
+/* ── RIGHT PANEL ── */
+.lp-form-side{display:flex;align-items:center;justify-content:center;padding:48px 44px;background:#060810;position:relative;overflow:hidden;}
+.lp-orb-1{position:absolute;top:-15%;right:-15%;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,rgba(168,85,247,0.1),transparent 70%);pointer-events:none;}
+.lp-orb-2{position:absolute;bottom:-20%;left:-10%;width:360px;height:360px;border-radius:50%;background:radial-gradient(circle,rgba(0,229,255,0.07),transparent 70%);pointer-events:none;}
+.lp-orb-3{position:absolute;top:40%;left:30%;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(236,72,153,0.05),transparent 70%);pointer-events:none;}
+
+.lp-wrap{width:100%;max-width:400px;position:relative;z-index:2;}
+
+/* Logo */
+.lp-logo{display:flex;align-items:center;gap:11px;margin-bottom:38px;}
+.lp-logo-mark{width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,#00e5ff,#a855f7);display:flex;align-items:center;justify-content:center;font-size:1.25rem;box-shadow:0 0 28px rgba(0,229,255,0.35),0 0 60px rgba(168,85,247,0.15);}
+.lp-logo-name{font-family:'Space Grotesk',sans-serif;font-size:1.2rem;font-weight:800;color:#fff;}
+.lp-logo-name .mood{color:#a855f7;}
+.lp-logo-sub{font-size:0.6rem;color:rgba(255,255,255,0.25);letter-spacing:0.05em;margin-top:1px;}
+
+/* Heading */
+.lp-heading{font-family:'Space Grotesk',sans-serif;font-size:2.4rem;font-weight:800;color:#fff;line-height:1.1;margin-bottom:8px;}
+.lp-heading .grad{background:linear-gradient(135deg,#00e5ff 0%,#a855f7 60%,#ec4899 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+.lp-sub{color:rgba(255,255,255,0.35);font-size:0.87rem;margin-bottom:30px;}
+.lp-sub a{color:#00e5ff;font-weight:600;}
+
+/* Card */
+.lp-card{background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.07);border-radius:22px;padding:28px;backdrop-filter:blur(24px);box-shadow:0 24px 64px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.06);}
+
+/* Inputs */
+.lp-field{margin-bottom:18px;}
+.lp-label{display:block;font-size:0.7rem;font-weight:700;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.09em;margin-bottom:8px;}
+.lp-input-wrap{position:relative;}
+.lp-input-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:0.95rem;pointer-events:none;opacity:0.4;}
+.lp-input{width:100%;padding:13px 16px 13px 40px;background:rgba(255,255,255,0.04);border:1.5px solid rgba(255,255,255,0.09);border-radius:13px;font-size:0.93rem;color:#e2e8f0;transition:all 0.25s ease;font-family:'Inter',sans-serif;}
+.lp-input::placeholder{color:rgba(148,163,184,0.3);}
+.lp-input:focus{border-color:#00e5ff;background:rgba(0,229,255,0.03);box-shadow:0 0 0 4px rgba(0,229,255,0.08);outline:none;}
+.lp-eye{position:absolute;right:13px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.25);font-size:0.95rem;transition:color 0.2s;padding:4px;}
+.lp-eye:hover{color:rgba(255,255,255,0.7);}
+
+/* Row */
+.lp-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;flex-wrap:wrap;gap:8px;}
+.lp-remember{display:flex;align-items:center;gap:7px;cursor:pointer;font-size:0.8rem;color:rgba(255,255,255,0.35);}
+.lp-remember input{accent-color:#00e5ff;width:14px;height:14px;}
+.lp-forgot{color:#00e5ff;font-size:0.8rem;font-weight:600;text-decoration:none;transition:opacity 0.2s;}
+.lp-forgot:hover{opacity:0.7;}
+
+/* Submit button */
+.lp-btn{width:100%;padding:15px;border-radius:13px;background:linear-gradient(135deg,#00e5ff 0%,#a855f7 100%);background-size:200% 200%;color:#fff;font-weight:800;font-size:1rem;border:none;cursor:pointer;transition:all 0.3s ease;letter-spacing:0.02em;position:relative;overflow:hidden;animation:gradShift 4s ease infinite;}
+.lp-btn:hover{transform:translateY(-2px);box-shadow:0 10px 40px rgba(0,229,255,0.3),0 4px 16px rgba(168,85,247,0.2);}
+.lp-btn:active{transform:translateY(0);}
+.lp-btn-shine{position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent);transform:skewX(-20deg);transition:left 0.5s ease;}
+.lp-btn:hover .lp-btn-shine{left:150%;}
+
+/* Divider */
+.lp-divider{display:flex;align-items:center;gap:12px;margin:20px 0;color:rgba(255,255,255,0.18);font-size:0.75rem;}
+.lp-divider::before,.lp-divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,0.07);}
+
+/* Social */
+.lp-social{display:flex;gap:10px;}
+.lp-social-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border:1.5px solid rgba(255,255,255,0.09);border-radius:13px;font-weight:600;font-size:0.83rem;color:rgba(255,255,255,0.5);background:rgba(255,255,255,0.02);cursor:pointer;transition:all 0.25s ease;font-family:'Inter',sans-serif;}
+.lp-social-btn:hover{border-color:rgba(0,229,255,0.3);color:#fff;background:rgba(0,229,255,0.04);transform:translateY(-1px);}
+
+/* Footer */
+.lp-footer{text-align:center;font-size:0.83rem;color:rgba(255,255,255,0.28);margin-top:20px;}
+.lp-footer a{color:#00e5ff;font-weight:700;}
+.lp-back{display:inline-flex;align-items:center;gap:6px;color:rgba(255,255,255,0.25);font-size:0.8rem;margin-bottom:28px;transition:color 0.2s;text-decoration:none;}
+.lp-back:hover{color:#00e5ff;}
+
+/* Trust badges */
+.lp-trust{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:22px;padding-top:18px;border-top:1px solid rgba(255,255,255,0.05);}
+.lp-trust-item{display:flex;align-items:center;gap:5px;font-size:0.7rem;color:rgba(255,255,255,0.2);}
+
+/* Flash messages */
+.lp-alerts{margin-bottom:16px;}
+.lp-alert{padding:10px 14px;border-radius:10px;font-size:0.83rem;font-weight:600;margin-bottom:8px;}
+.lp-alert.danger{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);color:#f87171;}
+.lp-alert.success{background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);color:#34d399;}
+.lp-alert.info{background:rgba(0,229,255,0.08);border:1px solid rgba(0,229,255,0.2);color:#00e5ff;}
+.lp-alert.warning{background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.25);color:#fbbf24;}
+
+@media(max-width:900px){.login-page{grid-template-columns:1fr;}.lp-visual{display:none;}.lp-form-side{padding:40px 24px;}}
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="login-page">
+
+  <!-- ── LEFT: Video Panel ── -->
+  <div class="lp-visual">
+    <video class="lp-video" autoplay muted loop playsinline>
+      <source src="{{ url_for('serve_media', filename='extreme-close-up-of-a-cats-face-camera-slowly-zoom.mp4') }}" type="video/mp4">
+    </video>
+    <div class="lp-overlay"></div>
+    <div class="lp-overlay-right"></div>
+    <div class="lp-grid"></div>
+    <div class="lp-scan"></div>
+
+    <!-- Detection box with 4 corners -->
+    <div class="lp-detect" style="top:18%;left:14%;width:66%;height:54%;">
+      <div class="lp-detect-label">🔍 AI EMOTION SCAN</div>
+      <div class="lp-detect-br"></div>
+      <div class="lp-detect-conf">CONFIDENCE: 94.2%</div>
+    </div>
+
+    <!-- Crosshair center dot -->
+    <div style="position:absolute;top:45%;left:47%;z-index:7;width:14px;height:14px;border-radius:50%;border:2px solid #00e5ff;box-shadow:0 0 12px #00e5ff;animation:lpPulse 2s ease-in-out infinite;"></div>
+    <div style="position:absolute;top:45.4%;left:47.4%;z-index:7;width:6px;height:6px;border-radius:50%;background:#00e5ff;box-shadow:0 0 8px #00e5ff;"></div>
+
+    <!-- Emotion tags -->
+    <div class="lp-tag" style="top:12%;right:6%;background:rgba(16,185,129,0.1);border-color:rgba(16,185,129,0.3);color:#10b981;animation-delay:0s;">
+      😸 Happy
+      <div class="lp-tag-bar"><div class="lp-tag-fill" style="width:94%;background:#10b981;"></div></div>
+      <span style="font-size:0.7rem;opacity:0.7;">94%</span>
+    </div>
+    <div class="lp-tag" style="top:36%;right:4%;background:rgba(0,229,255,0.08);border-color:rgba(0,229,255,0.25);color:#00e5ff;animation-delay:1.3s;">
+      🔍 Curious
+      <div class="lp-tag-bar"><div class="lp-tag-fill" style="width:78%;background:#00e5ff;"></div></div>
+      <span style="font-size:0.7rem;opacity:0.7;">78%</span>
+    </div>
+    <div class="lp-tag" style="bottom:30%;right:6%;background:rgba(168,85,247,0.08);border-color:rgba(168,85,247,0.25);color:#a855f7;animation-delay:2.6s;">
+      😺 Relaxed
+      <div class="lp-tag-bar"><div class="lp-tag-fill" style="width:61%;background:#a855f7;"></div></div>
+      <span style="font-size:0.7rem;opacity:0.7;">61%</span>
+    </div>
+
+    <!-- Scan progress bar -->
+    <div style="position:absolute;top:18%;left:14%;width:66%;height:3px;z-index:8;background:rgba(0,229,255,0.1);border-radius:2px;">
+      <div style="height:100%;background:linear-gradient(90deg,#00e5ff,#a855f7);border-radius:2px;animation:scanProgress 3s ease-in-out infinite;"></div>
+    </div>
+    <style>@keyframes scanProgress{0%{width:0%}60%{width:100%}100%{width:100%}}</style>
+
+    <!-- Bottom info -->
+    <div class="lp-info">
+      <div class="lp-live"><span class="lp-live-dot"></span> LIVE AI ANALYSIS</div>
+      <h2>Your Cat's Emotions,<br>Decoded in Milliseconds</h2>
+      <p>Upload a photo or audio clip — our neural network reads the mood instantly.</p>
+      <div class="lp-stats">
+        <div class="lp-stat"><div class="lp-stat-n">12.5K+</div><div class="lp-stat-l">Analyses Done</div></div>
+        <div class="lp-stat"><div class="lp-stat-n">94%</div><div class="lp-stat-l">Accuracy</div></div>
+        <div class="lp-stat"><div class="lp-stat-n">7</div><div class="lp-stat-l">Emotions</div></div>
+        <div class="lp-stat"><div class="lp-stat-n">&lt;1s</div><div class="lp-stat-l">Response</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── RIGHT: Form Panel ── -->
+  <div class="lp-form-side">
+    <div class="lp-orb-1"></div>
+    <div class="lp-orb-2"></div>
+    <div class="lp-orb-3"></div>
+
+    <div class="lp-wrap">
+      <a href="{{ url_for('landing') }}" class="lp-back">← Back to home</a>
+
+      <div class="lp-logo">
+        <div class="lp-logo-mark">🐱</div>
+        <div>
+          <div class="lp-logo-name">Meow<span class="mood">Mood</span></div>
+          <div class="lp-logo-sub">AI-Powered Cat Emotion Recognition</div>
+        </div>
+      </div>
+
+      <div class="lp-heading">Welcome<br><span class="grad">Back 👋</span></div>
+      <p class="lp-sub">Sign in to continue your cat's emotional journey. <a href="{{ url_for('register') }}">New here?</a></p>
+
+      <!-- Flash messages -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="lp-alerts">
+            {% for cat, msg in messages %}
+              <div class="lp-alert {{ cat }}">{{ msg }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      <div class="lp-card">
+        <form id="loginForm" method="POST" action="{{ url_for('login') }}" novalidate>
+
+          <div class="lp-field">
+            <label class="lp-label" for="loginEmail">Email Address</label>
+            <div class="lp-input-wrap">
+              <span class="lp-input-icon">✉️</span>
+              <input type="email" id="loginEmail" name="email" class="lp-input" placeholder="you@example.com" required autocomplete="email">
+            </div>
+          </div>
+
+          <div class="lp-field">
+            <label class="lp-label" for="loginPassword">Password</label>
+            <div class="lp-input-wrap">
+              <span class="lp-input-icon">🔒</span>
+              <input type="password" id="loginPassword" name="password" class="lp-input" placeholder="Enter your password" required autocomplete="current-password" style="padding-right:44px;">
+              <button type="button" class="lp-eye" onclick="togglePw()" aria-label="Toggle password visibility">👁️</button>
+            </div>
+          </div>
+
+          <div class="lp-row">
+            <label class="lp-remember"><input type="checkbox" id="rememberMe"> Remember me</label>
+            <a href="#" class="lp-forgot">Forgot password?</a>
+          </div>
+
+          <button type="submit" class="lp-btn" id="submitLogin">
+            <span class="lp-btn-shine"></span>
+            🐾 Sign In to MeowMood
+          </button>
+        </form>
+
+        <div class="lp-divider">or continue with</div>
+        <div class="lp-social">
+          <button class="lp-social-btn" type="button">
+            <svg width="16" height="16" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+            Google
+          </button>
+          <button class="lp-social-btn" type="button">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            Facebook
+          </button>
+        </div>
+      </div>
+
+      <div class="lp-footer">Don't have an account? <a href="{{ url_for('register') }}">Create one free →</a></div>
+
+      <div class="lp-trust">
+        <div class="lp-trust-item">🔒 SSL Secured</div>
+        <div class="lp-trust-item">🛡️ Privacy First</div>
+        <div class="lp-trust-item">⚡ Instant Access</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function togglePw(){
+  const inp = document.getElementById('loginPassword');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+// Submit loading state
+document.getElementById('loginForm').addEventListener('submit', function(){
+  const btn = document.getElementById('submitLogin');
+  btn.textContent = '⏳ Signing in...';
+  btn.disabled = true;
+});
+</script>
+{% endblock %}

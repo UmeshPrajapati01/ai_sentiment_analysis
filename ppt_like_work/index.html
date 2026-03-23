@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MewConnect — AI Cat Emotion Recognition | Presentation</title>
+
+    <!-- GSAP via CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <style>
+        /* ═══════════════════════════════════════════
+   DESIGN TOKENS + RESET
+═══════════════════════════════════════════ */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&family=Syne:wght@700;800&display=swap');
+
+        :root {
+            --amber: #f59e0b;
+            --amber2: #fbbf24;
+            --orange: #fb923c;
+            --violet: #8b5cf6;
+            --teal: #14b8a6;
+            --rose: #f43f5e;
+            --green: #10b981;
+            --blue: #3b82f6;
+            --bg: #050810;
+            --bg2: #0c1120;
+            --surface: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.10);
+            --text: #f1f5f9;
+            --muted: #94a3b8;
+            --g-brand: linear-gradient(135deg, #f59e0b, #fb923c);
+            --g-hero: linear-gradient(135deg, #0c1120, #1a0e30, #0c1120);
+        }
+
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            user-select: none;
+        }
+
+        /* ═══════════════════════════════════════════
+   PROGRESS BAR (TOP)
+═══════════════════════════════════════════ */
+        #progressBar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            z-index: 1000;
+            background: linear-gradient(90deg, var(--amber), var(--orange), var(--violet));
+            width: 0%;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 12px rgba(245, 158, 11, 0.7);
+        }
+
+        /* ═══════════════════════════════════════════
+   NAVIGATION DOTS
+═══════════════════════════════════════════ */
+        #navDots {
+            position: fixed;
+            right: 28px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.25);
+            border: 1.5px solid rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.35s ease;
+            position: relative;
+        }
+
+        .dot::after {
+            content: attr(data-label);
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.75);
+            color: #fff;
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 6px;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            pointer-events: none;
+        }
+
+        .dot:hover::after {
+            opacity: 1;
+        }
+
+        .dot.active {
+            background: var(--amber);
+            border-color: var(--amber);
+            transform: scale(1.4);
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.6);
+        }
+
+        /* ═══════════════════════════════════════════
+   SLIDE NUMBER
+═══════════════════════════════════════════ */
+        #slideCounter {
+            position: fixed;
+            bottom: 24px;
+            right: 36px;
+            z-index: 1000;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.35);
+            letter-spacing: 0.1em;
+        }
+
+        /* ═══════════════════════════════════════════
+   KEYBOARD HINT
+═══════════════════════════════════════════ */
+        #hint {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.72rem;
+            color: rgba(255, 255, 255, 0.2);
+            z-index: 1000;
+            letter-spacing: 0.08em;
+        }
+
+        /* ═══════════════════════════════════════════
+   SLIDES CONTAINER
+═══════════════════════════════════════════ */
+        #slidesWrap {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        /* ═══════════════════════════════════════════
+   INDIVIDUAL SLIDE
+═══════════════════════════════════════════ */
+        .slide {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            text-align: center;
+            padding: 60px 8vw;
+            opacity: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .slide.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        /* ── Floating BG blobs ── */
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(90px);
+            pointer-events: none;
+            z-index: 0;
+            animation: blobFloat 8s ease-in-out infinite alternate;
+        }
+
+        @keyframes blobFloat {
+            from {
+                transform: translateY(0) scale(1);
+            }
+
+            to {
+                transform: translateY(-30px) scale(1.05);
+            }
+        }
+
+        /* ── Grid BG ── */
+        .grid-bg {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
+
+        /* ═══════════════════════════════════════════
+   SHARED ELEMENT STYLES
+═══════════════════════════════════════════ */
+        .slide-content {
+            position: relative;
+            z-index: 2;
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        .slide-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--amber);
+            background: rgba(245, 158, 11, 0.12);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            padding: 6px 18px;
+            border-radius: 999px;
+            margin-bottom: 20px;
+        }
+
+        .slide-title {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(2.2rem, 5vw, 3.8rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 18px;
+        }
+
+        .slide-subtitle {
+            font-size: clamp(1rem, 2vw, 1.25rem);
+            color: var(--muted);
+            line-height: 1.7;
+            max-width: 680px;
+            margin: 0 auto 32px;
+        }
+
+        .hl {
+            background: var(--g-brand);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hl2 {
+            background: linear-gradient(135deg, var(--violet), var(--teal));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Cards */
+        .cards-row {
+            display: grid;
+            gap: 16px;
+            margin-top: 8px;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px 22px;
+            text-align: left;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(245, 158, 11, 0.4);
+        }
+
+        .card-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .card h4 {
+            font-weight: 800;
+            font-size: 1rem;
+            margin-bottom: 6px;
+        }
+
+        .card p {
+            font-size: 0.84rem;
+            color: var(--muted);
+            line-height: 1.55;
+        }
+
+        /* Bullet list */
+        .bullet-list {
+            list-style: none;
+            text-align: left;
+            margin: 0 auto;
+        }
+
+        .bullet-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            font-size: 0.95rem;
+            line-height: 1.55;
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+
+        .bullet-list li .bi {
+            font-size: 1.1rem;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        /* Stat pills */
+        .stats-row {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 24px;
+        }
+
+        .stat-pill {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 18px 28px;
+            text-align: center;
+            min-width: 130px;
+        }
+
+        .stat-pill .num {
+            font-family: 'Syne', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 800;
+        }
+
+        .stat-pill .lbl {
+            font-size: 0.75rem;
+            color: var(--muted);
+            margin-top: 2px;
+        }
+
+        /* Step pipeline */
+        .pipeline {
+            display: flex;
+            gap: 0;
+            align-items: stretch;
+            margin-top: 24px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .pipe-step {
+            flex: 1;
+            min-width: 130px;
+            max-width: 180px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 20px 14px;
+            text-align: center;
+            position: relative;
+            margin: 6px;
+            transition: transform 0.3s ease;
+        }
+
+        .pipe-step:hover {
+            transform: translateY(-4px);
+        }
+
+        .pipe-step .step-num {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--g-brand);
+            color: #fff;
+            font-weight: 800;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+        }
+
+        .pipe-step .step-icon {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+
+        .pipe-step h5 {
+            font-size: 0.82rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .pipe-step p {
+            font-size: 0.72rem;
+            color: var(--muted);
+        }
+
+        /* Feature boxes */
+        .feat-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-top: 20px;
+        }
+
+        .feat-box {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 20px 16px;
+            transition: all 0.3s ease;
+            cursor: default;
+        }
+
+        .feat-box:hover {
+            background: rgba(245, 158, 11, 0.08);
+            border-color: rgba(245, 158, 11, 0.4);
+            transform: scale(1.03);
+        }
+
+        .feat-box .fb-icon {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+
+        .feat-box h5 {
+            font-weight: 800;
+            font-size: 0.88rem;
+            margin-bottom: 5px;
+        }
+
+        .feat-box p {
+            font-size: 0.76rem;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        /* ═══════════════════════════════════════════
+   SLIDE 1 SPECIFICS
+═══════════════════════════════════════════ */
+        #slide1 {
+            background: radial-gradient(ellipse at 60% 30%, rgba(245, 158, 11, 0.12) 0%, transparent 65%),
+                radial-gradient(ellipse at 20% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 60%), var(--bg2);
+        }
+
+        .title-cat {
+            font-size: 5rem;
+            display: block;
+            animation: catBounce 2s ease-in-out infinite;
+            margin-bottom: 4px;
+        }
+
+        @keyframes catBounce {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(-5deg);
+            }
+
+            50% {
+                transform: translateY(-12px) rotate(5deg);
+            }
+        }
+
+        .badge-row {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 28px;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 5px 14px;
+            border-radius: 999px;
+        }
+
+        .badge.ai {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--amber);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .badge.ml {
+            background: rgba(139, 92, 246, 0.15);
+            color: #a78bfa;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+
+        .badge.flask {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        /* ═══════════════════════════════════════════
+   ANIMATIONS (element-level)
+═══════════════════════════════════════════ */
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        @keyframes fadeDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.85)
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1)
+            }
+        }
+
+        /* ═══════════════════════════════════════════
+   ANIMATED LINE (slide 4)
+═══════════════════════════════════════════ */
+        .connector-line {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+            margin: 24px 0 0;
+        }
+
+        .c-node {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--amber);
+            flex-shrink: 0;
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.6);
+        }
+
+        .c-line {
+            height: 2px;
+            flex: 1;
+            max-width: 80px;
+            background: linear-gradient(90deg, var(--amber), var(--violet));
+            transform: scaleX(0);
+            transform-origin: left;
+            animation: lineGrow 0.8s ease forwards;
+        }
+
+        @keyframes lineGrow {
+            to {
+                transform: scaleX(1);
+            }
+        }
+
+        /* ═══════════════════════════════════════════
+   SLIDE 6 (CONCLUSION)
+═══════════════════════════════════════════ */
+        .cta-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--g-brand);
+            color: #fff;
+            font-weight: 800;
+            font-size: 1rem;
+            padding: 14px 36px;
+            border-radius: 999px;
+            margin-top: 28px;
+            box-shadow: 0 8px 32px rgba(245, 158, 11, 0.4);
+            cursor: pointer;
+            border: none;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(245, 158, 11, 0.55);
+        }
+
+        .future-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .fp {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 8px 18px;
+            border-radius: 999px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            transition: all 0.25s ease;
+        }
+
+        .fp:hover {
+            background: rgba(245, 158, 11, 0.12);
+            border-color: rgba(245, 158, 11, 0.4);
+            color: var(--amber);
+        }
+
+        /* ═══════════════════════════════════════════
+   SCROLLBAR HIDE
+═══════════════════════════════════════════ */
+        ::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Progress bar -->
+    <div id="progressBar"></div>
+
+    <!-- Nav dots -->
+    <div id="navDots">
+        <div class="dot active" data-index="0" data-label="Title"></div>
+        <div class="dot" data-index="1" data-label="Problem"></div>
+        <div class="dot" data-index="2" data-label="Solution"></div>
+        <div class="dot" data-index="3" data-label="Architecture"></div>
+        <div class="dot" data-index="4" data-label="Features"></div>
+        <div class="dot" data-index="5" data-label="Conclusion"></div>
+    </div>
+
+    <!-- Slide counter -->
+    <div id="slideCounter">01 / 06</div>
+
+    <!-- Keyboard hint -->
+    <div id="hint">← → Arrow Keys &nbsp;|&nbsp; Scroll to Navigate</div>
+
+    <!-- ═══════════════════════════════════
+     SLIDES
+════════════════════════════════════ -->
+    <div id="slidesWrap">
+
+        <!-- ╔══════════════════════════════╗
+       ║  SLIDE 1 — TITLE             ║
+       ╚══════════════════════════════╝ -->
+        <section class="slide active" id="slide1">
+            <div class="grid-bg"></div>
+            <div class="blob"
+                style="width:400px;height:400px;background:rgba(245,158,11,0.12);top:-80px;right:-80px;animation-delay:0s;">
+            </div>
+            <div class="blob"
+                style="width:300px;height:300px;background:rgba(139,92,246,0.10);bottom:-60px;left:-60px;animation-delay:2s;">
+            </div>
+
+            <div class="slide-content">
+                <span class="title-cat" id="s1Cat">🐱</span>
+                <div class="slide-label" id="s1Label">🎓 Final Year AI Project — Feb 2026 | Batch 8</div>
+                <h1 class="slide-title" id="s1Title">
+                    Development of an<br>
+                    <span class="hl">AI-Based Cat Emotion</span><br>
+                    Recognition System
+                </h1>
+                <p class="slide-subtitle" id="s1Sub">
+                    Using Facial &amp; Vocal Analysis powered by Deep Learning<br>
+                    Flask Backend · CNN Image Model · Audio Classification
+                </p>
+                <div class="badge-row" id="s1Badges">
+                    <span class="badge ai">🤖 AI / Deep Learning</span>
+                    <span class="badge ml">📊 Machine Learning</span>
+                    <span class="badge flask">🌐 Flask Web App</span>
+                    <span class="badge ai">🐾 Computer Vision</span>
+                    <span class="badge ml">🎵 Audio Processing</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ╔══════════════════════════════╗
+       ║  SLIDE 2 — PROBLEM           ║
+       ╚══════════════════════════════╝ -->
+        <section class="slide" id="slide2">
+            <div class="grid-bg"></div>
+            <div class="blob"
+                style="width:350px;height:350px;background:rgba(244,63,94,0.10);top:-50px;left:-50px;animation-delay:1s;">
+            </div>
+            <div class="blob"
+                style="width:280px;height:280px;background:rgba(245,158,11,0.08);bottom:-40px;right:-40px;animation-delay:3s;">
+            </div>
+
+            <div class="slide-content">
+                <div class="slide-label">⚠️ Problem Statement</div>
+                <h2 class="slide-title">Why Can't We <span class="hl">Understand Cats?</span></h2>
+                <p class="slide-subtitle">Cats are the world's most popular pets — yet their emotions remain widely
+                    misunderstood.</p>
+
+                <div class="cards-row" style="grid-template-columns:repeat(2,1fr);" id="s2Cards">
+                    <div class="card">
+                        <div class="card-icon">🗣️</div>
+                        <h4>Limited Communication</h4>
+                        <p>Cats can't verbally express distress, pain, or happiness. Owners often misread behavioral
+                            signals entirely.</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">😰</div>
+                        <h4>Delayed Veterinary Care</h4>
+                        <p>Unrecognized negative emotions like fear or anger can delay necessary medical intervention
+                            and worsen health outcomes.</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">📉</div>
+                        <h4>No Automated Tools</h4>
+                        <p>No accessible, AI-powered system exists to decode cat emotions from everyday photos and audio
+                            clips.</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">💔</div>
+                        <h4>Weak Human–Cat Bond</h4>
+                        <p>Failure to understand emotional states results in reduced quality of interaction and weaker
+                            human–cat relationships.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ╔══════════════════════════════╗
+       ║  SLIDE 3 — SOLUTION          ║
+       ╚══════════════════════════════╝ -->
+        <section class="slide" id="slide3">
+            <div class="grid-bg"></div>
+            <div class="blob"
+                style="width:400px;height:400px;background:rgba(16,185,129,0.10);top:-60px;right:-60px;animation-delay:0.5s;">
+            </div>
+            <div class="blob"
+                style="width:300px;height:300px;background:rgba(59,130,246,0.08);bottom:-40px;left:-40px;animation-delay:2.5s;">
+            </div>
+
+            <div class="slide-content">
+                <div class="slide-label">✅ Our Solution — MewConnect</div>
+                <h2 class="slide-title"><span class="hl2">MewConnect</span> — AI Emotion Bridge</h2>
+                <p class="slide-subtitle">An end-to-end web application that reads cat emotions from photos and audio
+                    using trained neural networks.</p>
+
+                <div class="stats-row" id="s3Stats">
+                    <div class="stat-pill">
+                        <div class="num"
+                            style="background:var(--g-brand);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">
+                            7+</div>
+                        <div class="lbl">Emotions Classified</div>
+                    </div>
+                    <div class="stat-pill">
+                        <div class="num" style="color:var(--teal);">92%</div>
+                        <div class="lbl">Image Accuracy</div>
+                    </div>
+                    <div class="stat-pill">
+                        <div class="num" style="color:var(--violet);">87%</div>
+                        <div class="lbl">Audio Accuracy</div>
+                    </div>
+                    <div class="stat-pill">
+                        <div class="num" style="color:var(--amber);">&lt;2s</div>
+                        <div class="lbl">Analysis Time</div>
+                    </div>
+                </div>
+
+                <ul class="bullet-list" id="s3List" style="max-width:680px; margin:24px auto 0;">
+                    <li><span class="bi">🖼️</span><span>Upload a cat photo — CNN model detects emotional state from
+                            facial geometry</span></li>
+                    <li><span class="bi">🎵</span><span>Upload a cat audio clip — vocal patterns analyzed for emotional
+                            classification</span></li>
+                    <li><span class="bi">📊</span><span>Dashboard tracks emotion history with visual charts and trend
+                            analysis</span></li>
+                    <li><span class="bi">🔐</span><span>Secure auth system with user profiles, prediction logs, and
+                            metrics</span></li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- ╔══════════════════════════════╗
+       ║  SLIDE 4 — ARCHITECTURE      ║
+       ╚══════════════════════════════╝ -->
+        <section class="slide" id="slide4">
+            <div class="grid-bg"></div>
+            <div class="blob"
+                style="width:360px;height:360px;background:rgba(139,92,246,0.10);top:-50px;left:-50px;animation-delay:1.5s;">
+            </div>
+
+            <div class="slide-content">
+                <div class="slide-label">🏗️ System Architecture</div>
+                <h2 class="slide-title">How It <span class="hl">Works</span></h2>
+                <p class="slide-subtitle" style="margin-bottom:8px;">From upload to prediction in milliseconds</p>
+
+                <div class="pipeline" id="s4Pipeline">
+                    <div class="pipe-step">
+                        <div class="step-num">1</div>
+                        <div class="step-icon">📤</div>
+                        <h5>Upload</h5>
+                        <p>User uploads image or audio via drag-drop web interface</p>
+                    </div>
+                    <div class="pipe-step">
+                        <div class="step-num">2</div>
+                        <div class="step-icon">🌐</div>
+                        <h5>Flask API</h5>
+                        <p>Backend routes request to appropriate ML model pipeline</p>
+                    </div>
+                    <div class="pipe-step">
+                        <div class="step-num">3</div>
+                        <div class="step-icon">🧠</div>
+                        <h5>AI Model</h5>
+                        <p>CNN or audio classifier processes and returns emotion label</p>
+                    </div>
+                    <div class="pipe-step">
+                        <div class="step-num">4</div>
+                        <div class="step-icon">💾</div>
+                        <h5>Database</h5>
+                        <p>Prediction stored in SQLite with timestamp and user context</p>
+                    </div>
+                    <div class="pipe-step">
+                        <div class="step-num">5</div>
+                        <div class="step-icon">📊</div>
+                        <h5>Dashboard</h5>
+                        <p>Results displayed with confidence scores, charts, and history</p>
+                    </div>
+                </div>
+
+                <div class="connector-line" id="s4Line" style="max-width:600px;margin:20px auto 0;">
+                    <div class="c-node"></div>
+                    <div class="c-line" style="animation-delay:0.2s"></div>
+                    <div class="c-node"></div>
+                    <div class="c-line" style="animation-delay:0.5s"></div>
+                    <div class="c-node"></div>
+                    <div class="c-line" style="animation-delay:0.8s"></div>
+                    <div class="c-node"></div>
+                    <div class="c-line" style="animation-delay:1.1s"></div>
+                    <div class="c-node"></div>
+                </div>
+
+                <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:18px;">
+                    <span
+                        style="font-size:0.75rem;background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.3);color:#60a5fa;padding:5px 14px;border-radius:999px;font-weight:600;">Python
+                        Flask</span>
+                    <span
+                        style="font-size:0.75rem;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.3);color:var(--amber);padding:5px 14px;border-radius:999px;font-weight:600;">TensorFlow
+                        / Keras</span>
+                    <span
+                        style="font-size:0.75rem;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);color:#34d399;padding:5px 14px;border-radius:999px;font-weight:600;">OpenCV</span>
+                    <span
+                        style="font-size:0.75rem;background:rgba(139,92,246,0.12);border:1px solid rgba(139,92,246,0.3);color:#a78bfa;padding:5px 14px;border-radius:999px;font-weight:600;">Librosa</span>
+                    <span
+                        style="font-size:0.75rem;background:rgba(244,63,94,0.12);border:1px solid rgba(244,63,94,0.3);color:#fb7185;padding:5px 14px;border-radius:999px;font-weight:600;">SQLite</span>
+                    <span
+                        style="font-size:0.75rem;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);color:var(--muted);padding:5px 14px;border-radius:999px;font-weight:600;">HTML/CSS/JS</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ╔══════════════════════════════╗
+       ║  SLIDE 5 — FEATURES           ║
+       ╚══════════════════════════════╝ -->
+        <section class="slide" id="slide5">
+            <div class="grid-bg"></div>
+            <div class="blob"
+                style="width:380px;height:380px;background:rgba(245,158,11,0.10);bottom:-60px;right:-60px;animation-delay:0s;">
+            </div>
+
+            <div class="slide-content">
+                <div class="slide-label">⚡ Features & Demo</div>
+                <h2 class="slide-title">What <span class="hl">MewConnect</span> Delivers</h2>
+
+                <div class="feat-grid" id="s5Grid">
+                    <div class="feat-box">
+                        <div class="fb-icon">🔍</div>
+                        <h5>Emotion Detection</h5>
+                        <p>CNN classifies Happy, Sad, Angry, Curious, Scared, Relaxed and more from a single photo.</p>
+                    </div>
+                    <div class="feat-box">
+                        <div class="fb-icon">🎵</div>
+                        <h5>Vocal Analysis</h5>
+                        <p>Audio model analyzes meow frequency, pitch, and duration to predict emotional state.</p>
+                    </div>
+                    <div class="feat-box">
+                        <div class="fb-icon">📈</div>
+                        <h5>Trend Dashboard</h5>
+                        <p>Interactive charts track emotion patterns over time with weekly and monthly views.</p>
+                    </div>
+                    <div class="feat-box">
+                        <div class="fb-icon">🕐</div>
+                        <h5>History Logs</h5>
+                        <p>Every prediction is logged with timestamp, filename, and emotion label for future reference.
+                        </p>
+                    </div>
+                    <div class="feat-box">
+                        <div class="fb-icon">🔒</div>
+                        <h5>Secure Auth</h5>
+                        <p>Flask-Login user authentication with hashed passwords, session management, and profile
+                            control.</p>
+                    </div>
+                    <div class="feat-box">
+                        <div class="fb-icon">📱</div>
+                        <h5>Responsive UI</h5>
+                        <p>Dark glassmorphic design works smoothly on any device — desktop, tablet, or mobile.</p>
+                    </div>
+                </div>
+
+                <div class="stats-row" style="margin-top:16px;" id="s5Stats">
+                    <div class="stat-pill">
+                        <div class="num" style="color:var(--amber);">7</div>
+                        <div class="lbl">Emotions</div>
+                    </div>
+                    <div class="stat-pill">
+                        <div class="num" style="color:var(--teal);">2</div>
+                        <div class="lbl">AI Models</div>
+                    </div>
+                    <div class="stat-pill">
+                        <div class="num" style="color:var(--violet);">5</div>
+                        <div class="lbl">App Pages</div>
+                    </div>
+                    <div class="stat-pill">
+                        <div class="num" style="color:var(--rose);">∞</div>
+                        <div class="lbl">Analyses</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ╔══════════════════════════════╗
+       ║  SLIDE 6 — CONCLUSION         ║
+       ╚══════════════════════════════╝ -->
+        <section class="slide" id="slide6">
+            <div class="grid-bg"></div>
+            <div class="blob"
+                style="width:500px;height:500px;background:rgba(245,158,11,0.08);top:50%;left:50%;transform:translate(-50%,-50%);animation-delay:0s;">
+            </div>
+
+            <div class="slide-content">
+                <span
+                    style="font-size:4rem;display:block;margin-bottom:12px;animation:catBounce 2s ease-in-out infinite;">🐾</span>
+                <div class="slide-label">🎯 Conclusion &amp; Future Scope</div>
+                <h2 class="slide-title">Building a Future of <span class="hl">Human–Cat</span> Understanding</h2>
+                <p class="slide-subtitle">MewConnect proves AI can bridge the emotional gap between humans and their
+                    feline companions.</p>
+
+                <div class="future-pills" id="s6Pills">
+                    <span class="fp">🤖 Multi-pet support (dogs, birds)</span>
+                    <span class="fp">📱 Native mobile app</span>
+                    <span class="fp">🔴 Real-time video stream analysis</span>
+                    <span class="fp">☁️ Cloud model retraining</span>
+                    <span class="fp">🩺 Vet recommendation engine</span>
+                    <span class="fp">📊 Emotion-based health alerts</span>
+                    <span class="fp">🌍 Multi-language UI</span>
+                </div>
+
+                <div
+                    style="margin-top:28px; display:flex; align-items:center; justify-content:center; gap:20px; flex-wrap:wrap;">
+                    <div
+                        style="text-align:left; background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:18px 24px;">
+                        <div
+                            style="font-size:0.72rem;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.08em;">
+                            Team</div>
+                        <div style="font-weight:800; font-size:1rem;">AI Engineering — Feb Batch 8, 2026</div>
+                    </div>
+                    <div
+                        style="text-align:left; background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:18px 24px;">
+                        <div
+                            style="font-size:0.72rem;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.08em;">
+                            Stack</div>
+                        <div style="font-weight:800; font-size:1rem;">Python · Flask · TensorFlow · Vanilla JS</div>
+                    </div>
+                </div>
+
+                <div style="margin-top:24px; font-size:1.5rem; letter-spacing:6px; opacity:0.5;">🐱 😸 🐾 😺 🐈</div>
+            </div>
+        </section>
+
+    </div><!-- /slidesWrap -->
+
+    <!-- ════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════ -->
+    <script>
+        /* ── State ── */
+        let current = 0;
+        const TOTAL = 6;
+        let animating = false;
+
+        /* ── Refs ── */
+        const slides = document.querySelectorAll('.slide');
+        const dots = document.querySelectorAll('.dot');
+        const progress = document.getElementById('progressBar');
+        const counter = document.getElementById('slideCounter');
+
+        /* ═══════════════════════════════
+           SLIDE TRANSITION (GSAP)
+        ═══════════════════════════════ */
+        function goTo(index, dir = 1) {
+            if (index === current || animating || index < 0 || index >= TOTAL) return;
+            animating = true;
+
+            const leaving = slides[current];
+            const entering = slides[index];
+
+            // Leaving: slide out
+            gsap.to(leaving, {
+                opacity: 0,
+                x: dir > 0 ? -80 : 80,
+                scale: 0.97,
+                duration: 0.45,
+                ease: 'power2.in',
+                onComplete: () => {
+                    leaving.classList.remove('active');
+                    gsap.set(leaving, { x: 0, scale: 1 });
+                }
+            });
+
+            // Entering: slide in
+            entering.classList.add('active');
+            gsap.fromTo(entering,
+                { opacity: 0, x: dir > 0 ? 100 : -100, scale: 0.97 },
+                {
+                    opacity: 1, x: 0, scale: 1, duration: 0.55, ease: 'power3.out',
+                    onComplete: () => {
+                        animating = false;
+                        animateSlideContent(index);
+                    }
+                }
+            );
+
+            current = index;
+            updateUI();
+        }
+
+        /* ═══════════════════════════════
+           SLIDE CONTENT ANIMATIONS
+        ═══════════════════════════════ */
+        function animateSlideContent(idx) {
+            const tl = gsap.timeline();
+
+            if (idx === 0) {
+                tl.from('#s1Cat', { y: -30, opacity: 0, duration: 0.5, ease: 'back.out(2)' })
+                    .from('#s1Label', { y: 20, opacity: 0, duration: 0.4 }, '-=0.2')
+                    .from('#s1Title', { y: 30, opacity: 0, duration: 0.5, stagger: 0.08 }, '-=0.2')
+                    .from('#s1Sub', { y: 20, opacity: 0, duration: 0.4 }, '-=0.2')
+                    .from('#s1Badges .badge', { y: 15, opacity: 0, duration: 0.35, stagger: 0.1, ease: 'back.out(1.5)' }, '-=0.2');
+            }
+
+            if (idx === 1) {
+                tl.from('.slide-label', { y: 20, opacity: 0, duration: 0.4 })
+                    .from('.slide-title', { y: 30, opacity: 0, duration: 0.5 }, '-=0.2')
+                    .from('.slide-subtitle', { y: 20, opacity: 0, duration: 0.4 }, '-=0.2')
+                    .from('#s2Cards .card', { y: 40, opacity: 0, duration: 0.5, stagger: 0.12, ease: 'power3.out' }, '-=0.2');
+            }
+
+            if (idx === 2) {
+                const items = document.querySelectorAll('#s3List li');
+                tl.from('.slide-label', { y: 20, opacity: 0, duration: 0.4 })
+                    .from('.slide-title', { y: 30, opacity: 0, duration: 0.5 }, '-=0.2')
+                    .from('#s3Stats .stat-pill', { scale: 0.8, opacity: 0, duration: 0.45, stagger: 0.1, ease: 'back.out(2)' }, '-=0.2');
+                items.forEach((li, i) => {
+                    tl.to(li, { opacity: 1, x: 0, duration: 0.4, ease: 'power2.out' }, `-=0.15`);
+                });
+            }
+
+            if (idx === 3) {
+                tl.from('.slide-label', { y: 20, opacity: 0, duration: 0.4 })
+                    .from('.slide-title', { y: 30, opacity: 0, duration: 0.5 }, '-=0.2')
+                    .from('#s4Pipeline .pipe-step', { y: 50, opacity: 0, duration: 0.5, stagger: 0.1, ease: 'power3.out' }, '-=0.2');
+            }
+
+            if (idx === 4) {
+                tl.from('.slide-label', { y: 20, opacity: 0, duration: 0.4 })
+                    .from('.slide-title', { y: 30, opacity: 0, duration: 0.5 }, '-=0.2')
+                    .from('#s5Grid .feat-box', { y: 40, opacity: 0, duration: 0.45, stagger: 0.08, ease: 'power3.out' }, '-=0.2')
+                    .from('#s5Stats .stat-pill', { scale: 0.8, opacity: 0, duration: 0.4, stagger: 0.1, ease: 'back.out(2)' }, '-=0.15');
+            }
+
+            if (idx === 5) {
+                tl.from('.slide-label', { y: 20, opacity: 0, duration: 0.4 })
+                    .from('.slide-title', { y: 30, opacity: 0, duration: 0.55 }, '-=0.2')
+                    .from('.slide-subtitle', { y: 20, opacity: 0, duration: 0.4 }, '-=0.2')
+                    .from('#s6Pills .fp', { y: 20, opacity: 0, scale: 0.9, duration: 0.4, stagger: 0.08, ease: 'back.out(1.5)' }, '-=0.2');
+            }
+        }
+
+        /* ═══════════════════════════════
+           UPDATE PROGRESS + DOTS + COUNTER
+        ═══════════════════════════════ */
+        function updateUI() {
+            // Progress bar
+            const pct = ((current + 1) / TOTAL) * 100;
+            progress.style.width = pct + '%';
+
+            // Dots
+            dots.forEach((d, i) => d.classList.toggle('active', i === current));
+
+            // Counter
+            const n = String(current + 1).padStart(2, '0');
+            counter.textContent = `${n} / 0${TOTAL}`;
+        }
+
+        /* ═══════════════════════════════
+           INPUT HANDLERS
+        ═══════════════════════════════ */
+
+        // Keyboard
+        document.addEventListener('keydown', e => {
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown') goTo(current + 1, 1);
+            if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') goTo(current - 1, -1);
+            if (e.key === 'Home') goTo(0, -1);
+            if (e.key === 'End') goTo(TOTAL - 1, 1);
+        });
+
+        // Mouse wheel (debounced)
+        let wheelTimer = null;
+        document.addEventListener('wheel', e => {
+            if (wheelTimer) return;
+            const dir = e.deltaY > 0 ? 1 : -1;
+            goTo(current + dir, dir);
+            wheelTimer = setTimeout(() => { wheelTimer = null; }, 900);
+        }, { passive: true });
+
+        // Touch swipe
+        let touchStartY = 0;
+        document.addEventListener('touchstart', e => { touchStartY = e.touches[0].clientY; }, { passive: true });
+        document.addEventListener('touchend', e => {
+            const diff = touchStartY - e.changedTouches[0].clientY;
+            if (Math.abs(diff) > 50) goTo(current + (diff > 0 ? 1 : -1), diff > 0 ? 1 : -1);
+        });
+
+        // Dot clicks
+        dots.forEach(d => {
+            d.addEventListener('click', () => {
+                const idx = parseInt(d.getAttribute('data-index'));
+                goTo(idx, idx > current ? 1 : -1);
+            });
+        });
+
+        /* ═══════════════════════════════
+           INIT
+        ═══════════════════════════════ */
+        updateUI();
+        setTimeout(() => animateSlideContent(0), 100);
+    </script>
+</body>
+
+</html>

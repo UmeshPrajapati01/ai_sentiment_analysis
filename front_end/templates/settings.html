@@ -1,0 +1,367 @@
+{% extends "base.html" %}
+{% block title %}Settings | MeowMood{% endblock %}
+{% block page_id %}settings{% endblock %}
+
+{% block body %}
+<div class="dashboard-layout">
+  {% set active_page = 'settings' %}
+  {% include '_sidebar.html' %}
+
+  <main class="main-content" id="mainContent">
+    <button id="sidebarToggle" style="display:none;position:fixed;top:16px;left:16px;z-index:600;width:44px;height:44px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;font-size:1.2rem;cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,0.1);align-items:center;justify-content:center;" aria-label="Toggle sidebar">☰</button>
+
+    <div class="page-header">
+      <div>
+        <h1>Settings ⚙️</h1>
+        <p>Manage your account, preferences and security</p>
+      </div>
+    </div>
+
+    <!-- Settings Grid -->
+    <div style="display:flex;flex-direction:column;gap:20px;">
+
+      <!-- Account Info -->
+      <div class="dash-card reveal">
+        <div class="dash-card-header"><h3>👤 Account Information</h3></div>
+        <form method="POST" action="{{ url_for('settings_save') }}">
+          <input type="hidden" name="section" value="account">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+            <div class="form-group" style="margin:0;">
+              <label class="settings-label">Display Name</label>
+              <input type="text" name="display_name" class="form-control settings-input" value="{{ current_user.display_name }}">
+            </div>
+            <div class="form-group" style="margin:0;">
+              <label class="settings-label">Email Address</label>
+              <input type="email" name="email" class="form-control settings-input" value="{{ current_user.email }}" readonly style="opacity:0.5;cursor:not-allowed;">
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-sm">💾 Save Changes</button>
+        </form>
+      </div>
+
+      <!-- Change Password -->
+      <div class="dash-card reveal">
+        <div class="dash-card-header"><h3>🔒 Change Password</h3></div>
+        <form method="POST" action="{{ url_for('settings_save') }}">
+          <input type="hidden" name="section" value="password">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px;">
+            <div class="form-group" style="margin:0;">
+              <label class="settings-label">Current Password</label>
+              <input type="password" name="current_password" class="form-control settings-input" placeholder="••••••••">
+            </div>
+            <div class="form-group" style="margin:0;">
+              <label class="settings-label">New Password</label>
+              <input type="password" name="new_password" class="form-control settings-input" placeholder="••••••••">
+            </div>
+            <div class="form-group" style="margin:0;">
+              <label class="settings-label">Confirm New Password</label>
+              <input type="password" name="confirm_password" class="form-control settings-input" placeholder="••••••••">
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-sm">🔑 Update Password</button>
+        </form>
+      </div>
+
+      <!-- Notifications -->
+      <div class="dash-card reveal">
+        <div class="dash-card-header"><h3>🔔 Notification Preferences</h3></div>
+        <form method="POST" action="{{ url_for('settings_save') }}">
+          <input type="hidden" name="section" value="notifications">
+          <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:16px;">
+            {% for key, label, desc in [
+              ('notif_analysis','Analysis Complete','Get notified when your image or audio analysis finishes'),
+              ('notif_credits','Low Credits Alert','Warn me when my credits drop below 5'),
+              ('notif_tips','Weekly Cat Tips','Receive weekly tips about cat emotions and behaviour'),
+              ('notif_updates','Product Updates','Stay informed about new MeowMood features')
+            ] %}
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;">
+              <div>
+                <div style="font-weight:600;color:var(--dash-text);font-size:0.9rem;">{{ label }}</div>
+                <div style="font-size:0.78rem;color:var(--dash-text2);margin-top:2px;">{{ desc }}</div>
+              </div>
+              <label class="settings-toggle">
+                <input type="checkbox" name="{{ key }}" {% if loop.index <= 2 %}checked{% endif %}>
+                <span class="settings-toggle-slider"></span>
+              </label>
+            </div>
+            {% endfor %}
+          </div>
+          <button type="submit" class="btn btn-primary btn-sm">💾 Save Preferences</button>
+        </form>
+      </div>
+
+      <!-- Appearance -->
+      <div class="dash-card reveal">
+        <div class="dash-card-header"><h3>🎨 Appearance</h3></div>
+        <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:16px;">
+
+          <!-- Theme Picker -->
+          <div style="padding:16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;">
+            <div style="font-weight:600;color:var(--dash-text);font-size:0.9rem;margin-bottom:4px;">🌈 Dashboard Theme</div>
+            <div style="font-size:0.78rem;color:var(--dash-text2);margin-bottom:14px;">Choose your colour palette</div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;" id="themePicker">
+
+              <button class="theme-btn" data-theme="solar-amber" onclick="applyTheme('solar-amber',this)" title="Solar Amber">
+                <div class="theme-preview" style="background:linear-gradient(135deg,#0f0a00,#241a00);border:2px solid rgba(255,194,0,0.4);">
+                  <span style="color:#ffc200;font-size:1.1rem;">☀️</span>
+                </div>
+                <div class="theme-name">Solar Amber</div>
+              </button>
+
+              <button class="theme-btn" data-theme="midnight-purple" onclick="applyTheme('midnight-purple',this)" title="Midnight Purple">
+                <div class="theme-preview" style="background:linear-gradient(135deg,#0d0618,#1a0a2e);border:2px solid rgba(168,85,247,0.4);">
+                  <span style="color:#a855f7;font-size:1.1rem;">🔮</span>
+                </div>
+                <div class="theme-name">Midnight Purple</div>
+              </button>
+
+              <button class="theme-btn" data-theme="ocean-cyan" onclick="applyTheme('ocean-cyan',this)" title="Ocean Cyan">
+                <div class="theme-preview" style="background:linear-gradient(135deg,#020d14,#041c2c);border:2px solid rgba(6,182,212,0.4);">
+                  <span style="color:#06b6d4;font-size:1.1rem;">🌊</span>
+                </div>
+                <div class="theme-name">Ocean Cyan</div>
+              </button>
+
+              <button class="theme-btn" data-theme="soft-dark" onclick="applyTheme('soft-dark',this)" title="Soft Dark">
+                <div class="theme-preview" style="background:linear-gradient(135deg,#1a1a2e,#16213e);border:2px solid rgba(236,72,153,0.4);">
+                  <span style="color:#ec4899;font-size:1.1rem;">🌸</span>
+                </div>
+                <div class="theme-name">Soft Dark</div>
+              </button>
+
+              <button class="theme-btn" data-theme="light-white" onclick="applyTheme('light-white',this)" title="Light White">
+                <div class="theme-preview" style="background:linear-gradient(135deg,#ffffff,#f1f5f9);border:2px solid rgba(99,102,241,0.4);">
+                  <span style="font-size:1.1rem;">☀️</span>
+                </div>
+                <div class="theme-name">Light</div>
+              </button>
+
+              <button class="theme-btn" data-theme="eye-protection" onclick="applyTheme('eye-protection',this)" title="Eye Protection">
+                <div class="theme-preview" style="background:linear-gradient(135deg,#fefce8,#fef9c3);border:2px solid rgba(202,138,4,0.5);">
+                  <span style="font-size:1.1rem;">🛡️</span>
+                </div>
+                <div class="theme-name">Eye Protection</div>
+              </button>
+
+            </div>
+          </div>
+
+          <!-- Accent Color -->
+          <div style="padding:16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;">
+            <div style="font-weight:600;color:var(--dash-text);font-size:0.9rem;margin-bottom:4px;">✨ Accent Colour</div>
+            <div style="font-size:0.78rem;color:var(--dash-text2);margin-bottom:14px;">Primary highlight colour across the UI</div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;" id="accentPicker">
+              <button class="accent-btn" data-accent="#00e5ff" onclick="applyAccent('#00e5ff',this)" style="background:#00e5ff;" title="Cyan"></button>
+              <button class="accent-btn" data-accent="#a855f7" onclick="applyAccent('#a855f7',this)" style="background:#a855f7;" title="Purple"></button>
+              <button class="accent-btn" data-accent="#ec4899" onclick="applyAccent('#ec4899',this)" style="background:#ec4899;" title="Pink"></button>
+              <button class="accent-btn" data-accent="#10b981" onclick="applyAccent('#10b981',this)" style="background:#10b981;" title="Green"></button>
+              <button class="accent-btn" data-accent="#f59e0b" onclick="applyAccent('#f59e0b',this)" style="background:#f59e0b;" title="Amber"></button>
+              <button class="accent-btn" data-accent="#ef4444" onclick="applyAccent('#ef4444',this)" style="background:#ef4444;" title="Red"></button>
+            </div>
+          </div>
+
+          <!-- Sidebar Style -->
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;">
+            <div>
+              <div style="font-weight:600;color:var(--dash-text);font-size:0.9rem;">Compact Sidebar</div>
+              <div style="font-size:0.78rem;color:var(--dash-text2);margin-top:2px;">Show icons only, hide labels</div>
+            </div>
+            <label class="settings-toggle">
+              <input type="checkbox" id="toggleCompactSidebar" onchange="toggleCompact(this.checked)">
+              <span class="settings-toggle-slider"></span>
+            </label>
+          </div>
+
+          <!-- Credit Popup -->
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;">
+            <div>
+              <div style="font-weight:600;color:var(--dash-text);font-size:0.9rem;">Credit Used Popup</div>
+              <div style="font-size:0.78rem;color:var(--dash-text2);margin-top:2px;">Show popup after each analysis</div>
+            </div>
+            <label class="settings-toggle">
+              <input type="checkbox" id="toggleCreditPopup" checked onchange="localStorage.setItem('creditPopupSnoozedUntil', this.checked ? '' : Date.now()+9999999999)">
+              <span class="settings-toggle-slider"></span>
+            </label>
+          </div>
+
+          <!-- Scan Animation -->
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;">
+            <div>
+              <div style="font-weight:600;color:var(--dash-text);font-size:0.9rem;">Scan Animation</div>
+              <div style="font-size:0.78rem;color:var(--dash-text2);margin-top:2px;">Show scan line effect during analysis</div>
+            </div>
+            <label class="settings-toggle">
+              <input type="checkbox" checked>
+              <span class="settings-toggle-slider"></span>
+            </label>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Plan & Credits -->
+      <div class="dash-card reveal">
+        <div class="dash-card-header"><h3>💎 Plan & Credits</h3><a href="{{ url_for('plans') }}" style="color:#00e5ff;font-size:0.82rem;font-weight:600;">Manage Plans →</a></div>
+        <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+          <div style="flex:1;min-width:160px;padding:16px;background:rgba(0,229,255,0.05);border:1px solid rgba(0,229,255,0.15);border-radius:14px;text-align:center;">
+            <div style="font-size:0.72rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;">Current Plan</div>
+            <span class="credits-plan-badge plan-{{ current_user.plan }}">{{ current_user.plan_label }}</span>
+          </div>
+          <div style="flex:1;min-width:160px;padding:16px;background:rgba(168,85,247,0.05);border:1px solid rgba(168,85,247,0.15);border-radius:14px;text-align:center;">
+            <div style="font-size:0.72rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;">Available Credits</div>
+            <div style="font-family:'Space Grotesk',sans-serif;font-size:1.8rem;font-weight:800;color:#00e5ff;">⚡ {{ current_user.credits }}</div>
+          </div>
+          <div style="flex:1;min-width:160px;padding:16px;background:rgba(16,185,129,0.05);border:1px solid rgba(16,185,129,0.15);border-radius:14px;text-align:center;">
+            <div style="font-size:0.72rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;">Credit Costs</div>
+            <div style="font-size:0.82rem;color:#64748b;line-height:1.8;">📸 Image = 1 cr &nbsp;·&nbsp; 🎵 Audio = 2 cr &nbsp;·&nbsp; 🔀 Fusion = 3 cr</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Model History -->
+      <div class="dash-card reveal">
+        <div class="dash-card-header">
+          <h3>Model History</h3>
+          <a href="{{ url_for('model_history') }}" style="color:var(--cyan);font-size:0.82rem;font-weight:600;">View All →</a>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+          <div style="flex:1;">
+            <div style="font-size:0.88rem;color:var(--dash-text2);line-height:1.7;">
+              Permanent prediction log that powers your dashboard charts and graphs. This history is never deleted — even if you clear your user history, your charts stay accurate.
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;flex-shrink:0;">
+            <a href="{{ url_for('model_history') }}" class="btn btn-primary btn-sm">View Log</a>
+            <a href="{{ url_for('download_model_history') }}" class="btn btn-sm" style="background:rgba(16,185,129,0.1);color:#10b981;border:1px solid rgba(16,185,129,0.25);border-radius:999px;font-weight:700;">Download CSV</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Danger Zone -->
+      <div class="dash-card reveal" style="border:1px solid rgba(239,68,68,0.2);background:rgba(239,68,68,0.02);">
+        <div class="dash-card-header"><h3 style="color:#ef4444;">⚠️ Danger Zone</h3></div>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding:14px 16px;background:rgba(16,185,129,0.04);border:1px solid rgba(16,185,129,0.15);border-radius:12px;">
+            <div>
+              <div style="font-weight:600;color:var(--dash-text);font-size:0.9rem;">⬇️ Download History</div>
+              <div style="font-size:0.78rem;color:var(--dash-text2);">Export all your prediction records as a CSV file</div>
+            </div>
+            <a href="{{ url_for('download_history') }}" class="btn btn-sm" style="background:rgba(16,185,129,0.1);color:#10b981;border:1px solid rgba(16,185,129,0.25);border-radius:999px;font-weight:700;">⬇️ Export CSV</a>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding:14px 16px;background:rgba(239,68,68,0.04);border:1px solid rgba(239,68,68,0.12);border-radius:12px;">
+            <div>
+              <div style="font-weight:600;color:var(--dash-text);font-size:0.9rem;">Clear All History</div>
+              <div style="font-size:0.78rem;color:var(--dash-text2);">Permanently delete all your prediction records</div>
+            </div>
+            <form method="POST" action="{{ url_for('clear_history') }}" onsubmit="return confirm('Delete all history? This cannot be undone.')">
+              <button type="submit" class="btn btn-sm" style="background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.25);border-radius:999px;font-weight:700;">🗑️ Clear History</button>
+            </form>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding:14px 16px;background:rgba(239,68,68,0.04);border:1px solid rgba(239,68,68,0.12);border-radius:12px;">
+            <div>
+              <div style="font-weight:600;color:var(--dash-text);font-size:0.9rem;">Sign Out</div>
+              <div style="font-size:0.78rem;color:var(--dash-text2);">Log out of your MeowMood account</div>
+            </div>
+            <a href="{{ url_for('logout') }}" class="btn btn-sm" style="background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.25);border-radius:999px;font-weight:700;">🚪 Sign Out</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function(){
+  const toggle = document.getElementById('sidebarToggle');
+  const show = () => { if(toggle) toggle.style.display = window.innerWidth<=768?'flex':'none'; };
+  window.addEventListener('resize',show); show();
+
+  // Sync credit popup toggle with localStorage
+  const cb = document.getElementById('toggleCreditPopup');
+  if(cb){
+    const snoozed = localStorage.getItem('creditPopupSnoozedUntil');
+    cb.checked = !snoozed || Date.now() >= parseInt(snoozed);
+  }
+
+  // ── Theme definitions ──
+  var THEMES = {
+    'solar-amber':      { bg:'#0f0a00', bg2:'#1a1200', card:'#241a00', border:'rgba(255,200,0,0.1)', cyan:'#ffc200', purple:'#ff6b00', text:'#e2e8f0', text2:'#94a3b8' },
+    'midnight-purple':  { bg:'#0d0618', bg2:'#130820', card:'#1a0a2e', border:'rgba(168,85,247,0.15)', cyan:'#c084fc', purple:'#a855f7', text:'#e2e8f0', text2:'#94a3b8' },
+    'ocean-cyan':       { bg:'#020d14', bg2:'#041c2c', card:'#062030', border:'rgba(6,182,212,0.15)',   cyan:'#06b6d4', purple:'#0ea5e9', text:'#e2e8f0', text2:'#94a3b8' },
+    'soft-dark':        { bg:'#1a1a2e', bg2:'#16213e', card:'#1f2b47', border:'rgba(236,72,153,0.15)',  cyan:'#ec4899', purple:'#8b5cf6', text:'#e2e8f0', text2:'#94a3b8' },
+    'light-white':      { bg:'#ffffff', bg2:'#f1f5f9', card:'#ffffff', border:'rgba(99,102,241,0.2)',   cyan:'#6366f1', purple:'#8b5cf6', text:'#1e293b', text2:'#64748b' },
+    'eye-protection':   { bg:'#fefce8', bg2:'#fef9c3', card:'#fffde7', border:'rgba(202,138,4,0.25)',   cyan:'#ca8a04', purple:'#d97706', text:'#1c1917', text2:'#78716c' }
+  };
+
+  function applyThemeVars(t) {
+    var r = document.documentElement;
+    r.style.setProperty('--bg',   t.bg);
+    r.style.setProperty('--bg2',  t.bg2);
+    r.style.setProperty('--bg3',  t.bg2);
+    r.style.setProperty('--dash-bg',   t.bg);
+    r.style.setProperty('--dash-card', t.card);
+    r.style.setProperty('--dash-border', t.border);
+    r.style.setProperty('--cyan',   t.cyan);
+    r.style.setProperty('--cyan2',  t.cyan);
+    r.style.setProperty('--purple', t.purple);
+    if (t.text)  r.style.setProperty('--dash-text',  t.text);
+    if (t.text2) r.style.setProperty('--dash-text2', t.text2);
+  }
+
+  window.applyTheme = function(name, btn) {
+    var t = THEMES[name];
+    if (!t) return;
+    applyThemeVars(t);
+    localStorage.setItem('meowmood_theme', name);
+    // Update active state
+    document.querySelectorAll('.theme-btn').forEach(function(b){ b.classList.remove('active'); });
+    if (btn) btn.classList.add('active');
+  };
+
+  window.applyAccent = function(color, btn) {
+    document.documentElement.style.setProperty('--cyan', color);
+    document.documentElement.style.setProperty('--cyan2', color);
+    localStorage.setItem('meowmood_accent', color);
+    document.querySelectorAll('.accent-btn').forEach(function(b){ b.classList.remove('active'); });
+    if (btn) btn.classList.add('active');
+  };
+
+  window.toggleCompact = function(on) {
+    document.querySelector('.sidebar').classList.toggle('compact', on);
+    localStorage.setItem('meowmood_compact', on ? '1' : '');
+  };
+
+  // ── Restore saved preferences on load ──
+  var savedTheme  = localStorage.getItem('meowmood_theme')  || 'solar-amber';
+  var savedAccent = localStorage.getItem('meowmood_accent');
+  var savedCompact = localStorage.getItem('meowmood_compact');
+
+  // Apply theme
+  if (THEMES[savedTheme]) applyThemeVars(THEMES[savedTheme]);
+  var activeThemeBtn = document.querySelector('.theme-btn[data-theme="'+savedTheme+'"]');
+  if (activeThemeBtn) activeThemeBtn.classList.add('active');
+
+  // Apply accent
+  if (savedAccent) {
+    document.documentElement.style.setProperty('--cyan', savedAccent);
+    document.documentElement.style.setProperty('--cyan2', savedAccent);
+    var activeAccentBtn = document.querySelector('.accent-btn[data-accent="'+savedAccent+'"]');
+    if (activeAccentBtn) activeAccentBtn.classList.add('active');
+  } else {
+    var defaultAccent = document.querySelector('.accent-btn[data-accent="#00e5ff"]');
+    if (defaultAccent) defaultAccent.classList.add('active');
+  }
+
+  // Apply compact
+  if (savedCompact) {
+    document.querySelector('.sidebar').classList.add('compact');
+    var compactCb = document.getElementById('toggleCompactSidebar');
+    if (compactCb) compactCb.checked = true;
+  }
+
+})();
+</script>
+{% endblock %}

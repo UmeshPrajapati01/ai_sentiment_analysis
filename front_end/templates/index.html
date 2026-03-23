@@ -1,0 +1,620 @@
+{% extends "base.html" %}
+{% block title %}MeowMood | AI-Powered Cat Emotion Recognition{% endblock %}
+{% block page_id %}landing{% endblock %}
+
+{% block body %}
+<!-- NAVBAR -->
+<nav class="navbar" id="mainNavbar" role="navigation" aria-label="Main navigation">
+  <div class="container">
+    <a href="{{ url_for('home') }}" class="nav-logo" aria-label="MeowMood Home">
+      <div class="logo-mark">🐱</div>
+      <div class="logo-text">
+        <span class="logo-name">Meow<span class="mood">Mood</span></span>
+      </div>
+    </a>
+    <nav class="nav-links" id="navLinks">
+      <a href="#featuresSection">Features</a>
+      <a href="#videoSection">How It Works</a>
+      <a href="#gallerySection">Gallery</a>
+      <a href="{{ url_for('login') }}">Login</a>
+      <a href="{{ url_for('register') }}" class="btn btn-primary btn-sm">Get Started →</a>
+    </nav>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="heroSection">
+  <div class="hero-grid"></div>
+  <div class="hero-particles" id="heroParticles" aria-hidden="true"></div>
+  <div class="container">
+    <div class="hero-inner">
+      <div class="hero-content">
+        <div class="hero-badge anim-down d1">
+          <span class="dot"></span>
+          AI-Powered Cat Emotion Recognition
+        </div>
+        <h1 class="anim-up d1">
+          Understand Every<br><span style="color:#fff;">Meow</span> <span style="color:rgba(255,255,255,0.7);">&</span> <span style="color:#ff6b00;">Mood</span>
+        </h1>
+        <p class="hero-sub anim-up d2">
+          MeowMood uses deep learning to decode your cat's emotions from photos and sounds — in real time, with stunning accuracy.
+        </p>
+        <div class="hero-actions anim-up d3">
+          <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">Start Free</a>
+          <a href="#videoSection" class="btn btn-ghost btn-lg">&#9654; &nbsp;See It Work</a>
+        </div>
+        <div class="hero-stats anim-up d4">
+          <div><div class="hero-stat-num" data-count="12500">12500</div><div class="hero-stat-label">Cat Analyses</div></div>
+          <div><div class="hero-stat-num" data-count="98">98</div><div class="hero-stat-label">% Accuracy</div></div>
+          <div><div class="hero-stat-num" data-count="7">7</div><div class="hero-stat-label">Emotions Detected</div></div>
+        </div>
+      </div>
+      <div class="hero-visual anim-scale d2">
+        <div class="hero-card">
+          <!-- Video with scan line animation -->
+          <div class="hero-video-wrap">
+            <video autoplay muted loop playsinline preload="metadata">
+              <source src="{{ url_for('serve_media', filename='close-up-of-a-fluffy-cat-sitting-on-a-dark-surface.mp4') }}" type="video/mp4">
+            </video>
+            <!-- Scan line -->
+            <div class="hero-scan-line"></div>
+            <!-- Corner brackets -->
+            <div class="hero-corner tl"></div>
+            <div class="hero-corner tr"></div>
+            <div class="hero-corner bl"></div>
+            <div class="hero-corner br"></div>
+            <!-- Top badge -->
+            <div class="hero-video-overlay">
+              <span class="hero-live-badge"><span class="live-pulse"></span> MeowMood AI</span>
+              <span class="hero-conf-badge">92% conf.</span>
+            </div>
+          </div>
+          <!-- Emotion result panel -->
+          <div class="hero-result-panel">
+            <div class="hero-result-top">
+              <div class="hero-result-emotion">
+                <span style="font-size:1.1rem;line-height:1;">●</span>
+                <div>
+                  <div style="font-weight:800;font-size:0.95rem;color:#f1f5f9;">Happy</div>
+                  <div style="font-size:0.7rem;color:#94a3b8;">Primary emotion</div>
+                </div>
+              </div>
+              <div class="hero-conf-ring">
+                <svg viewBox="0 0 36 36" width="52" height="52">
+                  <circle cx="18" cy="18" r="15.9" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="3"/>
+                  <circle cx="18" cy="18" r="15.9" fill="none" stroke="#ffc200" stroke-width="3"
+                    stroke-dasharray="92 100" stroke-dashoffset="25" stroke-linecap="round"/>
+                </svg>
+                <span class="hero-conf-pct">92%</span>
+              </div>
+            </div>
+            <!-- Emotion bars -->
+            <div class="hero-emo-bars">
+              <div class="hero-emo-bar-row">
+                <span>Happy</span>
+                <div class="hero-bar-track"><div class="hero-bar-fill" style="width:92%;background:linear-gradient(90deg,#10b981,#34d399);"></div></div>
+                <span class="hero-bar-pct">92%</span>
+              </div>
+              <div class="hero-emo-bar-row">
+                <span>Curious</span>
+                <div class="hero-bar-track"><div class="hero-bar-fill" style="width:61%;background:linear-gradient(90deg,#00e5ff,#67e8f9);animation-delay:0.15s"></div></div>
+                <span class="hero-bar-pct">61%</span>
+              </div>
+              <div class="hero-emo-bar-row">
+                <span>Relaxed</span>
+                <div class="hero-bar-track"><div class="hero-bar-fill" style="width:44%;background:linear-gradient(90deg,#a855f7,#c084fc);animation-delay:0.3s"></div></div>
+                <span class="hero-bar-pct">44%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features-section" id="featuresSection">
+  <div class="container">
+    <div class="reveal" style="text-align:center;">
+      <div class="section-label">Core Capabilities</div>
+      <h2 class="section-title">Why <span style="color:#fff;">Meow</span><span style="color:#ff6b00;">Mood?</span></h2>
+      <p class="section-desc" style="margin:0 auto;">Understanding your cat's emotions has never been this precise or this fast.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card reveal" style="transition-delay:0.05s;">
+        <div class="feat-top">
+          <span class="feat-badge" style="background:rgba(0,229,255,0.08);color:#00e5ff;border-color:rgba(0,229,255,0.2);">CNN Model</span>
+        </div>
+        <h3>Emotion Detection</h3>
+        <p>Upload a photo and our CNN identifies happiness, fear, curiosity, anger and more in under 2 seconds.</p>
+        <div class="feat-stat-row">
+          <div class="feat-stat"><span class="feat-stat-val" style="color:#00e5ff;">92%</span><span class="feat-stat-lbl">Accuracy</span></div>
+          <div class="feat-stat"><span class="feat-stat-val" style="color:#00e5ff;">&lt;2s</span><span class="feat-stat-lbl">Response</span></div>
+          <div class="feat-stat"><span class="feat-stat-val" style="color:#00e5ff;">15+</span><span class="feat-stat-lbl">Emotions</span></div>
+        </div>
+        <div class="feat-bar-strip" style="background:linear-gradient(90deg,#00e5ff,#67e8f9);"></div>
+      </div>
+      <div class="feature-card reveal" style="transition-delay:0.15s;">
+        <div class="feat-top">
+          <span class="feat-badge" style="background:rgba(168,85,247,0.08);color:#a855f7;border-color:rgba(168,85,247,0.2);">Audio AI</span>
+        </div>
+        <h3>Vocal Analysis</h3>
+        <p>Upload an audio clip of your cat's meow or hiss. Our model decodes the emotional state behind every sound.</p>
+        <div class="feat-stat-row">
+          <div class="feat-stat"><span class="feat-stat-val" style="color:#a855f7;">87%</span><span class="feat-stat-lbl">Accuracy</span></div>
+          <div class="feat-stat"><span class="feat-stat-val" style="color:#a855f7;">MP3/WAV</span><span class="feat-stat-lbl">Formats</span></div>
+          <div class="feat-stat"><span class="feat-stat-val" style="color:#a855f7;">Mel-Spec</span><span class="feat-stat-lbl">Features</span></div>
+        </div>
+        <div class="feat-bar-strip" style="background:linear-gradient(90deg,#a855f7,#c084fc);"></div>
+      </div>
+      <div class="feature-card reveal" style="transition-delay:0.25s;">
+        <div class="feat-top">
+          <span class="feat-badge" style="background:rgba(236,72,153,0.08);color:#ec4899;border-color:rgba(236,72,153,0.2);">Multimodal</span>
+        </div>
+        <h3>Fusion Mode</h3>
+        <p>Combine image + audio together for a deeper, multi-modal emotion reading with higher confidence.</p>
+        <div class="feat-stat-row">
+          <div class="feat-stat"><span class="feat-stat-val" style="color:#ec4899;">2-in-1</span><span class="feat-stat-lbl">Inputs</span></div>
+          <div class="feat-stat"><span class="feat-stat-val" style="color:#ec4899;">+12%</span><span class="feat-stat-lbl">Confidence</span></div>
+          <div class="feat-stat"><span class="feat-stat-val" style="color:#ec4899;">Unique</span><span class="feat-stat-lbl">Feature</span></div>
+        </div>
+        <div class="feat-bar-strip" style="background:linear-gradient(90deg,#ec4899,#f472b6);"></div>
+      </div>
+      <div class="feature-card reveal" style="transition-delay:0.05s;">
+        <div class="feat-top">
+          <span class="feat-badge" style="background:rgba(16,185,129,0.08);color:#10b981;border-color:rgba(16,185,129,0.2);">Analytics</span>
+        </div>
+        <h3>Emotion Tracking</h3>
+        <p>Monitor your cat's emotional patterns over time with interactive charts and detailed history logs.</p>
+        <div class="feat-stat-row">
+          <div class="feat-stat"><span class="feat-stat-val" style="color:#10b981;">6</span><span class="feat-stat-lbl">Chart Types</span></div>
+          <div class="feat-stat"><span class="feat-stat-val" style="color:#10b981;">30d</span><span class="feat-stat-lbl">History</span></div>
+          <div class="feat-stat"><span class="feat-stat-val" style="color:#10b981;">CSV</span><span class="feat-stat-lbl">Export</span></div>
+        </div>
+        <div class="feat-bar-strip" style="background:linear-gradient(90deg,#10b981,#34d399);"></div>
+      </div>
+      <div class="feature-card reveal" style="transition-delay:0.15s;">
+        <div class="feat-top">
+          <span class="feat-badge" style="background:rgba(245,158,11,0.08);color:#f59e0b;border-color:rgba(245,158,11,0.2);">Smart AI</span>
+        </div>
+        <h3>AI Insights</h3>
+        <p>Receive actionable insights based on emotional trends to improve your cat's well-being and happiness.</p>
+        <div class="feat-stat-row">
+          <div class="feat-stat"><span class="feat-stat-val" style="color:#f59e0b;">Live</span><span class="feat-stat-lbl">Updates</span></div>
+          <div class="feat-stat"><span class="feat-stat-val" style="color:#f59e0b;">Trend</span><span class="feat-stat-lbl">Analysis</span></div>
+          <div class="feat-stat"><span class="feat-stat-val" style="color:#f59e0b;">Tips</span><span class="feat-stat-lbl">Included</span></div>
+        </div>
+        <div class="feat-bar-strip" style="background:linear-gradient(90deg,#f59e0b,#fbbf24);"></div>
+      </div>
+      <div class="feature-card reveal" style="transition-delay:0.25s;">
+        <div class="feat-top">
+          <span class="feat-badge" style="background:rgba(99,102,241,0.08);color:#818cf8;border-color:rgba(99,102,241,0.2);">Encrypted</span>
+        </div>
+        <h3>Private &amp; Secure</h3>
+        <p>Your data is encrypted and private. We never share your cat's data with anyone, ever.</p>
+        <div class="feat-stat-row">
+          <div class="feat-stat"><span class="feat-stat-val" style="color:#818cf8;">AES-256</span><span class="feat-stat-lbl">Encryption</span></div>
+          <div class="feat-stat"><span class="feat-stat-val" style="color:#818cf8;">0</span><span class="feat-stat-lbl">Data Shared</span></div>
+          <div class="feat-stat"><span class="feat-stat-val" style="color:#818cf8;">GDPR</span><span class="feat-stat-lbl">Ready</span></div>
+        </div>
+        <div class="feat-bar-strip" style="background:linear-gradient(90deg,#6366f1,#818cf8);"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="video-section" id="videoSection">
+  <div class="container">
+    <div style="text-align:center;" class="reveal">
+      <div class="section-label">How It Works</div>
+      <h2 class="section-title">From Upload to <span class="hl">Emotion Result</span></h2>
+      <p class="section-desc" style="margin:0 auto;margin-top:12px;">Four simple steps — powered by deep learning, Mel-spectrograms, and multi-modal fusion.</p>
+    </div>
+
+    <!-- Step pipeline -->
+    <div class="hiw-pipeline reveal" style="margin-top:60px;">
+
+      <!-- Step 1 -->
+      <div class="hiw-step">
+        <div class="hiw-step-num" style="background:linear-gradient(135deg,#00e5ff,#0ea5e9);">01</div>
+        <div class="hiw-connector"></div>
+        <div class="hiw-step-card" style="border-color:rgba(0,229,255,0.2);">
+          <h4>Upload Your File</h4>
+          <p>Drop a cat photo (PNG/JPG) or audio clip (MP3/WAV) — or both for Fusion Mode.</p>
+          <div class="hiw-chips">
+            <span class="hiw-chip" style="color:#00e5ff;border-color:rgba(0,229,255,0.2);">PNG / JPG</span>
+            <span class="hiw-chip" style="color:#00e5ff;border-color:rgba(0,229,255,0.2);">MP3 / WAV</span>
+            <span class="hiw-chip" style="color:#00e5ff;border-color:rgba(0,229,255,0.2);">Drag & Drop</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="hiw-step">
+        <div class="hiw-step-num" style="background:linear-gradient(135deg,#a855f7,#7c3aed);">02</div>
+        <div class="hiw-connector"></div>
+        <div class="hiw-step-card" style="border-color:rgba(168,85,247,0.2);">
+          <h4>AI Feature Extraction</h4>
+          <p>Image → ResNet CNN extracts facial geometry. Audio → Mel-spectrogram captures vocal patterns.</p>
+          <div class="hiw-chips">
+            <span class="hiw-chip" style="color:#a855f7;border-color:rgba(168,85,247,0.2);">ResNet CNN</span>
+            <span class="hiw-chip" style="color:#a855f7;border-color:rgba(168,85,247,0.2);">Mel-Spec</span>
+            <span class="hiw-chip" style="color:#a855f7;border-color:rgba(168,85,247,0.2);">64×64 Input</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="hiw-step">
+        <div class="hiw-step-num" style="background:linear-gradient(135deg,#ec4899,#db2777);">03</div>
+        <div class="hiw-connector"></div>
+        <div class="hiw-step-card" style="border-color:rgba(236,72,153,0.2);">
+          <h4>Fusion &amp; Classification</h4>
+          <p>Both models vote — if they agree, confidence spikes. If not, results are merged into a fusion label.</p>
+          <div class="hiw-chips">
+            <span class="hiw-chip" style="color:#ec4899;border-color:rgba(236,72,153,0.2);">Softmax</span>
+            <span class="hiw-chip" style="color:#ec4899;border-color:rgba(236,72,153,0.2);">Multi-modal</span>
+            <span class="hiw-chip" style="color:#ec4899;border-color:rgba(236,72,153,0.2);">+12% conf.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="hiw-step">
+        <div class="hiw-step-num" style="background:linear-gradient(135deg,#10b981,#059669);">04</div>
+        <div class="hiw-connector" style="display:none;"></div>
+        <div class="hiw-step-card" style="border-color:rgba(16,185,129,0.2);">
+          <h4>Result &amp; Tracking</h4>
+          <p>Emotion label + confidence score returned instantly. Saved to your history and dashboard charts.</p>
+          <div class="hiw-chips">
+            <span class="hiw-chip" style="color:#10b981;border-color:rgba(16,185,129,0.2);">Confidence %</span>
+            <span class="hiw-chip" style="color:#10b981;border-color:rgba(16,185,129,0.2);">History Log</span>
+            <span class="hiw-chip" style="color:#10b981;border-color:rgba(16,185,129,0.2);">Dashboard</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Demo video below pipeline -->
+    <div class="hiw-video-wrap reveal" style="margin-top:56px;">
+      <div class="hiw-video-label">
+        <span class="live-pulse" style="width:8px;height:8px;"></span> Live Demo
+      </div>
+      <div class="video-frame" style="max-width:780px;margin:0 auto;aspect-ratio:16/9;">
+        <video autoplay muted loop playsinline id="mainDemoVideo">
+          <source src="{{ url_for('serve_media', filename='futuristic-ai-powered-interface-video-featuring-a- (1).mp4') }}" type="video/mp4">
+        </video>
+        <div class="play-overlay" id="playOverlay" role="button" aria-label="Play/Pause demo video">
+          <button class="play-btn" id="playPauseBtn" aria-label="Toggle playback">⏸</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section class="gallery-section" id="gallerySection">
+  <div class="container">
+    <div style="text-align:center;" class="reveal">
+      <div class="section-label">Live Demos</div>
+      <h2 class="section-title">Emotion <span class="hl">Episodes</span></h2>
+      <p class="section-desc" style="margin:0 auto;">Real cat behavior clips — watch the AI read each emotion in real time.</p>
+    </div>
+
+    <div class="gallery-masonry reveal" style="margin-top:56px;">
+
+      <!-- Featured large card -->
+      <div class="gallery-featured">
+        <video autoplay muted loop playsinline><source src="{{ url_for('serve_media', filename='a-happy-playful-kitten-with-ears-perked-up-bright-.mp4') }}" type="video/mp4"></video>
+        <!-- Scan corners -->
+        <div class="gc-corner gc-tl"></div><div class="gc-corner gc-tr"></div>
+        <div class="gc-corner gc-bl"></div><div class="gc-corner gc-br"></div>
+        <!-- Top HUD -->
+        <div class="gc-hud-top">
+          <span class="gc-live"><span class="live-pulse"></span>Analyzing</span>
+          <span class="gc-model-tag">Image CNN</span>
+        </div>
+        <!-- Bottom result panel -->
+        <div class="gc-result-panel">
+          <div class="gc-emotion-row">
+            <span style="font-size:2rem;line-height:1;">●</span>
+            <div>
+              <div class="gc-emotion-name">Happy</div>
+              <div class="gc-emotion-sub">Primary detection · 94% confidence</div>
+            </div>
+            <div class="gc-conf-pill" style="background:rgba(16,185,129,0.15);border-color:rgba(16,185,129,0.3);color:#10b981;">94%</div>
+          </div>
+          <div class="gc-bars">
+            <div class="gc-bar-row"><span>Happy</span><div class="gc-bar-track"><div class="gc-bar-fill" style="width:94%;background:linear-gradient(90deg,#10b981,#34d399);"></div></div><span>94%</span></div>
+            <div class="gc-bar-row"><span>Curious</span><div class="gc-bar-track"><div class="gc-bar-fill" style="width:58%;background:linear-gradient(90deg,#ffc200,#ffd966);"></div></div><span>58%</span></div>
+            <div class="gc-bar-row"><span>Relaxed</span><div class="gc-bar-track"><div class="gc-bar-fill" style="width:32%;background:linear-gradient(90deg,#ff6b00,#ffa040);"></div></div><span>32%</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="gallery-small-card">
+        <video autoplay muted loop playsinline><source src="{{ url_for('serve_media', filename='a-cat-with-wide-alert-eyes-and-forward-pointing-wh.mp4') }}" type="video/mp4"></video>
+        <div class="gc-corner gc-tl"></div><div class="gc-corner gc-tr"></div>
+        <div class="gc-hud-top">
+          <span class="gc-live"><span class="live-pulse"></span>Analyzing</span>
+          <span class="gc-model-tag" style="border-color:rgba(255,194,0,0.3);color:#ffc200;">Image CNN</span>
+        </div>
+        <div class="gc-small-overlay">
+          <div class="gc-small-emotion">
+            <span style="font-size:1.4rem;line-height:1;">●</span>
+            <div>
+              <div class="gc-emotion-name" style="font-size:0.95rem;">Curious</div>
+              <div class="gc-emotion-sub">Whiskers alert · wide pupils</div>
+            </div>
+            <div class="gc-conf-pill" style="background:rgba(255,194,0,0.12);border-color:rgba(255,194,0,0.3);color:#ffc200;">87%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="gallery-small-card">
+        <video autoplay muted loop playsinline><source src="{{ url_for('serve_media', filename='a-cat-lying-on-a-cozy-surface-eyes-half-closed-doi.mp4') }}" type="video/mp4"></video>
+        <div class="gc-corner gc-tl"></div><div class="gc-corner gc-tr"></div>
+        <div class="gc-hud-top">
+          <span class="gc-live"><span class="live-pulse"></span>Analyzing</span>
+          <span class="gc-model-tag" style="border-color:rgba(255,107,0,0.3);color:#ff6b00;">Image CNN</span>
+        </div>
+        <div class="gc-small-overlay">
+          <div class="gc-small-emotion">
+            <span style="font-size:1.4rem;line-height:1;">●</span>
+            <div>
+              <div class="gc-emotion-name" style="font-size:0.95rem;">Relaxed</div>
+              <div class="gc-emotion-sub">Slow blink · soft posture</div>
+            </div>
+            <div class="gc-conf-pill" style="background:rgba(255,107,0,0.12);border-color:rgba(255,107,0,0.3);color:#ff6b00;">91%</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- CTA below gallery -->
+    <div style="text-align:center;margin-top:48px;" class="reveal">
+      <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">Analyze Your Cat Free</a>
+      <p style="margin-top:14px;font-size:0.82rem;color:rgba(255,255,255,0.3);">No credit card required · 20 free analyses on signup</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials-section" id="testimonialsSection">
+  <div class="container">
+    <div style="text-align:center;" class="reveal">
+      <div class="section-label">Cat Lover Stories</div>
+      <h2 class="section-title">Trusted by <span class="hl">Cat Parents</span></h2>
+      <p class="section-desc" style="margin:0 auto;margin-top:10px;">Real stories from real cat lovers around the world.</p>
+    </div>
+
+    <!-- Carousel wrapper -->
+    <div class="t-carousel reveal" style="margin-top:52px;">
+      <div class="t-track" id="tTrack">
+
+        <!-- Slide 1 -->
+        <div class="t-slide">
+          <div class="testimonial-card">
+            <div class="t-quote-icon">"</div>
+            <div class="t-stars">★★★★★</div>
+            <p class="t-text">I never knew my cat Mochi was anxious until MeowMood showed me the pattern. We fixed her environment and she's so much happier now!</p>
+            <div class="t-author"><div class="t-avatar" style="background:rgba(0,229,255,0.1);">🐱</div><div><div class="t-name">Priya Sharma</div><div class="t-role">Cat Mom · Bangalore</div></div><div class="t-badge" style="color:#00e5ff;border-color:rgba(0,229,255,0.2);">Image AI</div></div>
+          </div>
+          <div class="testimonial-card">
+            <div class="t-quote-icon">"</div>
+            <div class="t-stars">★★★★★</div>
+            <p class="t-text">The audio analysis is incredible. It correctly identified that my cat's vocalization was fear-based. I'm now more attentive to her needs.</p>
+            <div class="t-author"><div class="t-avatar" style="background:rgba(168,85,247,0.1);">😺</div><div><div class="t-name">James Mwangi</div><div class="t-role">Pet Enthusiast · Nairobi</div></div><div class="t-badge" style="color:#a855f7;border-color:rgba(168,85,247,0.2);">Audio AI</div></div>
+          </div>
+          <div class="testimonial-card">
+            <div class="t-quote-icon">"</div>
+            <div class="t-stars">★★★★★</div>
+            <p class="t-text">The fusion mode blew my mind — combining photo and audio gave a much more accurate reading of my rescue cat's emotional state.</p>
+            <div class="t-author"><div class="t-avatar" style="background:rgba(236,72,153,0.1);">😸</div><div><div class="t-name">Sofia Andrade</div><div class="t-role">Veterinary Nurse · São Paulo</div></div><div class="t-badge" style="color:#ec4899;border-color:rgba(236,72,153,0.2);">Fusion</div></div>
+          </div>
+        </div>
+
+        <!-- Slide 2 -->
+        <div class="t-slide">
+          <div class="testimonial-card">
+            <div class="t-quote-icon">"</div>
+            <div class="t-stars">★★★★★</div>
+            <p class="t-text">My vet was impressed when I showed her the emotion trend charts. She said it's the most useful tool she's seen for understanding feline stress.</p>
+            <div class="t-author"><div class="t-avatar" style="background:rgba(16,185,129,0.1);">🐾</div><div><div class="t-name">Aiko Tanaka</div><div class="t-role">Cat Breeder · Tokyo</div></div><div class="t-badge" style="color:#10b981;border-color:rgba(16,185,129,0.2);">Analytics</div></div>
+          </div>
+          <div class="testimonial-card">
+            <div class="t-quote-icon">"</div>
+            <div class="t-stars">★★★★★</div>
+            <p class="t-text">I used MeowMood to track my cat's mood after moving to a new apartment. The data helped me understand his adjustment period perfectly.</p>
+            <div class="t-author"><div class="t-avatar" style="background:rgba(245,158,11,0.1);">😾</div><div><div class="t-name">Lucas Ferreira</div><div class="t-role">Software Dev · Lisbon</div></div><div class="t-badge" style="color:#f59e0b;border-color:rgba(245,158,11,0.2);">Tracking</div></div>
+          </div>
+          <div class="testimonial-card">
+            <div class="t-quote-icon">"</div>
+            <div class="t-stars">★★★★★</div>
+            <p class="t-text">As a shelter volunteer, I use MeowMood to assess incoming cats. It helps us match them with the right adopters based on their emotional profile.</p>
+            <div class="t-author"><div class="t-avatar" style="background:rgba(99,102,241,0.1);">🙀</div><div><div class="t-name">Amara Diallo</div><div class="t-role">Shelter Volunteer · Dakar</div></div><div class="t-badge" style="color:#818cf8;border-color:rgba(99,102,241,0.2);">Fusion</div></div>
+          </div>
+        </div>
+
+        <!-- Slide 3 -->
+        <div class="t-slide">
+          <div class="testimonial-card">
+            <div class="t-quote-icon">"</div>
+            <div class="t-stars">★★★★★</div>
+            <p class="t-text">The confidence score feature is brilliant. When it says 94% Happy, I trust it. My cat's tail language now makes so much more sense to me.</p>
+            <div class="t-author"><div class="t-avatar" style="background:rgba(0,229,255,0.1);">😸</div><div><div class="t-name">Mei Lin</div><div class="t-role">Cat Parent · Shanghai</div></div><div class="t-badge" style="color:#00e5ff;border-color:rgba(0,229,255,0.2);">Image AI</div></div>
+          </div>
+          <div class="testimonial-card">
+            <div class="t-quote-icon">"</div>
+            <div class="t-stars">★★★★★</div>
+            <p class="t-text">I was skeptical at first but the audio model correctly identified my cat's "I'm hungry" meow vs her "I'm scared" cry. Genuinely impressive.</p>
+            <div class="t-author"><div class="t-avatar" style="background:rgba(168,85,247,0.1);">🔍</div><div><div class="t-name">Ravi Patel</div><div class="t-role">Data Scientist · Mumbai</div></div><div class="t-badge" style="color:#a855f7;border-color:rgba(168,85,247,0.2);">Audio AI</div></div>
+          </div>
+          <div class="testimonial-card">
+            <div class="t-quote-icon">"</div>
+            <div class="t-stars">★★★★★</div>
+            <p class="t-text">The dashboard charts are beautiful and actually useful. I can see my cat is most relaxed on weekends — turns out she loves when I work from home!</p>
+            <div class="t-author"><div class="t-avatar" style="background:rgba(236,72,153,0.1);">😺</div><div><div class="t-name">Emma Clarke</div><div class="t-role">Designer · London</div></div><div class="t-badge" style="color:#ec4899;border-color:rgba(236,72,153,0.2);">Analytics</div></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Controls -->
+      <div class="t-controls">
+        <button class="t-arrow" id="tPrev" aria-label="Previous">‹</button>
+        <div class="t-dots" id="tDots">
+          <button class="t-dot active" data-idx="0"></button>
+          <button class="t-dot" data-idx="1"></button>
+          <button class="t-dot" data-idx="2"></button>
+        </div>
+        <button class="t-arrow" id="tNext" aria-label="Next">›</button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="ctaSection">
+  <div class="container">
+    <div class="cta-card reveal">
+      <!-- Background glow orbs -->
+      <div class="cta-orb cta-orb1"></div>
+      <div class="cta-orb cta-orb2"></div>
+      <!-- Grid overlay -->
+      <div class="cta-grid-bg"></div>
+
+      <div class="cta-inner">
+        <!-- Left: text + buttons -->
+        <div class="cta-content">
+          <div class="cta-label">
+            <span class="live-pulse"></span> Free to Start
+          </div>
+          <h2>Ready to Understand<br><span class="hl">Your Cat?</span></h2>
+          <p>Join thousands of cat lovers deepening their bond every day. No credit card needed — 20 free analyses on signup.</p>
+          <div class="cta-buttons">
+            <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">Start Free Today</a>
+            <a href="{{ url_for('login') }}" class="btn btn-ghost btn-lg">Already a member? Log in →</a>
+          </div>
+          <!-- Trust row -->
+          <div class="cta-trust-row">
+            <span>No credit card</span>
+            <span>20 free analyses</span>
+            <span>Cancel anytime</span>
+          </div>
+        </div>
+
+        <!-- Right: floating stat cards -->
+        <div class="cta-stats-visual">
+          <div class="cta-stat-card" style="top:0;right:20px;animation-delay:0s;">
+            <div class="cta-stat-icon" style="background:rgba(0,229,255,0.1);font-size:1.1rem;">+</div>
+            <div>
+              <div class="cta-stat-val" style="color:#00e5ff;">12,500+</div>
+              <div class="cta-stat-lbl">Cat Analyses Done</div>
+            </div>
+          </div>
+          <div class="cta-stat-card" style="top:110px;right:0;animation-delay:0.4s;">
+            <div class="cta-stat-icon" style="background:rgba(168,85,247,0.1);">🎯</div>
+            <div>
+              <div class="cta-stat-val" style="color:#a855f7;">92%</div>
+              <div class="cta-stat-lbl">Image Accuracy</div>
+            </div>
+          </div>
+          <div class="cta-stat-card" style="top:220px;right:30px;animation-delay:0.8s;">
+            <div class="cta-stat-icon" style="background:rgba(16,185,129,0.1);">⚡</div>
+            <div>
+              <div class="cta-stat-val" style="color:#10b981;">&lt;2s</div>
+              <div class="cta-stat-lbl">Analysis Speed</div>
+            </div>
+          </div>
+          <div class="cta-stat-card" style="top:330px;right:10px;animation-delay:1.2s;">
+            <div class="cta-stat-icon" style="background:rgba(236,72,153,0.1);font-size:1.1rem;">⇄</div>
+            <div>
+              <div class="cta-stat-val" style="color:#ec4899;">Fusion</div>
+              <div class="cta-stat-lbl">Image + Audio Mode</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <h3>🐱 <span style="font-family:var(--f-display);font-weight:800;"><span style="color:#fff;">Meow</span><span style="color:#ff6b00;">Mood</span></span></h3>
+        <p>AI-Powered Cat Emotion Recognition. Built by cat lovers, for cat lovers. Understand your companion better, every day.</p>
+      </div>
+      <div class="footer-col"><h4>Product</h4><a href="#featuresSection">Features</a><a href="#videoSection">How It Works</a><a href="#gallerySection">Gallery</a><a href="{{ url_for('register') }}">Get Started</a></div>
+      <div class="footer-col"><h4>Account</h4><a href="{{ url_for('login') }}">Login</a><a href="{{ url_for('register') }}">Register</a></div>
+      <div class="footer-col"><h4>Company</h4><a href="#">About</a><a href="#">Privacy Policy</a><a href="#">Terms of Use</a><a href="#">Contact</a></div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 MeowMood. Made with 💙 for cat lovers everywhere.</p>
+      <p>Powered by AI · Built with Flask · Purrs guaranteed 🐾</p>
+    </div>
+  </div>
+</footer>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  // Play/pause demo video
+  const video = document.getElementById('mainDemoVideo');
+  const btn = document.getElementById('playPauseBtn');
+  if (video && btn) {
+    btn.addEventListener('click', () => {
+      if (video.paused) { video.play(); btn.textContent = '⏸'; }
+      else { video.pause(); btn.textContent = '▶'; }
+    });
+  }
+
+  // Testimonials carousel
+  (function(){
+    var track = document.getElementById('tTrack');
+    var dots  = document.querySelectorAll('.t-dot');
+    var prev  = document.getElementById('tPrev');
+    var next  = document.getElementById('tNext');
+    if (!track) return;
+    var total = dots.length;
+    var cur = 0;
+    var timer;
+
+    function goTo(idx) {
+      cur = (idx + total) % total;
+      var slideW = track.parentElement.offsetWidth;
+      track.style.transform = 'translateX(-' + (cur * slideW) + 'px)';
+      dots.forEach(function(d,i){ d.classList.toggle('active', i === cur); });
+    }
+
+    function startAuto() {
+      clearInterval(timer);
+      timer = setInterval(function(){ goTo(cur + 1); }, 4000);
+    }
+
+    // Recalculate on resize
+    window.addEventListener('resize', function(){ goTo(cur); });
+
+    if (prev) prev.addEventListener('click', function(){ goTo(cur - 1); startAuto(); });
+    if (next) next.addEventListener('click', function(){ goTo(cur + 1); startAuto(); });
+    dots.forEach(function(d){ d.addEventListener('click', function(){ goTo(parseInt(d.dataset.idx)); startAuto(); }); });
+
+    startAuto();
+  })();
+</script>
+{% endblock %}
