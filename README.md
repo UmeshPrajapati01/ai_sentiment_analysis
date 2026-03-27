@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 🐱 MeowMood — AI Cat Emotion Recognition
 
 A multimodal AI system that recognizes cat emotions from **facial images** and **audio (meow sounds)**.  
@@ -160,3 +161,7 @@ See `backend/trained_modelimages/audio_model/classification_report.txt` for full
 - Cat sound emotion recognition — [JL-TFMSFNet, ScienceDirect](https://www.sciencedirect.com/science/article/abs/pii/S0957417424014878)
 - Data augmentation — [TensorFlow Docs](https://www.tensorflow.org/tutorials/images/data_augmentation)
 - MFCC audio features — librosa documentation
+=======
+# Development-of-an-AI-Based-Cat-Emotion-Recognition-System-Using-Facial-and-Vocal-Analysis
+The objective of this project is to develop an intelligent system capable of detecting cat emotions using both facial expressions and vocal sounds. The system is designed to help users understand pet behavior through AI-based analysis. The project aims to: • Build deep learning models for emotion detection • 
+>>>>>>> e43a8a482d5c9c82adb68d7dcafcef8fa2438dc6
