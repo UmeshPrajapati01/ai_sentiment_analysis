@@ -1,3 +1,4 @@
+--extra-index-url https://download.pytorch.org/whl/cpu
 # MeowMood — AI Cat Emotion Recognition
 # Install with: pip install -r requirements.txt
 
@@ -9,8 +10,8 @@ Flask-SQLAlchemy==3.1.1
 Werkzeug==3.1.6
 
 # Deep Learning — Vision
-torch==2.10.0
-torchvision==0.25.0
+torch==2.2.2+cpu
+torchvision==0.17.2+cpu
 
 # Deep Learning — Audio (SOTA path)
 tensorflow==2.16.2
