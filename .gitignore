@@ -55,3 +55,13 @@ training_log.txt
 !README.md
 !audio_labels.txt
 !classes.txt
+
+
+.venv/
+__pycache__/
+*.pyc
+uploads/
+server.log
+data/
+collected_data/
+distling_model/
