@@ -558,4 +558,12 @@ if __name__ == '__main__':
     print("  🐱 MeowMood - AI Cat Emotion Recognition")
     print("  🌐 http://127.0.0.1:5000")
     print("=" * 60)
-    app.run(debug=True, port=5000)
+    
+
+    import os
+
+app.run(
+    host="0.0.0.0",
+    port=int(os.environ.get("PORT", 5000)),
+    debug=True
+)
