@@ -65,3 +65,6 @@ server.log
 data/
 collected_data/
 distling_model/
+
+*.pth
+trained_modelimages/
