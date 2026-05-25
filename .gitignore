@@ -68,3 +68,5 @@ distling_model/
 
 *.pth
 trained_modelimages/
+
+!runtime.txt
