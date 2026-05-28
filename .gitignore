@@ -48,7 +48,7 @@ Thumbs.db
 # ── Project Metadata ──
 server.log
 training_log.txt
-*.png
+
 *.txt
 !requirements.txt
 !README.md
