@@ -20,9 +20,8 @@ colected_data/
 uploads/
 outputs/
 *.wav
-*.mp3
 *.npy
-*.mp4
+
 
 # ── Model Weights (Large Files) ──
 # Exclude heavy weights (keep logic and scalers if needed)
